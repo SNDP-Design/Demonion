@@ -16,6 +16,7 @@ interface ExportModalProps {
   videoElement: HTMLVideoElement | null;
   micStream: MediaStream | null;
   settings: EditorSettings;
+  onChangeSettings: (settings: Partial<EditorSettings>) => void;
   duration: number;
 }
 
@@ -26,6 +27,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   videoElement,
   micStream,
   settings,
+  onChangeSettings,
   duration
 }) => {
   const [exportState, setExportState] = useState<'idle' | 'rendering' | 'completed' | 'error'>('idle');
@@ -61,6 +63,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     }
 
     try {
+      // 1. Temporarily request 4K resolution buffer on canvas
+      onChangeSettings({ exportResolution: '4k' });
+
+      // 2. Wait a brief moment for React state and DOM resize to settle
+      await new Promise(r => setTimeout(r, 150));
+
       setExportState('rendering');
       setProgress(0);
       chunksRef.current = [];
@@ -186,7 +194,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
       const recorder = new MediaRecorder(outputStream, {
         mimeType: mimeType || undefined,
-        videoBitsPerSecond: 25000000 // 25 Mbps ultra-sharp high quality
+        videoBitsPerSecond: 40000000 // 40 Mbps ultra-sharp compressed 4K
       });
       recorderRef.current = recorder;
 
@@ -217,6 +225,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         videoElement.currentTime = originalTimeRef.current;
         videoElement.pause();
 
+        // Restore canvas resolution to standard 1080p
+        onChangeSettings({ exportResolution: '1080p' });
+
         setExportState('completed');
       };
 
@@ -245,6 +256,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     } catch (err: any) {
       console.error(err);
       setErrorMsg(err.message || 'An error occurred during video rendering.');
+      
+      // Restore canvas resolution to standard 1080p
+      onChangeSettings({ exportResolution: '1080p' });
+
       setExportState('error');
 
       // Reset audio context if failed
@@ -267,6 +282,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       videoElement.pause();
       videoElement.currentTime = originalTimeRef.current;
     }
+    // Restore canvas resolution to standard 1080p
+    onChangeSettings({ exportResolution: '1080p' });
+
     setExportState('idle');
   };
 

@@ -543,6 +543,7 @@ function App() {
         videoElement={editorVideoRef.current}
         micStream={micStream}
         settings={settings}
+        onChangeSettings={(updates) => setSettings({ ...settings, ...updates })}
         duration={duration}
       />
 

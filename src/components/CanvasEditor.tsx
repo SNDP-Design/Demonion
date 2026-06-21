@@ -25,28 +25,29 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   useEffect(() => {
     let width = 1920;
     let height = 1080;
+    const is4K = settings.exportResolution === '4k';
 
     switch (settings.aspectRatio) {
       case '16-9':
-        width = 1920;
-        height = 1080;
+        width = is4K ? 3840 : 1920;
+        height = is4K ? 2160 : 1080;
         break;
       case '9-16':
-        width = 1080;
-        height = 1920;
+        width = is4K ? 2160 : 1080;
+        height = is4K ? 3840 : 1920;
         break;
       case '1-1':
-        width = 1080;
-        height = 1080;
+        width = is4K ? 2160 : 1080;
+        height = is4K ? 2160 : 1080;
         break;
       case '4-3':
-        width = 1440;
-        height = 1080;
+        width = is4K ? 2880 : 1440;
+        height = is4K ? 2160 : 1080;
         break;
     }
 
     setCanvasDimensions({ width, height });
-  }, [settings.aspectRatio]);
+  }, [settings.aspectRatio, settings.exportResolution]);
 
   // Easing function for smooth zooms
   const ease = (u: number, type: 'linear' | 'ease-out' | 'ease-in-out' | 'smooth') => {

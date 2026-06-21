@@ -32,4 +32,5 @@ export interface EditorSettings {
   cameraBorderColor: string;
   trimStart: number; // in seconds
   trimEnd: number; // in seconds
+  exportResolution?: '1080p' | '4k';
 }
