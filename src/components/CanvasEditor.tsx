@@ -106,6 +106,10 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const cw = canvas.width;
       const ch = canvas.height;
 
+      // Enable high-quality image smoothing
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
       // 1. Draw Canvas Background
       ctx.clearRect(0, 0, cw, ch);
       

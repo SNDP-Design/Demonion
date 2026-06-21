@@ -60,7 +60,10 @@ function App() {
     const initWebcam = async () => {
       if (useWebcam && recordingState === 'idle') {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { width: { ideal: 1280 }, height: { ideal: 720 } }, 
+            audio: false 
+          });
           setWebcamStream(stream);
           if (webcamVideoRef.current) {
             webcamVideoRef.current.srcObject = stream;
@@ -90,7 +93,12 @@ function App() {
     try {
       // 1. Prompt screen grab
       const screenStream = await navigator.mediaDevices.getDisplayMedia({
-        video: { displaySurface: 'monitor' },
+        video: { 
+          displaySurface: 'monitor',
+          width: { ideal: 2560, max: 3840 },
+          height: { ideal: 1600, max: 2160 },
+          frameRate: { ideal: 60 }
+        },
         audio: true
       });
 
@@ -109,7 +117,9 @@ function App() {
       let activeWebcamStream: MediaStream | null = null;
       if (useWebcam) {
         try {
-          activeWebcamStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          activeWebcamStream = await navigator.mediaDevices.getUserMedia({ 
+            video: { width: { ideal: 1280 }, height: { ideal: 720 } } 
+          });
           setWebcamStream(activeWebcamStream);
           if (webcamVideoRef.current) {
             webcamVideoRef.current.srcObject = activeWebcamStream;
@@ -135,7 +145,8 @@ function App() {
             
             // Create recorder (we record screen stream video)
             const recorder = new MediaRecorder(screenStream, {
-              mimeType: 'video/webm;codecs=vp9'
+              mimeType: 'video/webm;codecs=vp9',
+              videoBitsPerSecond: 25000000 // 25 Mbps high quality screen capture
             });
             screenRecorderRef.current = recorder;
 

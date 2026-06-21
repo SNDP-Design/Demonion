@@ -186,7 +186,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
       const recorder = new MediaRecorder(outputStream, {
         mimeType: mimeType || undefined,
-        videoBitsPerSecond: 8000000 // 8 Mbps high quality
+        videoBitsPerSecond: 25000000 // 25 Mbps ultra-sharp high quality
       });
       recorderRef.current = recorder;
 
