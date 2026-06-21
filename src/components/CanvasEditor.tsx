@@ -275,7 +275,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       }
 
       // Draw Circular Webcam overlay inside the card (so it scale clips perfectly)
-      if (settings.cameraPosition !== 'none' && webcamElement && webcamElement.readyState >= 2) {
+      if (settings.cameraPosition !== 'none') {
         const r = settings.cameraSize / 2;
         const margin = 20;
         let cx = x0 + r + margin;
@@ -295,18 +295,36 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
         ctx.clip();
 
-        // Crop webcam square
-        const webW = webcamElement.videoWidth;
-        const webH = webcamElement.videoHeight;
-        const sq = Math.min(webW, webH);
-        const wsx = (webW - sq) / 2;
-        const wsy = (webH - sq) / 2;
+        if (webcamElement && webcamElement.readyState >= 2) {
+          // Crop webcam square
+          const webW = webcamElement.videoWidth;
+          const webH = webcamElement.videoHeight;
+          const sq = Math.min(webW, webH);
+          const wsx = (webW - sq) / 2;
+          const wsy = (webH - sq) / 2;
 
-        ctx.drawImage(
-          webcamElement,
-          wsx, wsy, sq, sq,
-          cx - r, cy - r, 2 * r, 2 * r
-        );
+          ctx.drawImage(
+            webcamElement,
+            wsx, wsy, sq, sq,
+            cx - r, cy - r, 2 * r, 2 * r
+          );
+        } else {
+          // Fallback: Draw a premium stylized gradient avatar preview
+          let camGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+          camGrad.addColorStop(0, '#8b5cf6'); // violet-500
+          camGrad.addColorStop(1, '#ec4899'); // pink-500
+          ctx.fillStyle = camGrad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Draw mock webcam camera silhouette icon
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.font = `bold ${Math.round(r * 0.4)}px Inter`;
+          ctx.fillText('CAM', cx, cy);
+        }
         ctx.restore();
 
         // Stroke Webcam Border
@@ -397,8 +415,10 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         onClick={handleCanvasClick}
         className="max-w-full max-h-full aspect-video rounded-xl shadow-2xl border border-glass bg-black cursor-crosshair transition-shadow hover:shadow-[0_0_50px_rgba(139,92,246,0.1)]"
         style={{
-          width: settings.aspectRatio === '16-9' ? '100%' : 'auto',
-          height: settings.aspectRatio === '9-16' ? '100%' : 'auto',
+          width: 'auto',
+          height: 'auto',
+          maxWidth: '100%',
+          maxHeight: '100%',
           aspectRatio: settings.aspectRatio.replace('-', '/')
         }}
       />

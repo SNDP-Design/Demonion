@@ -333,7 +333,7 @@ function App() {
           </div>
           <div>
             <h1 className="text-base font-extrabold tracking-tight bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
-              ScreenCharm
+              Screentor
             </h1>
             <p className="text-[10px] text-gray-500 font-semibold tracking-wider uppercase">Browser Studio</p>
           </div>

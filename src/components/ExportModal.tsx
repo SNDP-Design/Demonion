@@ -393,7 +393,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             <div className="flex flex-col gap-2.5 pt-2">
               <a 
                 href={downloadUrl} 
-                download={`screencharm-${Date.now()}.${exportExtension}`}
+                download={`screentor-${Date.now()}.${exportExtension}`}
                 className="glass-button justify-center py-3 active text-sm font-bold flex items-center gap-2"
               >
                 <Download size={16} /> Download Video
