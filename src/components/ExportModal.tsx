@@ -210,6 +210,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         const url = URL.createObjectURL(blob);
         setDownloadUrl(url);
 
+        // Trigger automatic download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `screentor-${Date.now()}.${extension}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
         // Format file size
         const sizeMb = blob.size / (1024 * 1024);
         setFileSize(`${sizeMb.toFixed(2)} MB`);
