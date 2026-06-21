@@ -268,7 +268,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillStyle = '#0a0d14';
         ctx.fillRect(x0, y0 + headerH, finalW, finalH);
         ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        ctx.font = 'bold 24px Outfit';
+        ctx.font = 'bold 24px Inter';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('Screen Recording Preview', x0 + finalW / 2, y0 + headerH + finalH / 2);
