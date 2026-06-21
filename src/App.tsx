@@ -48,6 +48,22 @@ function App() {
   const timerRef = useRef<any>(null);
   const [recTime, setRecTime] = useState(0);
 
+  // Callback ref states to ensure preview render loop updates when DOM elements mount
+  const [editorVideoEl, setEditorVideoEl] = useState<HTMLVideoElement | null>(null);
+  const [webcamVideoEl, setWebcamVideoEl] = useState<HTMLVideoElement | null>(null);
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const setEditorVideoRef = (el: HTMLVideoElement | null) => {
+    editorVideoRef.current = el;
+    setEditorVideoEl(el);
+  };
+
+  const setWebcamVideoRef = (el: HTMLVideoElement | null) => {
+    webcamVideoRef.current = el;
+    setWebcamVideoEl(el);
+  };
+
   // Auto clean blob url
   useEffect(() => {
     return () => {
@@ -144,8 +160,22 @@ function App() {
             recordedChunksRef.current = [];
             
             // Create recorder (we record screen stream video)
+            let recordMimeType = 'video/webm;codecs=vp9';
+            if (!MediaRecorder.isTypeSupported(recordMimeType)) {
+              recordMimeType = 'video/webm;codecs=vp8';
+            }
+            if (!MediaRecorder.isTypeSupported(recordMimeType)) {
+              recordMimeType = 'video/webm';
+            }
+            if (!MediaRecorder.isTypeSupported(recordMimeType)) {
+              recordMimeType = 'video/mp4;codecs=h264';
+            }
+            if (!MediaRecorder.isTypeSupported(recordMimeType)) {
+              recordMimeType = '';
+            }
+
             const recorder = new MediaRecorder(screenStream, {
-              mimeType: 'video/webm;codecs=vp9',
+              mimeType: recordMimeType || undefined,
               videoBitsPerSecond: 25000000 // 25 Mbps high quality screen capture
             });
             screenRecorderRef.current = recorder;
@@ -365,8 +395,8 @@ function App() {
 
       {/* Screen Elements for Feeds (Hidden in viewport) */}
       <video
-        ref={editorVideoRef}
-        src={videoSrc}
+        ref={setEditorVideoRef}
+        src={videoSrc || undefined}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleMetadata}
         style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0.001, pointerEvents: 'none', zIndex: -1000 }}
@@ -374,7 +404,7 @@ function App() {
         playsInline
       />
       <video
-        ref={webcamVideoRef}
+        ref={setWebcamVideoRef}
         style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0.001, pointerEvents: 'none', zIndex: -1000 }}
         autoPlay
         playsInline
@@ -504,8 +534,9 @@ function App() {
               />
               
               <CanvasEditor 
-                videoElement={editorVideoRef.current}
-                webcamElement={useWebcam ? webcamVideoRef.current : null}
+                canvasRef={canvasRef}
+                videoElement={editorVideoEl}
+                webcamElement={useWebcam ? webcamVideoEl : null}
                 settings={settings}
                 keyframes={keyframes}
                 currentTime={currentTime}
@@ -539,8 +570,8 @@ function App() {
       <ExportModal 
         isOpen={exportModalOpen}
         onClose={() => setExportModalOpen(false)}
-        canvasElement={document.querySelector('canvas')}
-        videoElement={editorVideoRef.current}
+        canvasElement={canvasRef.current}
+        videoElement={editorVideoEl}
         micStream={micStream}
         settings={settings}
         onChangeSettings={(updates) => setSettings({ ...settings, ...updates })}

@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import type { EditorSettings, ZoomKeyframe } from '../types';
 
 interface CanvasEditorProps {
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
   videoElement: HTMLVideoElement | null;
   webcamElement: HTMLVideoElement | null;
   settings: EditorSettings;
@@ -11,6 +12,7 @@ interface CanvasEditorProps {
 }
 
 export const CanvasEditor: React.FC<CanvasEditorProps> = ({
+  canvasRef,
   videoElement,
   webcamElement,
   settings,
@@ -18,9 +20,23 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   currentTime,
   onCanvasClick
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasDimensions, setCanvasDimensions] = useState({ width: 1920, height: 1080 });
+
+  // Refs for tracking values inside the high-frequency animation loop without restarting it
+  const settingsRef = useRef(settings);
+  const keyframesRef = useRef(keyframes);
+  const videoElementRef = useRef(videoElement);
+  const webcamElementRef = useRef(webcamElement);
+  const currentTimeRef = useRef(currentTime);
+
+  useEffect(() => {
+    settingsRef.current = settings;
+    keyframesRef.current = keyframes;
+    videoElementRef.current = videoElement;
+    webcamElementRef.current = webcamElement;
+    currentTimeRef.current = currentTime;
+  });
 
   useEffect(() => {
     let width = 1920;
@@ -58,12 +74,12 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   };
 
   // Interpolation logic for zooms
-  const getInterpolatedZoom = (t: number) => {
-    if (keyframes.length === 0) {
+  const getInterpolatedZoom = (t: number, kfs: ZoomKeyframe[]) => {
+    if (kfs.length === 0) {
       return { zoom: 1.0, x: 0.5, y: 0.5 };
     }
 
-    const sorted = [...keyframes].sort((a, b) => a.time - b.time);
+    const sorted = [...kfs].sort((a, b) => a.time - b.time);
     const nextIndex = sorted.findIndex(kf => t <= kf.time);
     
     if (nextIndex === -1) {
@@ -106,6 +122,12 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     const render = () => {
       const cw = canvas.width;
       const ch = canvas.height;
+
+      const settings = settingsRef.current;
+      const videoElement = videoElementRef.current;
+      const webcamElement = webcamElementRef.current;
+      const keyframes = keyframesRef.current;
+      const time = videoElement ? videoElement.currentTime : currentTimeRef.current;
 
       // Enable high-quality image smoothing
       ctx.imageSmoothingEnabled = true;
@@ -249,7 +271,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         const vWidth = videoElement.videoWidth || 1920;
         const vHeight = videoElement.videoHeight || 1080;
 
-        const zoomState = getInterpolatedZoom(currentTime);
+        const zoomState = getInterpolatedZoom(time, keyframes);
 
         const sw = vWidth / zoomState.zoom;
         const sh = vHeight / zoomState.zoom;
@@ -353,7 +375,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     animId = requestAnimationFrame(render);
 
     return () => cancelAnimationFrame(animId);
-  }, [videoElement, webcamElement, settings, keyframes, currentTime, canvasDimensions]);
+  }, [canvasRef, canvasDimensions]);
 
   // Click on Canvas handles setting keyframes
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
