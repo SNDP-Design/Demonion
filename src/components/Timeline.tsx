@@ -138,7 +138,7 @@ export const Timeline: React.FC<TimelineProps> = ({
               <button
                 key={rate}
                 onClick={() => onPlaybackRateChange(rate)}
-                className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all ${playbackRate === rate ? 'bg-violet-600/20 text-violet-400 border border-violet-500/30' : 'hover:bg-white/5 hover:text-white'}`}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all ${playbackRate === rate ? 'bg-violet-soft-20 text-violet-400 border border-violet-soft-30' : 'hover-bg-glass hover:text-white'}`}
               >
                 {rate}x
               </button>
@@ -149,7 +149,7 @@ export const Timeline: React.FC<TimelineProps> = ({
         <div className="flex items-center gap-4">
           <button
             onClick={onAddKeyframe}
-            className="flex items-center gap-1 text-[11px] font-semibold text-yellow-400 hover:text-yellow-300 transition-colors bg-yellow-500/10 border border-yellow-500/20 py-1.5 px-3 rounded-lg"
+            className="flex items-center gap-1 text-[11px] font-semibold text-yellow-400 hover:text-yellow-300 transition-colors badge-yellow py-1.5 px-3 rounded-lg"
           >
             <Plus size={12} /> Add Zoom Keyframe
           </button>

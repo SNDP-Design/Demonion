@@ -828,34 +828,112 @@ aside.sidebar {
   transform: translateX(14px);
 }
 
-/* Active Color Mappings (Tailwind equivalents) */
-.border-purple-500 {
+
+/* Active Color Mappings & Semantic CSS Utilities */
+.active-purple {
   border-color: #a855f7 !important;
+  background-color: rgba(168, 85, 247, 0.12) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.2) !important;
 }
-.bg-purple-500\/10 {
-  background-color: rgba(168, 85, 247, 0.1) !important;
-}
-.border-blue-500 {
+
+.active-blue {
   border-color: #3b82f6 !important;
+  background-color: rgba(59, 130, 246, 0.12) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.2) !important;
 }
-.bg-blue-500\/10 {
-  background-color: rgba(59, 130, 246, 0.1) !important;
-}
-.border-pink-500 {
+
+.active-pink {
   border-color: #ec4899 !important;
+  background-color: rgba(236, 72, 153, 0.08) !important;
+  box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.2), 0 0 12px rgba(236, 72, 153, 0.25) !important;
 }
-.ring-1 {
-  box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.2) !important;
+
+.bg-black-90 {
+  background-color: rgba(0, 0, 0, 0.9) !important;
 }
-.ring-pink-500\/25 {
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25) !important;
+
+.bg-black-80 {
+  background-color: rgba(0, 0, 0, 0.8) !important;
 }
-.hover\:bg-white\/5:hover {
+
+.bg-black-60 {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.bg-black-40 {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.bg-zinc-950-20 {
+  background-color: rgba(9, 9, 11, 0.2) !important;
+}
+
+.bg-white-5 {
   background-color: rgba(255, 255, 255, 0.05) !important;
 }
-.border-violet-500\/30 {
+
+.border-white-5 {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.border-white-10 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.shadow-violet-glow {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.25) !important;
+}
+
+.shadow-violet-soft {
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.1) !important;
+}
+
+.shadow-violet-glow-large {
+  box-shadow: 0 25px 60px -15px rgba(139, 92, 246, 0.3) !important;
+}
+
+.badge-violet {
+  background-color: rgba(139, 92, 246, 0.1) !important;
+  border: 1px solid rgba(139, 92, 246, 0.2) !important;
+}
+
+.icon-container-violet {
+  background-color: rgba(139, 92, 246, 0.1) !important;
+  color: #a78bfa !important;
+  border: 1px solid rgba(139, 92, 246, 0.2) !important;
+}
+
+.badge-amber {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+}
+
+.bg-violet-soft-20 {
+  background-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+.border-violet-soft-30 {
   border-color: rgba(139, 92, 246, 0.3) !important;
 }
-.border-yellow-500\/20 {
-  border-color: rgba(234, 179, 8, 0.2) !important;
+
+.badge-yellow {
+  background-color: rgba(234, 179, 8, 0.1) !important;
+  border: 1px solid rgba(234, 179, 8, 0.2) !important;
 }
+
+.hover-bg-glass:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.recorder-card {
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.recorder-card:hover {
+  border-color: rgba(139, 92, 246, 0.3) !important;
+  box-shadow: 0 15px 40px -5px rgba(139, 92, 246, 0.2) !important;
+}
+

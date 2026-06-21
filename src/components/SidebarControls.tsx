@@ -64,7 +64,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
               <button
                 key={pos.id}
                 onClick={() => updateSetting('cameraPosition', pos.id as any)}
-                className={`p-2.5 rounded-lg border text-xs font-semibold text-center transition-all ${settings.cameraPosition === pos.id ? 'border-purple-500 bg-purple-500/10 text-white' : 'border-glass hover:bg-white/5 text-gray-400'} ${pos.id === 'none' ? 'col-span-2' : ''}`}
+                className={`p-2.5 rounded-lg border text-xs font-semibold text-center transition-all ${settings.cameraPosition === pos.id ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'} ${pos.id === 'none' ? 'col-span-2' : ''}`}
               >
                 {pos.name}
               </button>
@@ -122,7 +122,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                 <button
                   key={ratio.id}
                   onClick={() => updateSetting('aspectRatio', ratio.id as AspectRatio)}
-                  className={`py-2 rounded-lg border text-xs font-semibold transition-all ${settings.aspectRatio === ratio.id ? 'border-blue-500 bg-blue-500/10 text-white' : 'border-glass hover:bg-white/5 text-gray-400'}`}
+                  className={`py-2 rounded-lg border text-xs font-semibold transition-all ${settings.aspectRatio === ratio.id ? 'active-blue' : 'border-glass hover-bg-glass text-gray-400'}`}
                 >
                   {ratio.name}
                 </button>
@@ -202,8 +202,13 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
             {GRADIENT_PRESETS.map((preset) => (
               <button
                 key={preset.id}
-                onClick={() => updateSetting('gradientPresetId', preset.id)}
-                className={`group p-1 rounded-xl border text-left overflow-hidden transition-all ${settings.gradientPresetId === preset.id ? 'border-pink-500 ring-1 ring-pink-500/25' : 'border-glass hover:border-white/10'}`}
+                onClick={() => {
+                  onChangeSettings({
+                    gradientPresetId: preset.id,
+                    backgroundType: 'gradient'
+                  });
+                }}
+                className={`group p-1 rounded-xl border text-left overflow-hidden transition-all ${settings.gradientPresetId === preset.id && settings.backgroundType === 'gradient' ? 'active-pink' : 'border-glass hover:border-white/10'}`}
               >
                 <div 
                   className="h-10 rounded-lg w-full mb-1" 

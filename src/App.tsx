@@ -317,7 +317,7 @@ function App() {
       {/* Header Bar */}
       <header className="glass-panel flex justify-between items-center px-6 py-4 border-b border-glass h-[70px] select-none rounded-none">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-accent-gradient flex-center shadow-lg shadow-violet-500/25">
+          <div className="w-8 h-8 rounded-lg bg-accent-gradient flex-center shadow-lg shadow-violet-glow">
             <Sparkles size={16} className="text-white animate-pulse" />
           </div>
           <div>
@@ -344,7 +344,7 @@ function App() {
             </button>
             <button 
               onClick={() => setExportModalOpen(true)}
-              className="glass-button py-2 px-5 text-xs active flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-500/10"
+              className="glass-button py-2 px-5 text-xs active flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 shadow-violet-soft"
             >
               <Download size={14} /> Export Video
             </button>
@@ -377,7 +377,7 @@ function App() {
         {recordingState === 'idle' && (
           <section className="flex-1 flex flex-col justify-center items-center max-w-4xl mx-auto px-6 py-12 gap-8 text-center animate-fade-in">
             <div className="space-y-3">
-              <span className="px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-xs font-semibold text-violet-400">
+              <span className="px-3 py-1 rounded-full badge-violet text-xs font-semibold text-violet-400">
                 ✨ Focused Product Demo Recorder
               </span>
               <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
@@ -391,9 +391,9 @@ function App() {
             {/* Recorder controls panel */}
             <div className="w-full max-w-lg mt-2">
               
-              <div className="glass-panel p-8 flex flex-col justify-between items-center gap-6 text-left border border-white/5 hover:border-violet-500/30 group hover:shadow-[0_15px_40px_-5px_rgba(139,92,246,0.2)]">
+              <div className="glass-panel p-8 flex flex-col justify-between items-center gap-6 text-left recorder-card group">
                 <div className="w-full space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-violet-600/10 text-violet-400 border border-violet-500/20 flex-center group-hover:scale-105 transition-transform">
+                  <div className="w-12 h-12 rounded-xl icon-container-violet flex-center group-hover:scale-105 transition-transform">
                     <Video size={24} />
                   </div>
                   <div>
@@ -432,7 +432,7 @@ function App() {
 
                 <button 
                   onClick={handleStartScreenRecording}
-                  className="glass-button w-full justify-center active py-3 font-bold text-sm shadow-lg shadow-violet-500/20"
+                  className="glass-button w-full justify-center active py-3 font-bold text-sm shadow-violet-glow"
                 >
                   Start Screen Recording
                 </button>
@@ -444,7 +444,7 @@ function App() {
 
         {/* Countdown overlay screen */}
         {countdown !== null && (
-          <div className="flex-1 flex-center bg-black/90 z-40">
+          <div className="flex-1 flex-center bg-black-90 z-40">
             <div className="text-center space-y-3">
               <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Recording starts in</p>
               <div className="text-8xl font-black text-violet-500 animate-ping font-mono">

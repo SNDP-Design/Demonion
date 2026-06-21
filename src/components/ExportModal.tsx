@@ -271,8 +271,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex-center z-50 animate-fade-in p-4">
-      <div className="glass-panel w-full max-w-[480px] p-6 space-y-6 relative border border-white/10 shadow-[0_25px_60px_-15px_rgba(139,92,246,0.3)] animate-slide-up bg-zinc-950">
+    <div className="fixed inset-0 bg-black-80 flex-center z-50 animate-fade-in p-4">
+      <div className="glass-panel w-full max-w-[480px] p-6 space-y-6 relative border border-white-10 shadow-violet-glow-large animate-slide-up bg-zinc-950">
         
         {/* Close Button */}
         {exportState !== 'rendering' && (
@@ -299,7 +299,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
               {/* FPS Selector */}
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-gray-300">Frame Rate (FPS)</span>
-                <div className="flex bg-white/5 p-0.5 rounded-lg border border-glass">
+                <div className="flex bg-white-5 p-0.5 rounded-lg border border-glass">
                   {[30, 60].map((f) => (
                     <button
                       key={f}
@@ -313,7 +313,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
               </div>
 
               {/* Warning Alert */}
-              <div className="flex gap-2.5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 leading-normal">
+              <div className="flex gap-2.5 p-3 rounded-lg badge-amber text-[11px] text-amber-300 leading-normal">
                 <AlertTriangle size={16} className="shrink-0 mt-0.5" />
                 <span>
                   Please do not minimize this tab or switch windows while rendering, as browsers automatically throttle background canvases, which will stall the export process.
@@ -353,7 +353,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 <span>Rendering</span>
                 <span>{progress}%</span>
               </div>
-              <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden border border-glass">
+              <div className="w-full bg-white-5 h-2 rounded-full overflow-hidden border border-glass">
                 <div 
                   className="bg-accent-gradient h-full transition-all duration-100 ease-out" 
                   style={{ width: `${progress}%` }}
@@ -379,7 +379,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
               <p className="text-xs text-gray-400">Successfully exported in high quality</p>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-white/5 border border-glass grid grid-cols-2 text-xs divide-x divide-glass">
+            <div className="p-3.5 rounded-xl bg-white-5 border border-glass grid grid-cols-2 text-xs divide-x divide-glass">
               <div className="space-y-0.5">
                 <div className="text-gray-500">File Format</div>
                 <div className="font-semibold text-white">{exportExtension.toUpperCase()} Video</div>
