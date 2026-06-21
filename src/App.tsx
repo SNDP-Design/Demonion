@@ -329,7 +329,7 @@ function App() {
       <header className="glass-panel flex justify-between items-center px-6 py-4 border-b border-glass h-[70px] select-none rounded-none">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-accent-gradient flex-center shadow-lg shadow-violet-glow">
-            <Sparkles size={16} className="text-white animate-pulse" />
+            <Sparkles size={16} className="text-black animate-pulse" />
           </div>
           <div>
             <h1 className="text-base font-extrabold tracking-tight bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
@@ -416,26 +416,26 @@ function App() {
                   <div className="space-y-3 pt-3 border-t border-glass">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-300 flex items-center gap-2"><Mic size={15} /> Voice Mic Audio</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
+                      <label className="switch-container">
                         <input 
                           type="checkbox" 
                           checked={useMic} 
                           onChange={(e) => setUseMic(e.target.checked)} 
-                          className="sr-only peer"
+                          className="switch-input"
                         />
-                        <div className="w-9 h-5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-violet-600"></div>
+                        <div className="switch-slider"></div>
                       </label>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-300 flex items-center gap-2"><Camera size={15} /> Face Webcam Overlay</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
+                      <label className="switch-container">
                         <input 
                           type="checkbox" 
                           checked={useWebcam} 
                           onChange={(e) => setUseWebcam(e.target.checked)} 
-                          className="sr-only peer"
+                          className="switch-input"
                         />
-                        <div className="w-9 h-5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-violet-600"></div>
+                        <div className="switch-slider"></div>
                       </label>
                     </div>
                   </div>

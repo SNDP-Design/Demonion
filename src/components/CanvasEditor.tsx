@@ -311,15 +311,15 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         } else {
           // Fallback: Draw a premium stylized gradient avatar preview
           let camGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
-          camGrad.addColorStop(0, '#8b5cf6'); // violet-500
-          camGrad.addColorStop(1, '#ec4899'); // pink-500
+          camGrad.addColorStop(0, '#ffffff'); 
+          camGrad.addColorStop(1, '#a3a3a3'); 
           ctx.fillStyle = camGrad;
           ctx.beginPath();
           ctx.arc(cx, cy, r, 0, Math.PI * 2);
           ctx.fill();
 
           // Draw mock webcam camera silhouette icon
-          ctx.fillStyle = '#ffffff';
+          ctx.fillStyle = '#0a0a0a';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.font = `bold ${Math.round(r * 0.4)}px Inter`;
