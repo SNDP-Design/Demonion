@@ -43,7 +43,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
         <h2 className="font-bold text-white tracking-wide text-xs uppercase">Demo Canvas Styles</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-6">
+      <div className="sidebar-content space-y-6">
         
         {/* Section 1: Webcam Overlay */}
         <div className="space-y-4">
@@ -179,14 +179,14 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
           {/* macOS window traffic lights header toggle */}
           <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass">
             <span className="text-xs text-gray-300 font-semibold">macOS Title Dots</span>
-            <label className="relative inline-flex items-center cursor-pointer">
+            <label className="switch-container">
               <input 
                 type="checkbox" 
                 checked={settings.macOSHeader} 
                 onChange={(e) => updateSetting('macOSHeader', e.target.checked)} 
-                className="sr-only peer"
+                className="switch-input"
               />
-              <div className="w-8 h-4.5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="switch-slider"></div>
             </label>
           </div>
         </div>

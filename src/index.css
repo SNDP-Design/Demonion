@@ -761,3 +761,101 @@ select.glass-input {
   cursor: grabbing !important;
 }
 
+/* ==========================================
+   Custom UI Polish & Fixes
+   ========================================== */
+
+/* Button Global Resets */
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Sidebar Custom Layout & Scroll Constraints */
+aside.sidebar {
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.sidebar-content {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 20px !important;
+}
+
+/* Toggle Switch Styles */
+.switch-container {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+.switch-input {
+  display: none !important;
+}
+.switch-slider {
+  width: 32px;
+  height: 18px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9px;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+.switch-slider::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s ease;
+}
+.switch-input:checked + .switch-slider {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+.switch-input:checked + .switch-slider::after {
+  transform: translateX(14px);
+}
+
+/* Active Color Mappings (Tailwind equivalents) */
+.border-purple-500 {
+  border-color: #a855f7 !important;
+}
+.bg-purple-500\/10 {
+  background-color: rgba(168, 85, 247, 0.1) !important;
+}
+.border-blue-500 {
+  border-color: #3b82f6 !important;
+}
+.bg-blue-500\/10 {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+.border-pink-500 {
+  border-color: #ec4899 !important;
+}
+.ring-1 {
+  box-shadow: 0 0 0 1px rgba(236, 72, 153, 0.2) !important;
+}
+.ring-pink-500\/25 {
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25) !important;
+}
+.hover\:bg-white\/5:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+.border-violet-500\/30 {
+  border-color: rgba(139, 92, 246, 0.3) !important;
+}
+.border-yellow-500\/20 {
+  border-color: rgba(234, 179, 8, 0.2) !important;
+}
