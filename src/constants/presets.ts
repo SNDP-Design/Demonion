@@ -7,8 +7,6 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
   { id: 'nebula', name: 'Cosmic Nebula', css: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #db2777 100%)' },
   { id: 'ocean', name: 'Deep Blue', css: 'linear-gradient(135deg, #1e3a8a 0%, #0284c7 50%, #0d9488 100%)' },
   { id: 'mono-dark', name: 'Studio Dark', css: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)' },
-  { id: 'mono-light', name: 'Studio Light', css: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)' },
-  { id: 'mesh-candy', name: 'Cotton Candy', css: 'radial-gradient(at 0% 0%, #c084fc 0px, transparent 50%), radial-gradient(at 100% 0%, #f472b6 0px, transparent 50%), radial-gradient(at 100% 100%, #60a5fa 0px, transparent 50%), radial-gradient(at 0% 100%, #34d399 0px, transparent 50%), #171a26' },
 ];
 
 export const DEFAULT_SETTINGS: EditorSettings = {

@@ -1006,7 +1006,7 @@ aside.sidebar {
 .browser-aspect-control { display: flex; flex-direction: column; gap: 16px; }
 .sidebar-slider-label { display: flex; justify-content: space-between; color: var(--text-muted); font-size: 14px; line-height: 1.3; }
 .sidebar-slider-label b { font-weight: 700; }
-.gradient-thumbnail-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.gradient-thumbnail-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
 .gradient-thumbnail { aspect-ratio: 1; padding: 4px; overflow: hidden; border: 1px solid var(--border-glass); border-radius: 8px; }
 .gradient-thumbnail span { display: block; width: 100%; height: 100%; border-radius: 5px; }
 .recording-camera-preview { position: fixed; right: 32px; bottom: 32px; z-index: 50; display: block; object-fit: cover; pointer-events: none; border: 3px solid #fff; background: #101010; box-shadow: 0 16px 38px rgba(0,0,0,.5); }
