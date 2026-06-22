@@ -37,12 +37,12 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
               <button onClick={() => update('cameraShape', 'rounded')} title="Rounded square camera" aria-label="Rounded square camera" className={`facecam-position-button ${settings.cameraShape === 'rounded' ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}><Square size={17} /></button>
             </div>
           </div>
-          {settings.cameraPosition !== 'none' && <div className="space-y-3.5 pt-1">
+          {settings.cameraPosition !== 'none' && <div className="camera-overlay-settings pt-1">
             <label className="space-y-1.5 block"><span className="sidebar-slider-label"><span>Camera Bubble Size</span><b>{settings.cameraSize}px</b></span>
               <input type="range" min="80" max="200" value={settings.cameraSize} onChange={(event) => update('cameraSize', Number(event.target.value))} />
             </label>
-            <label className="flex items-center justify-between text-xs text-gray-400"><span>Border Color</span>
-              <input type="color" value={settings.cameraBorderColor} onChange={(event) => update('cameraBorderColor', event.target.value)} className="w-7 h-7 rounded border border-glass cursor-pointer bg-transparent" />
+            <label className="sidebar-field-label"><span>Border Color</span>
+              <input type="color" value={settings.cameraBorderColor} onChange={(event) => update('cameraBorderColor', event.target.value)} className="color-picker" />
             </label>
           </div>}
         </section>
@@ -63,7 +63,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
 
         <section className="space-y-4 border-t border-glass pt-5">
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Paintbrush size={14} /> Background</h3>
-          <label className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass text-xs text-gray-300"><span>Flat Color</span><input type="color" value={settings.solidColor} onChange={(event) => onChangeSettings({ solidColor: event.target.value, backgroundType: 'solid' })} className="w-7 h-7 rounded border border-glass cursor-pointer bg-transparent" /></label>
+          <label className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass text-xs text-gray-300"><span>Flat Color</span><input type="color" value={settings.solidColor} onChange={(event) => onChangeSettings({ solidColor: event.target.value, backgroundType: 'solid' })} className="color-picker" /></label>
           <div className="gradient-thumbnail-grid">{GRADIENT_PRESETS.map((preset) => <button key={preset.id} onClick={() => onChangeSettings({ gradientPresetId: preset.id, backgroundType: 'gradient' })} title={preset.name} aria-label={preset.name} className={`gradient-thumbnail ${settings.gradientPresetId === preset.id && settings.backgroundType === 'gradient' ? 'active-pink' : 'border-glass hover:border-white/10'}`}><span style={{ background: preset.css }} /></button>)}</div>
         </section>
       </div>
