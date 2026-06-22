@@ -47,16 +47,18 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
           </div>}
         </section>
 
-        <section className="browser-window-section space-y-4 border-t border-glass pt-5">
+        <section className="browser-window-section border-t border-glass pt-5">
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Layout size={14} /> Browser Window</h3>
-          <div className="space-y-2"><label className="text-[11px] text-gray-500 font-bold uppercase">Aspect Ratio</label>
-            <div className="browser-aspect-row">{[
-              { id: '16-9', name: '16:9 Desktop' }, { id: '4-3', name: '4:3 Tablet' },
-            ].map((ratio) => <button key={ratio.id} onClick={() => update('aspectRatio', ratio.id as AspectRatio)} className={`facecam-position-button browser-aspect-button ${settings.aspectRatio === ratio.id ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}>{ratio.name}</button>)}</div>
+          <div className="browser-window-controls">
+            <div className="browser-aspect-control"><label className="text-[11px] text-gray-500 font-bold uppercase">Aspect Ratio</label>
+              <div className="browser-aspect-row">{[
+                { id: '16-9', name: '16:9 Desktop' }, { id: '4-3', name: '4:3 Tablet' },
+              ].map((ratio) => <button key={ratio.id} onClick={() => update('aspectRatio', ratio.id as AspectRatio)} className={`facecam-position-button browser-aspect-button ${settings.aspectRatio === ratio.id ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}>{ratio.name}</button>)}</div>
+            </div>
+            <Slider label="Window Padding" value={`${Math.round(settings.scale * 100)}%`} min="0.5" max="1.1" step="0.01" current={settings.scale} onChange={(value) => update('scale', value)} />
+            <Slider label="Shadow Blur" value={`${settings.shadowIntensity}px`} min="0" max="100" current={settings.shadowIntensity} onChange={(value) => update('shadowIntensity', value)} />
+            <label className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass text-xs text-gray-300"><span>macOS Title Dots</span><span className="switch-container"><input type="checkbox" checked={settings.macOSHeader} onChange={(event) => update('macOSHeader', event.target.checked)} className="switch-input" /><span className="switch-slider" /></span></label>
           </div>
-          <Slider className="browser-slider" label="Window Padding" value={`${Math.round(settings.scale * 100)}%`} min="0.5" max="1.1" step="0.01" current={settings.scale} onChange={(value) => update('scale', value)} />
-          <Slider className="browser-slider" label="Shadow Blur" value={`${settings.shadowIntensity}px`} min="0" max="100" current={settings.shadowIntensity} onChange={(value) => update('shadowIntensity', value)} />
-          <label className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass text-xs text-gray-300"><span>macOS Title Dots</span><span className="switch-container"><input type="checkbox" checked={settings.macOSHeader} onChange={(event) => update('macOSHeader', event.target.checked)} className="switch-input" /><span className="switch-slider" /></span></label>
         </section>
 
         <section className="space-y-4 border-t border-glass pt-5">

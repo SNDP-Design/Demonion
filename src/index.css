@@ -1001,9 +1001,9 @@ aside.sidebar {
 .facecam-shape-buttons { display: flex; gap: 7px; }.facecam-shape-buttons .facecam-position-button { width: 40px; }
 .browser-aspect-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
 .browser-aspect-button { padding: 0 8px; font-size: 12px; font-weight: 600; }
-.browser-window-section > * + * { margin-top: 42px !important; }
-.browser-window-section .browser-aspect-row { margin-top: 16px; }
-.browser-slider + .browser-slider { margin-top: 42px !important; }
+.browser-window-section { display: flex; flex-direction: column; gap: 18px; }
+.browser-window-controls { display: flex; flex-direction: column; gap: 46px; }
+.browser-aspect-control { display: flex; flex-direction: column; gap: 16px; }
 .sidebar-slider-label { display: flex; justify-content: space-between; color: var(--text-muted); font-size: 14px; line-height: 1.3; }
 .sidebar-slider-label b { font-weight: 700; }
 .gradient-thumbnail-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
