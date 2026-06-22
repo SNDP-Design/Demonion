@@ -1,41 +1,31 @@
 import React, { useRef, useEffect, useState } from 'react';
-import type { EditorSettings, ZoomKeyframe } from '../types';
+import type { EditorSettings } from '../types';
 
 interface CanvasEditorProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   videoElement: HTMLVideoElement | null;
   webcamElement: HTMLVideoElement | null;
   settings: EditorSettings;
-  keyframes: ZoomKeyframe[];
-  currentTime: number;
-  onCanvasClick: (x: number, y: number) => void;
 }
 
 export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   canvasRef,
   videoElement,
   webcamElement,
-  settings,
-  keyframes,
-  currentTime,
-  onCanvasClick
+  settings
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasDimensions, setCanvasDimensions] = useState({ width: 1920, height: 1080 });
 
   // Refs for tracking values inside the high-frequency animation loop without restarting it
   const settingsRef = useRef(settings);
-  const keyframesRef = useRef(keyframes);
   const videoElementRef = useRef(videoElement);
   const webcamElementRef = useRef(webcamElement);
-  const currentTimeRef = useRef(currentTime);
 
   useEffect(() => {
     settingsRef.current = settings;
-    keyframesRef.current = keyframes;
     videoElementRef.current = videoElement;
     webcamElementRef.current = webcamElement;
-    currentTimeRef.current = currentTime;
   });
 
   useEffect(() => {
@@ -65,51 +55,6 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     setCanvasDimensions({ width, height });
   }, [settings.aspectRatio, settings.exportResolution]);
 
-  // Easing function for smooth zooms
-  const ease = (u: number, type: 'linear' | 'ease-out' | 'ease-in-out' | 'smooth') => {
-    if (type === 'linear') return u;
-    if (type === 'ease-out') return 1 - Math.pow(1 - u, 3);
-    if (type === 'ease-in-out') return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
-    return u * u * (3 - 2 * u);
-  };
-
-  // Interpolation logic for zooms
-  const getInterpolatedZoom = (t: number, kfs: ZoomKeyframe[]) => {
-    if (kfs.length === 0) {
-      return { zoom: 1.0, x: 0.5, y: 0.5 };
-    }
-
-    const sorted = [...kfs].sort((a, b) => a.time - b.time);
-    const nextIndex = sorted.findIndex(kf => t <= kf.time);
-    
-    if (nextIndex === -1) {
-      const last = sorted[sorted.length - 1];
-      return { zoom: last.zoom, x: last.x, y: last.y };
-    }
-
-    const next = sorted[nextIndex];
-    const prev = nextIndex > 0 ? sorted[nextIndex - 1] : null;
-
-    const zoomStart = prev ? prev.zoom : 1.0;
-    const xStart = prev ? prev.x : 0.5;
-    const yStart = prev ? prev.y : 0.5;
-
-    const transitionStart = next.time - next.duration;
-
-    if (t < transitionStart) {
-      return { zoom: zoomStart, x: xStart, y: yStart };
-    }
-
-    const u = (t - transitionStart) / next.duration;
-    const factor = ease(Math.max(0, Math.min(1, u)), next.easing);
-
-    return {
-      zoom: zoomStart + (next.zoom - zoomStart) * factor,
-      x: xStart + (next.x - xStart) * factor,
-      y: yStart + (next.y - yStart) * factor
-    };
-  };
-
   // Canvas drawing loop
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -126,8 +71,6 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const settings = settingsRef.current;
       const videoElement = videoElementRef.current;
       const webcamElement = webcamElementRef.current;
-      const keyframes = keyframesRef.current;
-      const time = videoElement ? videoElement.currentTime : currentTimeRef.current;
 
       // Enable high-quality image smoothing
       ctx.imageSmoothingEnabled = true;
@@ -271,20 +214,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         const vWidth = videoElement.videoWidth || 1920;
         const vHeight = videoElement.videoHeight || 1080;
 
-        const zoomState = getInterpolatedZoom(time, keyframes);
-
-        const sw = vWidth / zoomState.zoom;
-        const sh = vHeight / zoomState.zoom;
-
-        let sx = zoomState.x * vWidth - sw / 2;
-        let sy = zoomState.y * vHeight - sh / 2;
-
-        sx = Math.max(0, Math.min(vWidth - sw, sx));
-        sy = Math.max(0, Math.min(vHeight - sh, sy));
-
         ctx.drawImage(
           videoElement,
-          sx, sy, sw, sh,
+          0, 0, vWidth, vHeight,
           x0, y0 + headerH, finalW, finalH
         );
       } else {
@@ -377,66 +309,17 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     return () => cancelAnimationFrame(animId);
   }, [canvasRef, canvasDimensions]);
 
-  // Click on Canvas handles setting keyframes
-  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const clickY = e.clientY - rect.top;
-
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    
-    const cvsX = clickX * scaleX;
-    const cvsY = clickY * scaleY;
-
-    const cw = canvas.width;
-    const ch = canvas.height;
-
-    // Adapt to video aspect ratio for canvas clicks
-    let videoRatio = 9 / 16;
-    if (videoElement && videoElement.videoWidth && videoElement.videoHeight) {
-      videoRatio = videoElement.videoHeight / videoElement.videoWidth;
-    }
-
-    const baseCardW = cw * 0.8;
-    const finalW = baseCardW * settings.scale;
-    const finalH = finalW * videoRatio;
-    const headerH = settings.macOSHeader ? 32 : 0;
-    const totalH = finalH + headerH;
-
-    const x0 = (cw - finalW) / 2;
-    const y0 = (ch - totalH) / 2;
-    
-    const cardLeft = x0;
-    const cardTop = y0 + headerH;
-
-    const localX = (cvsX - cardLeft) / finalW;
-    const localY = (cvsY - cardTop) / finalH;
-
-    const normX = Math.max(0, Math.min(1, localX));
-    const normY = Math.max(0, Math.min(1, localY));
-
-    onCanvasClick(normX, normY);
-  };
-
   return (
     <div 
       ref={containerRef}
       className="flex-1 flex-center p-6 relative overflow-hidden bg-black/40"
       style={{ minHeight: '350px' }}
     >
-      <div className="absolute top-4 left-4 z-10 bg-black/60 border border-glass rounded-lg px-3 py-1.5 text-[10px] text-gray-300">
-        💡 <strong>Tip:</strong> Click on the screen preview to place zoom focus points!
-      </div>
       <canvas
         ref={canvasRef}
         width={canvasDimensions.width}
         height={canvasDimensions.height}
-        onClick={handleCanvasClick}
-        className="max-w-full max-h-full aspect-video rounded-xl shadow-2xl border border-glass bg-black cursor-crosshair transition-shadow hover:shadow-[0_0_50px_rgba(139,92,246,0.1)]"
+        className="max-w-full max-h-full aspect-video rounded-xl shadow-2xl border border-glass bg-black transition-shadow hover:shadow-[0_0_50px_rgba(139,92,246,0.1)]"
         style={{
           width: 'auto',
           height: 'auto',

@@ -1,9 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
-import type { ZoomKeyframe } from '../types';
 import { 
   Play, 
   Pause, 
-  Plus, 
   Gauge 
 } from 'lucide-react';
 
@@ -13,10 +11,6 @@ interface TimelineProps {
   onTimeUpdate: (time: number) => void;
   isPlaying: boolean;
   onTogglePlay: () => void;
-  keyframes: ZoomKeyframe[];
-  onAddKeyframe: () => void;
-  onRemoveKeyframe: (id: string) => void;
-  onUpdateKeyframeTime: (id: string, newTime: number) => void;
   trimStart: number;
   trimEnd: number;
   onTrimChange: (start: number, end: number) => void;
@@ -30,10 +24,6 @@ export const Timeline: React.FC<TimelineProps> = ({
   onTimeUpdate,
   isPlaying,
   onTogglePlay,
-  keyframes,
-  onAddKeyframe,
-  onRemoveKeyframe: _onRemoveKeyframe,
-  onUpdateKeyframeTime,
   trimStart,
   trimEnd,
   onTrimChange,
@@ -41,7 +31,7 @@ export const Timeline: React.FC<TimelineProps> = ({
   onPlaybackRateChange
 }) => {
   const trackRef = useRef<HTMLDivElement>(null);
-  const [draggingItem, setDraggingItem] = useState<{ type: 'playhead' | 'keyframe' | 'trim-start' | 'trim-end'; keyframeId?: string } | null>(null);
+  const [draggingItem, setDraggingItem] = useState<{ type: 'playhead' | 'trim-start' | 'trim-end' } | null>(null);
 
   // Formatting utility e.g. 00:05.2
   const formatTime = (time: number) => {
@@ -67,8 +57,6 @@ export const Timeline: React.FC<TimelineProps> = ({
         onTrimChange(Math.min(targetTime, endVal - 0.2), endVal);
       } else if (draggingItem.type === 'trim-end') {
         onTrimChange(trimStart, Math.max(targetTime, trimStart + 0.2));
-      } else if (draggingItem.type === 'keyframe' && draggingItem.keyframeId) {
-        onUpdateKeyframeTime(draggingItem.keyframeId, targetTime);
       }
     } else {
       // Just a click to seek
@@ -78,11 +66,10 @@ export const Timeline: React.FC<TimelineProps> = ({
 
   const handleMouseDown = (
     e: React.MouseEvent, 
-    type: 'playhead' | 'keyframe' | 'trim-start' | 'trim-end', 
-    keyframeId?: string
+    type: 'playhead' | 'trim-start' | 'trim-end'
   ) => {
     e.stopPropagation();
-    setDraggingItem({ type, keyframeId });
+    setDraggingItem({ type });
   };
 
   useEffect(() => {
@@ -107,7 +94,7 @@ export const Timeline: React.FC<TimelineProps> = ({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [draggingItem, duration, trimStart, trimEnd, onTimeUpdate, onTrimChange, onUpdateKeyframeTime]);
+  }, [draggingItem, duration, trimStart, trimEnd, onTimeUpdate, onTrimChange]);
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
   const trimStartPercent = duration > 0 ? (trimStart / duration) * 100 : 0;
@@ -146,14 +133,6 @@ export const Timeline: React.FC<TimelineProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onAddKeyframe}
-            className="flex items-center gap-1 text-[11px] font-semibold text-yellow-400 hover:text-yellow-300 transition-colors badge-yellow py-1.5 px-3 rounded-lg"
-          >
-            <Plus size={12} /> Add Zoom Keyframe
-          </button>
-        </div>
       </div>
 
       {/* The Timeline Visual Track */}
@@ -211,20 +190,6 @@ export const Timeline: React.FC<TimelineProps> = ({
           >
             <div className="w-[1px] h-3 bg-violet-800" />
           </div>
-
-          {/* Keyframe Markers */}
-          {keyframes.map((kf) => {
-            const kfPercent = duration > 0 ? (kf.time / duration) * 100 : 0;
-            return (
-              <div
-                key={kf.id}
-                onMouseDown={(e) => handleMouseDown(e, 'keyframe', kf.id)}
-                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-yellow-400 border-2 border-yellow-600 hover:bg-yellow-300 hover:scale-115 cursor-ew-resize z-30 transition-transform"
-                style={{ left: `calc(${kfPercent}% - 7px)`, transform: 'translateY(-50%) rotate(45deg)' }}
-                title={`Zoom ${kf.zoom.toFixed(1)}x at ${kf.time.toFixed(1)}s (Drag to move)`}
-              />
-            );
-          })}
 
           {/* Playhead Line */}
           <div 

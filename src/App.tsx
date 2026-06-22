@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import type { EditorSettings, ZoomKeyframe } from './types';
+import type { EditorSettings } from './types';
 import { DEFAULT_SETTINGS } from './constants/presets';
-import { SidebarControls } from './components/SidebarControls';
 import { CanvasEditor } from './components/CanvasEditor';
 import { Timeline } from './components/Timeline';
 import { ExportModal } from './components/ExportModal';
@@ -27,7 +26,6 @@ function App() {
 
   // Editor states
   const [settings, setSettings] = useState<EditorSettings>(DEFAULT_SETTINGS);
-  const [keyframes, setKeyframes] = useState<ZoomKeyframe[]>([]);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -306,46 +304,6 @@ function App() {
     };
   }, [trimStart, trimEnd, duration, isPlaying]);
 
-  // Keyframes operations
-  const handleAddKeyframe = () => {
-    const newKf: ZoomKeyframe = {
-      id: Math.random().toString(36).substr(2, 9),
-      time: currentTime,
-      zoom: 1.5,
-      x: 0.5,
-      y: 0.5,
-      duration: 0.6,
-      easing: 'smooth'
-    };
-    setKeyframes([...keyframes, newKf].sort((a,b) => a.time - b.time));
-  };
-
-  const handleRemoveKeyframe = (id: string) => {
-    setKeyframes(keyframes.filter(kf => kf.id !== id));
-  };
-
-  const handleUpdateKeyframe = (id: string, updates: Partial<ZoomKeyframe>) => {
-    setKeyframes(keyframes.map(kf => kf.id === id ? { ...kf, ...updates } : kf));
-  };
-
-  const handleUpdateKeyframeTime = (id: string, newTime: number) => {
-    setKeyframes(keyframes.map(kf => kf.id === id ? { ...kf, time: Math.max(0, Math.min(duration, newTime)) } : kf).sort((a,b) => a.time - b.time));
-  };
-
-  // Canvas Click: add keyframe at clicked spot
-  const handleCanvasClick = (x: number, y: number) => {
-    const newKf: ZoomKeyframe = {
-      id: Math.random().toString(36).substr(2, 9),
-      time: currentTime,
-      zoom: 2.0, // default zoom-in factor when clicking
-      x,
-      y,
-      duration: 0.6,
-      easing: 'smooth'
-    };
-    setKeyframes([...keyframes, newKf].sort((a,b) => a.time - b.time));
-  };
-
   const formatSecs = (s: number) => {
     const m = Math.floor(s / 60);
     const sec = s % 60;
@@ -376,7 +334,6 @@ function App() {
                 if (window.confirm('Discard current video and start over?')) {
                   setRecordingState('idle');
                   setVideoSrc('');
-                  setKeyframes([]);
                 }
               }}
               className="glass-button text-xs py-1.5 px-3 hover:text-red-400 transition-colors"
@@ -522,25 +479,11 @@ function App() {
           <div className="flex-1 flex flex-col overflow-hidden animate-fade-in">
             {/* Split controls & editor */}
             <div className="flex-1 flex overflow-hidden">
-              <SidebarControls 
-                settings={settings}
-                onChangeSettings={(updates) => setSettings({ ...settings, ...updates })}
-                keyframes={keyframes}
-                onAddKeyframe={handleAddKeyframe}
-                onRemoveKeyframe={handleRemoveKeyframe}
-                onUpdateKeyframe={handleUpdateKeyframe}
-                currentTime={currentTime}
-                duration={duration}
-              />
-              
               <CanvasEditor 
                 canvasRef={canvasRef}
                 videoElement={editorVideoEl}
                 webcamElement={useWebcam ? webcamVideoEl : null}
                 settings={settings}
-                keyframes={keyframes}
-                currentTime={currentTime}
-                onCanvasClick={handleCanvasClick}
               />
             </div>
 
@@ -551,10 +494,6 @@ function App() {
               onTimeUpdate={handleSeek}
               isPlaying={isPlaying}
               onTogglePlay={handleTogglePlay}
-              keyframes={keyframes}
-              onAddKeyframe={handleAddKeyframe}
-              onRemoveKeyframe={handleRemoveKeyframe}
-              onUpdateKeyframeTime={handleUpdateKeyframeTime}
               trimStart={trimStart}
               trimEnd={trimEnd}
               onTrimChange={handleTrimChange}
