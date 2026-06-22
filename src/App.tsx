@@ -412,7 +412,6 @@ function App() {
             <div className="xg-brand-mark"><Sparkles size={16} /></div>
             <div>
               <h1>Screentor</h1>
-              <p>Browser Studio</p>
             </div>
           </div>
           {showLandingPage && (
