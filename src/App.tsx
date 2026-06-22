@@ -311,24 +311,26 @@ function App() {
   };
 
   return (
-    <main className="h-screen w-screen bg-[#07080a] flex flex-col text-white font-sans overflow-hidden">
+    <main className="xg-app h-screen w-screen flex flex-col text-white font-sans overflow-hidden">
       
       {/* Header Bar */}
-      <header className="glass-panel flex justify-between items-center px-6 py-4 border-b border-glass h-[70px] select-none rounded-none">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-accent-gradient flex-center shadow-lg shadow-violet-glow">
-            <Sparkles size={16} className="text-black animate-pulse" />
+      <header className="xg-nav select-none">
+        <div className="xg-nav-inner">
+          <div className="xg-brand">
+            <div className="xg-brand-mark"><Sparkles size={16} /></div>
+            <div>
+              <h1>Screentor</h1>
+              <p>Browser Studio</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-base font-extrabold tracking-tight bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
-              Screentor
-            </h1>
-            <p className="text-[10px] text-gray-500 font-semibold tracking-wider uppercase">Browser Studio</p>
+          <div className="xg-nav-links" aria-label="Workspace sections">
+            <span className="active">Studio</span>
+            <span>Capture</span>
+            <span>Export</span>
           </div>
-        </div>
 
-        {recordingState === 'editor' && (
-          <div className="flex items-center gap-3">
+          {recordingState === 'editor' && (
+          <div className="xg-nav-actions">
             <button 
               onClick={() => {
                 if (window.confirm('Discard current video and start over?')) {
@@ -336,18 +338,19 @@ function App() {
                   setVideoSrc('');
                 }
               }}
-              className="glass-button text-xs py-1.5 px-3 hover:text-red-400 transition-colors"
+              className="xg-button xg-button-secondary"
             >
               <RotateCcw size={13} /> Reset
             </button>
             <button 
               onClick={() => setExportModalOpen(true)}
-              className="glass-button py-2 px-5 text-xs active flex items-center gap-1.5 bg-violet-600 hover:bg-violet-500 shadow-violet-soft"
+              className="xg-button xg-button-primary"
             >
               <Download size={14} /> Export Video
             </button>
           </div>
         )}
+        </div>
       </header>
 
       {/* Screen Elements for Feeds (Hidden in viewport) */}
@@ -373,36 +376,27 @@ function App() {
 
         {/* State 1: Dashboard Setup */}
         {recordingState === 'idle' && (
-          <section className="flex-1 flex flex-col justify-center items-center max-w-4xl mx-auto px-6 py-12 gap-8 text-center animate-fade-in">
-            <div className="space-y-3">
-              <span className="px-3 py-1 rounded-full badge-violet text-xs font-semibold text-violet-400">
-                ✨ Focused Product Demo Recorder
-              </span>
-              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
-                Record Gorgeous Browser Demos
-              </h2>
-              <p className="text-gray-400 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
-                Automatically pad your browser screen inside a macOS window container with a circular webcam bubble. Cut dead air and highlight details instantly.
-              </p>
+          <section className="xg-hero animate-fade-in">
+            <div className="xg-hero-copy">
+              <span className="xg-pill"><span className="xg-status-dot" /> Ready to record</span>
+              <h2>Record product demos<br /><span>that look polished.</span></h2>
+              <p>Capture your screen, camera, and voice in one quiet, focused studio. Then trim your recording and export it when it is ready.</p>
             </div>
 
             {/* Recorder controls panel */}
-            <div className="w-full max-w-lg mt-2">
-              
-              <div className="glass-panel p-8 flex flex-col justify-between items-center gap-6 text-left recorder-card group">
-                <div className="w-full space-y-4">
-                  <div className="w-12 h-12 rounded-xl icon-container-violet flex-center group-hover:scale-105 transition-transform">
+            <div className="xg-recorder-card">
+                <div className="xg-recorder-heading">
+                  <div className="xg-recorder-icon">
                     <Video size={24} />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-white">Record Demo Screen</h3>
-                    <p className="text-xs text-gray-500 leading-normal mt-1 font-medium">Capture your browser tab or window, along with system sound, webcam feed, and microphone voice.</p>
+                    <h3>New recording</h3>
+                    <p>Choose what to include, then select your browser tab or window.</p>
                   </div>
-                  
-                  {/* Settings toggles */}
-                  <div className="space-y-3 pt-3 border-t border-glass">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-300 flex items-center gap-2"><Mic size={15} /> Voice Mic Audio</span>
+                </div>
+                <div className="xg-recorder-options">
+                    <div className="xg-option-row">
+                      <span><Mic size={15} /> Voice microphone</span>
                       <label className="switch-container">
                         <input 
                           type="checkbox" 
@@ -413,8 +407,8 @@ function App() {
                         <div className="switch-slider"></div>
                       </label>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-300 flex items-center gap-2"><Camera size={15} /> Face Webcam Overlay</span>
+                    <div className="xg-option-row">
+                      <span><Camera size={15} /> Camera overlay</span>
                       <label className="switch-container">
                         <input 
                           type="checkbox" 
@@ -425,17 +419,14 @@ function App() {
                         <div className="switch-slider"></div>
                       </label>
                     </div>
-                  </div>
                 </div>
 
                 <button 
                   onClick={handleStartScreenRecording}
-                  className="glass-button w-full justify-center active py-3 font-bold text-sm shadow-violet-glow"
+                  className="xg-button xg-button-primary xg-record-button"
                 >
-                  Start Screen Recording
+                  Start recording <span aria-hidden="true">→</span>
                 </button>
-              </div>
-
             </div>
           </section>
         )}
