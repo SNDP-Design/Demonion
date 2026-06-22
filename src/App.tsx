@@ -40,6 +40,7 @@ function App() {
   const [trimEnd, setTrimEnd] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportProgress, setExportProgress] = useState<number | null>(null);
   const [recordingIncludesWebcam, setRecordingIncludesWebcam] = useState(false);
 
   // Recorder flags
@@ -433,10 +434,14 @@ function App() {
               <RotateCcw size={13} /> Reset Video
             </button>
             <button 
-              onClick={() => setExportModalOpen(true)}
+              onClick={() => {
+                setExportProgress(0);
+                setExportModalOpen(true);
+              }}
               className="xg-button xg-button-primary"
+              disabled={exportProgress !== null}
             >
-              <Download size={14} /> Export Video
+              {exportProgress === null ? <><Download size={14} /> Export Video</> : `Exporting ${exportProgress}%`}
             </button>
           </div>
         )}
@@ -682,7 +687,12 @@ function App() {
       {/* Export Modal */}
       <ExportModal 
         isOpen={exportModalOpen}
-        onClose={() => setExportModalOpen(false)}
+        onClose={() => {
+          setExportModalOpen(false);
+          setExportProgress(null);
+        }}
+        onProgress={setExportProgress}
+        onError={(message) => window.alert(message)}
         canvasElement={canvasRef.current}
         videoElement={editorVideoEl}
         cameraVideoElement={recordedCameraVideoEl}
