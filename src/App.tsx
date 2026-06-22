@@ -460,7 +460,13 @@ function App() {
       />
       <video
         ref={setWebcamVideoRef}
-        style={{ position: 'fixed', right: '8px', bottom: '8px', width: '160px', height: '90px', opacity: 0.01, pointerEvents: 'none', zIndex: 0 }}
+        className={recordingState === 'recording' && useWebcam ? 'recording-camera-preview' : undefined}
+        style={recordingState === 'recording' && useWebcam ? {
+          width: `${Math.min(220, Math.max(110, settings.cameraSize))}px`,
+          aspectRatio: '1 / 1',
+          borderRadius: settings.cameraShape === 'circle' ? '50%' : '20%',
+          borderColor: settings.cameraBorderColor,
+        } : { position: 'fixed', right: '8px', bottom: '8px', width: '160px', height: '90px', opacity: 0.01, pointerEvents: 'none', zIndex: 0 }}
         autoPlay
         playsInline
         muted
