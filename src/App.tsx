@@ -415,11 +415,13 @@ function App() {
               <p>Browser Studio</p>
             </div>
           </div>
-          <nav className="xg-nav-links" aria-label="Main sections">
-            <a href="#home" className={showLandingPage ? 'active' : ''}>Home</a>
-            <a href="#how-it-works">How it works</a>
-            <a href="#features">Features</a>
-          </nav>
+          {showLandingPage && (
+            <nav className="xg-nav-links" aria-label="Main sections">
+              <a href="#home" className="active">Home</a>
+              <a href="#how-it-works">How it works</a>
+              <a href="#features">Features</a>
+            </nav>
+          )}
 
           {showLandingPage ? (
             <div className="xg-nav-actions">
@@ -439,7 +441,7 @@ function App() {
               }}
               className="xg-button xg-button-secondary"
             >
-              <RotateCcw size={13} /> Reset
+              <RotateCcw size={13} /> Reset Video
             </button>
             <button 
               onClick={() => setExportModalOpen(true)}
