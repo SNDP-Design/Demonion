@@ -28,6 +28,7 @@ function App() {
   
   // Streams
   const [videoSrc, setVideoSrc] = useState<string>('');
+  const [cameraSrc, setCameraSrc] = useState<string>('');
   const [micStream, setMicStream] = useState<MediaStream | null>(null);
 
   // Editor states
@@ -48,17 +49,19 @@ function App() {
   // Refs
   const editorVideoRef = useRef<HTMLVideoElement | null>(null);
   const webcamVideoRef = useRef<HTMLVideoElement | null>(null);
+  const recordedCameraVideoRef = useRef<HTMLVideoElement | null>(null);
   const webcamStreamRef = useRef<MediaStream | null>(null);
   const webcamRequestRef = useRef<Promise<boolean> | null>(null);
   const screenRecorderRef = useRef<MediaRecorder | null>(null);
-  const compositeRecordingRef = useRef<{ frameId: number; screenVideo: HTMLVideoElement } | null>(null);
+  const cameraRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
+  const recordedCameraChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<any>(null);
   const [recTime, setRecTime] = useState(0);
 
   // Callback ref states to ensure preview render loop updates when DOM elements mount
   const [editorVideoEl, setEditorVideoEl] = useState<HTMLVideoElement | null>(null);
-  const [webcamVideoEl, setWebcamVideoEl] = useState<HTMLVideoElement | null>(null);
+  const [recordedCameraVideoEl, setRecordedCameraVideoEl] = useState<HTMLVideoElement | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -130,11 +133,15 @@ function App() {
 
   const setWebcamVideoRef = useCallback((el: HTMLVideoElement | null) => {
     webcamVideoRef.current = el;
-    setWebcamVideoEl((current) => current === el ? current : el);
     if (el && webcamStreamRef.current) {
       void connectWebcamVideo(webcamStreamRef.current);
     }
   }, [connectWebcamVideo]);
+
+  const setRecordedCameraVideoRef = useCallback((el: HTMLVideoElement | null) => {
+    recordedCameraVideoRef.current = el;
+    setRecordedCameraVideoEl((current) => current === el ? current : el);
+  }, []);
 
   // Auto clean blob url
   useEffect(() => {
@@ -191,93 +198,37 @@ function App() {
         }
       }
 
-      const startCompositeRecording = async () => {
-        const screenVideo = document.createElement('video');
-        screenVideo.srcObject = screenStream;
-        screenVideo.muted = true;
-        screenVideo.playsInline = true;
-        await screenVideo.play();
-
-        const screenReady = await waitForVideoFrame(screenVideo);
-        if (!screenReady) throw new Error('Screen video did not become ready in time.');
-
-        const compositeCanvas = document.createElement('canvas');
-        const sourceWidth = screenVideo.videoWidth || 1920;
-        const sourceHeight = screenVideo.videoHeight || 1080;
-        compositeCanvas.width = sourceWidth;
-        compositeCanvas.height = sourceHeight;
-        const context = compositeCanvas.getContext('2d');
-        if (!context) throw new Error('Could not prepare the recording canvas.');
-
-        let lastDrawTime = 0;
-        const drawFrame = (now: number) => {
-          if (now - lastDrawTime >= 1000 / 60) {
-            lastDrawTime = now;
-            const width = compositeCanvas.width;
-            const height = compositeCanvas.height;
-            context.drawImage(screenVideo, 0, 0, width, height);
-
-            const cameraVideo = webcamVideoRef.current;
-            if (includeWebcam && settings.cameraPosition !== 'none' && cameraVideo && cameraVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-              const size = Math.round(Math.min(width, height) * 0.2);
-              const radius = size / 2;
-              const margin = Math.round(Math.min(width, height) * 0.035);
-              let centerX = margin + radius;
-              let centerY = margin + radius;
-
-              if (settings.cameraPosition === 'top-right' || settings.cameraPosition === 'bottom-right') centerX = width - margin - radius;
-              if (settings.cameraPosition === 'bottom-left' || settings.cameraPosition === 'bottom-right') centerY = height - margin - radius;
-
-              const sourceWidth = cameraVideo.videoWidth;
-              const sourceHeight = cameraVideo.videoHeight;
-              const cropSize = Math.min(sourceWidth, sourceHeight);
-              context.save();
-              context.beginPath();
-              context.arc(centerX, centerY, radius, 0, Math.PI * 2);
-              context.clip();
-              context.drawImage(cameraVideo, (sourceWidth - cropSize) / 2, (sourceHeight - cropSize) / 2, cropSize, cropSize, centerX - radius, centerY - radius, size, size);
-              context.restore();
-              context.beginPath();
-              context.arc(centerX, centerY, radius, 0, Math.PI * 2);
-              context.lineWidth = Math.max(3, Math.round(size * 0.025));
-              context.strokeStyle = '#ffffff';
-              context.stroke();
-            }
-          }
-
-          compositeRecordingRef.current = { frameId: requestAnimationFrame(drawFrame), screenVideo };
-        };
-        drawFrame(performance.now());
-
+      const startSeparateRecording = () => {
         recordedChunksRef.current = [];
-        const recordingStream = compositeCanvas.captureStream(60);
-        screenStream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
-        if (recordingStream.getAudioTracks().length === 0) {
-          activeMicStream?.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
-        }
-
+        recordedCameraChunksRef.current = [];
         let recordMimeType = 'video/webm;codecs=vp9';
         if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = 'video/webm;codecs=vp8';
         if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = 'video/webm';
         if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = '';
 
-        const recorder = new MediaRecorder(recordingStream, {
+        const recorder = new MediaRecorder(screenStream, {
           mimeType: recordMimeType || undefined,
           videoBitsPerSecond: 45000000,
         });
         screenRecorderRef.current = recorder;
+
+        const cameraStream = includeWebcam ? webcamStreamRef.current : null;
+        if (cameraStream) {
+          const cameraRecorder = new MediaRecorder(cameraStream, { mimeType: recordMimeType || undefined, videoBitsPerSecond: 12000000 });
+          cameraRecorderRef.current = cameraRecorder;
+          cameraRecorder.ondataavailable = (event) => { if (event.data.size > 0) recordedCameraChunksRef.current.push(event.data); };
+          cameraRecorder.onstop = () => {
+            if (recordedCameraChunksRef.current.length > 0) setCameraSrc(URL.createObjectURL(new Blob(recordedCameraChunksRef.current, { type: recordMimeType || 'video/webm' })));
+          };
+          cameraRecorder.start();
+        }
         recorder.ondataavailable = (event) => {
           if (event.data.size > 0) recordedChunksRef.current.push(event.data);
         };
         recorder.onstop = () => {
-          if (compositeRecordingRef.current) {
-            cancelAnimationFrame(compositeRecordingRef.current.frameId);
-            compositeRecordingRef.current.screenVideo.pause();
-            compositeRecordingRef.current.screenVideo.srcObject = null;
-            compositeRecordingRef.current = null;
-          }
           const blob = new Blob(recordedChunksRef.current, { type: recordMimeType || 'video/webm' });
-          setRecordingIncludesWebcam(includeWebcam);
+          if (cameraRecorderRef.current?.state === 'recording') cameraRecorderRef.current.stop();
+          setRecordingIncludesWebcam(false);
           setVideoSrc(URL.createObjectURL(blob));
           setRecordingState('editor');
           screenStream.getTracks().forEach((track) => track.stop());
@@ -297,11 +248,7 @@ function App() {
             clearInterval(counter);
             setCountdown(null);
             
-            void startCompositeRecording().catch((error) => {
-              console.error('Could not start the combined recording:', error);
-              screenStream.getTracks().forEach((track) => track.stop());
-              setRecordingState('idle');
-            });
+            startSeparateRecording();
 
             return null;
           }
@@ -317,6 +264,7 @@ function App() {
   const handleStopRecording = () => {
     if (screenRecorderRef.current && screenRecorderRef.current.state === 'recording') {
       screenRecorderRef.current.stop();
+      if (cameraRecorderRef.current?.state === 'recording') cameraRecorderRef.current.stop();
       clearInterval(timerRef.current);
     }
   };
@@ -325,6 +273,9 @@ function App() {
   const handleTimeUpdate = () => {
     if (editorVideoRef.current) {
       setCurrentTime(editorVideoRef.current.currentTime);
+      if (recordedCameraVideoRef.current && Math.abs(recordedCameraVideoRef.current.currentTime - editorVideoRef.current.currentTime) > 0.08) {
+        recordedCameraVideoRef.current.currentTime = editorVideoRef.current.currentTime;
+      }
     }
   };
 
@@ -343,6 +294,7 @@ function App() {
 
     if (isPlaying) {
       video.pause();
+      recordedCameraVideoRef.current?.pause();
       setIsPlaying(false);
     } else {
       const end = trimEnd > 0 ? trimEnd : duration;
@@ -350,6 +302,7 @@ function App() {
         video.currentTime = trimStart;
       }
       video.play().catch(e => console.error(e));
+      recordedCameraVideoRef.current?.play().catch(e => console.error(e));
       setIsPlaying(true);
     }
   };
@@ -358,6 +311,7 @@ function App() {
     const video = editorVideoRef.current;
     if (video) {
       video.currentTime = time;
+      if (recordedCameraVideoRef.current) recordedCameraVideoRef.current.currentTime = time;
       setCurrentTime(time);
     }
   };
@@ -445,6 +399,7 @@ function App() {
                 if (window.confirm('Discard current video and start over?')) {
                   setRecordingState('idle');
                   setVideoSrc('');
+                  setCameraSrc('');
                   setRecordingIncludesWebcam(false);
                 }
               }}
@@ -480,6 +435,7 @@ function App() {
         playsInline
         muted
       />
+      <video ref={setRecordedCameraVideoRef} src={cameraSrc || undefined} style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0.001, pointerEvents: 'none', zIndex: -1000 }} muted playsInline />
 
       {/* Layout Content Body */}
       <div className={showLandingPage ? 'landing-scroll-container flex-1' : 'flex-1 flex overflow-hidden'}>
@@ -674,8 +630,8 @@ function App() {
               <CanvasEditor 
                 canvasRef={canvasRef}
                 videoElement={editorVideoEl}
-                webcamElement={useWebcam && !recordingIncludesWebcam ? webcamVideoEl : null}
-                showWebcamOverlay={useWebcam && !recordingIncludesWebcam}
+                webcamElement={useWebcam && !recordingIncludesWebcam ? recordedCameraVideoEl : null}
+                showWebcamOverlay={useWebcam && !recordingIncludesWebcam && Boolean(cameraSrc)}
                 settings={settings}
               />
             </div>
@@ -705,6 +661,7 @@ function App() {
         onClose={() => setExportModalOpen(false)}
         canvasElement={canvasRef.current}
         videoElement={editorVideoEl}
+        cameraVideoElement={recordedCameraVideoEl}
         micStream={micStream}
         settings={settings}
         onChangeSettings={(updates) => setSettings({ ...settings, ...updates })}

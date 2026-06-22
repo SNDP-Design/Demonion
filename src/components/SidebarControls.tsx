@@ -1,7 +1,7 @@
 import React from 'react';
 import type { AspectRatio, EditorSettings } from '../types';
 import { GRADIENT_PRESETS } from '../constants/presets';
-import { Camera, CameraOff, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Paintbrush, SlidersHorizontal } from 'lucide-react';
+import { Camera, CameraOff, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Paintbrush } from 'lucide-react';
 
 interface SidebarControlsProps {
   settings: EditorSettings;
@@ -13,11 +13,6 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
 
   return (
     <aside className="glass-panel sidebar flex flex-col h-full w-[350px] border-r border-glass text-sm select-none rounded-none">
-      <div className="flex border-b border-glass px-5 py-4 items-center gap-2">
-        <SlidersHorizontal size={16} className="text-gray-300" />
-        <h2 className="font-bold text-white tracking-wide text-xs uppercase">Recording Settings</h2>
-      </div>
-
       <div className="sidebar-content space-y-6">
         <section className="space-y-4">
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Camera size={14} /> Facecam Overlay</h3>

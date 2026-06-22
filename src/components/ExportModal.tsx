@@ -14,6 +14,7 @@ interface ExportModalProps {
   onClose: () => void;
   canvasElement: HTMLCanvasElement | null;
   videoElement: HTMLVideoElement | null;
+  cameraVideoElement: HTMLVideoElement | null;
   micStream: MediaStream | null;
   settings: EditorSettings;
   onChangeSettings: (settings: Partial<EditorSettings>) => void;
@@ -25,6 +26,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   onClose,
   canvasElement,
   videoElement,
+  cameraVideoElement,
   micStream,
   settings,
   onChangeSettings,
@@ -92,6 +94,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
       // Pause video and seek to trimStart
       videoElement.pause();
+      cameraVideoElement?.pause();
       const startSec = settings.trimStart;
       const endSec = settings.trimEnd > 0 ? settings.trimEnd : duration;
       const exportDuration = endSec - startSec;
@@ -111,6 +114,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
         videoElement.addEventListener('seeked', onSeeked);
         videoElement.currentTime = startSec;
+        if (cameraVideoElement) cameraVideoElement.currentTime = startSec;
       });
 
       // SETUP AUDIO MIXER USING WEB AUDIO API
@@ -245,6 +249,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         videoElement.playbackRate = originalPlayRateRef.current;
         videoElement.currentTime = originalTimeRef.current;
         videoElement.pause();
+        if (cameraVideoElement) {
+          cameraVideoElement.currentTime = originalTimeRef.current;
+          cameraVideoElement.pause();
+        }
 
         // Restore canvas resolution to standard 1080p
         onChangeSettings({ exportResolution: '1080p' });
@@ -255,6 +263,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       // Start recording
       recorder.start();
       videoElement.play();
+      cameraVideoElement?.play();
 
       // Monitor loop for export progress and trim completion
       const checkProgress = () => {
@@ -302,6 +311,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     if (videoElement) {
       videoElement.pause();
       videoElement.currentTime = originalTimeRef.current;
+    }
+    if (cameraVideoElement) {
+      cameraVideoElement.pause();
+      cameraVideoElement.currentTime = originalTimeRef.current;
     }
     // Restore canvas resolution to standard 1080p
     onChangeSettings({ exportResolution: '1080p' });
