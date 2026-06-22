@@ -161,7 +161,7 @@ function App() {
           displaySurface: 'monitor',
           width: { ideal: 1920, max: 1920 },
           height: { ideal: 1080, max: 1080 },
-          frameRate: { ideal: 30, max: 30 }
+          frameRate: { ideal: 60, max: 60 }
         },
         audio: true
       });
@@ -212,7 +212,7 @@ function App() {
 
         let lastDrawTime = 0;
         const drawFrame = (now: number) => {
-          if (now - lastDrawTime >= 1000 / 30) {
+          if (now - lastDrawTime >= 1000 / 60) {
             lastDrawTime = now;
             const width = compositeCanvas.width;
             const height = compositeCanvas.height;
@@ -251,7 +251,7 @@ function App() {
         drawFrame(performance.now());
 
         recordedChunksRef.current = [];
-        const recordingStream = compositeCanvas.captureStream(30);
+        const recordingStream = compositeCanvas.captureStream(60);
         screenStream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
         if (recordingStream.getAudioTracks().length === 0) {
           activeMicStream?.getAudioTracks().forEach((track) => recordingStream.addTrack(track));

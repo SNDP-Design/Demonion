@@ -32,7 +32,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 }) => {
   const [exportState, setExportState] = useState<'idle' | 'rendering' | 'completed' | 'error'>('idle');
   const [progress, setProgress] = useState(0);
-  const [fps, setFps] = useState<30 | 60>(30);
   const [fileSize, setFileSize] = useState<string>('');
   const [downloadUrl, setDownloadUrl] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -151,7 +150,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       }
 
       // GET CANVAS STREAM
-      const canvasStream = canvasElement.captureStream(fps);
+      const canvasStream = canvasElement.captureStream(60);
       const outputStream = new MediaStream();
 
       // Add video track
@@ -322,20 +321,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             </p>
 
             <div className="space-y-3 pt-2">
-              {/* FPS Selector */}
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-gray-300">Frame Rate (FPS)</span>
-                <div className="xg-segmented-control">
-                  {[30, 60].map((f) => (
-                    <button
-                      key={f}
-                      onClick={() => setFps(f as any)}
-                      className={`xg-segment-button ${fps === f ? 'active' : ''}`}
-                    >
-                      {f} FPS
-                    </button>
-                  ))}
-                </div>
+                <span className="text-xs font-semibold text-gray-300">Export Quality</span>
+                <span className="xg-export-quality">4K · 60 FPS</span>
               </div>
 
               {/* Warning Alert */}
