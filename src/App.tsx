@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import type { EditorSettings, ZoomKeyframe } from './types';
 import { DEFAULT_SETTINGS } from './constants/presets';
 import { SidebarControls } from './components/SidebarControls';
@@ -54,15 +54,15 @@ function App() {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  const setEditorVideoRef = (el: HTMLVideoElement | null) => {
+  const setEditorVideoRef = useCallback((el: HTMLVideoElement | null) => {
     editorVideoRef.current = el;
-    setEditorVideoEl(el);
-  };
+    setEditorVideoEl((current) => current === el ? current : el);
+  }, []);
 
-  const setWebcamVideoRef = (el: HTMLVideoElement | null) => {
+  const setWebcamVideoRef = useCallback((el: HTMLVideoElement | null) => {
     webcamVideoRef.current = el;
-    setWebcamVideoEl(el);
-  };
+    setWebcamVideoEl((current) => current === el ? current : el);
+  }, []);
 
   // Auto clean blob url
   useEffect(() => {
