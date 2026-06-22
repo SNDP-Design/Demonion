@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { EditorSettings } from './types';
 import { DEFAULT_SETTINGS } from './constants/presets';
+import { SidebarControls } from './components/SidebarControls';
 import { CanvasEditor } from './components/CanvasEditor';
 import { Timeline } from './components/Timeline';
 import { ExportModal } from './components/ExportModal';
@@ -470,6 +471,10 @@ function App() {
           <div className="flex-1 flex flex-col overflow-hidden animate-fade-in">
             {/* Split controls & editor */}
             <div className="flex-1 flex overflow-hidden">
+              <SidebarControls
+                settings={settings}
+                onChangeSettings={(updates) => setSettings({ ...settings, ...updates })}
+              />
               <CanvasEditor 
                 canvasRef={canvasRef}
                 videoElement={editorVideoEl}
