@@ -180,7 +180,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.shadowOffsetY = settings.shadowIntensity * 0.3;
         
         ctx.beginPath();
-        ctx.roundRect(x0, y0, finalW, totalH, settings.borderRadius);
+        ctx.roundRect(x0, y0, finalW, totalH, 24);
         ctx.fillStyle = '#111317';
         ctx.fill();
         ctx.restore();
@@ -189,7 +189,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       // 4. Draw Composite Card Frame (clipped rounded borders)
       ctx.save();
       ctx.beginPath();
-      ctx.roundRect(x0, y0, finalW, totalH, settings.borderRadius);
+      ctx.roundRect(x0, y0, finalW, totalH, 24);
       ctx.clip();
 
       // Card base background
@@ -292,7 +292,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       // Draw Card Border
       if (settings.borderWidth > 0) {
         ctx.beginPath();
-        ctx.roundRect(x0, y0, finalW, totalH, settings.borderRadius);
+        ctx.roundRect(x0, y0, finalW, totalH, 24);
         ctx.lineWidth = settings.borderWidth * 2;
         ctx.strokeStyle = settings.borderColor;
         ctx.stroke();

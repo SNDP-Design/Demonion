@@ -51,18 +51,18 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Layout size={14} /> Browser Window</h3>
           <div className="space-y-2"><label className="text-[11px] text-gray-500 font-bold uppercase">Aspect Ratio</label>
             <div className="grid grid-cols-2 gap-1.5">{[
-              { id: '16-9', name: '16:9 Desktop' }, { id: '9-16', name: '9:16 Vertical' }, { id: '1-1', name: '1:1 Square' }, { id: '4-3', name: '4:3 Tablet' },
+              { id: '16-9', name: '16:9 Desktop' }, { id: '4-3', name: '4:3 Tablet' },
             ].map((ratio) => <button key={ratio.id} onClick={() => update('aspectRatio', ratio.id as AspectRatio)} className={`py-2 rounded-lg border text-xs font-semibold transition-all ${settings.aspectRatio === ratio.id ? 'active-blue' : 'border-glass hover-bg-glass text-gray-400'}`}>{ratio.name}</button>)}</div>
           </div>
           <Slider label="Window Padding" value={`${Math.round(settings.scale * 100)}%`} min="0.5" max="1.1" step="0.01" current={settings.scale} onChange={(value) => update('scale', value)} />
-          <Slider label="Corner Rounding" value={`${settings.borderRadius}px`} min="0" max="32" current={settings.borderRadius} onChange={(value) => update('borderRadius', value)} />
           <Slider label="Shadow Blur" value={`${settings.shadowIntensity}px`} min="0" max="100" current={settings.shadowIntensity} onChange={(value) => update('shadowIntensity', value)} />
           <label className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass text-xs text-gray-300"><span>macOS Title Dots</span><span className="switch-container"><input type="checkbox" checked={settings.macOSHeader} onChange={(event) => update('macOSHeader', event.target.checked)} className="switch-input" /><span className="switch-slider" /></span></label>
         </section>
 
         <section className="space-y-4 border-t border-glass pt-5">
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Paintbrush size={14} /> Background</h3>
-          <div className="grid grid-cols-2 gap-2">{GRADIENT_PRESETS.map((preset) => <button key={preset.id} onClick={() => onChangeSettings({ gradientPresetId: preset.id, backgroundType: 'gradient' })} className={`group p-1 rounded-xl border text-left overflow-hidden transition-all ${settings.gradientPresetId === preset.id ? 'active-pink' : 'border-glass hover:border-white/10'}`}><span className="block h-10 rounded-lg w-full mb-1" style={{ background: preset.css }} /><span className="text-[10px] font-bold px-1 text-gray-400 block truncate group-hover:text-white">{preset.name}</span></button>)}</div>
+          <label className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass text-xs text-gray-300"><span>Flat Color</span><input type="color" value={settings.solidColor} onChange={(event) => onChangeSettings({ solidColor: event.target.value, backgroundType: 'solid' })} className="w-7 h-7 rounded border border-glass cursor-pointer bg-transparent" /></label>
+          <div className="grid grid-cols-2 gap-2">{GRADIENT_PRESETS.map((preset) => <button key={preset.id} onClick={() => onChangeSettings({ gradientPresetId: preset.id, backgroundType: 'gradient' })} className={`group p-1 rounded-xl border text-left overflow-hidden transition-all ${settings.gradientPresetId === preset.id && settings.backgroundType === 'gradient' ? 'active-pink' : 'border-glass hover:border-white/10'}`}><span className="block h-10 rounded-lg w-full mb-1" style={{ background: preset.css }} /><span className="text-[10px] font-bold px-1 text-gray-400 block truncate group-hover:text-white">{preset.name}</span></button>)}</div>
         </section>
       </div>
     </aside>

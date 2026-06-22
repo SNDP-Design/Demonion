@@ -16,7 +16,7 @@ export const DEFAULT_SETTINGS: EditorSettings = {
   gradientPresetId: 'sunset',
   solidColor: '#0f172a',
   aspectRatio: '16-9',
-  borderRadius: 12,
+  borderRadius: 24,
   shadowIntensity: 60,
   borderWidth: 1,
   borderColor: 'rgba(255,255,255,0.15)',

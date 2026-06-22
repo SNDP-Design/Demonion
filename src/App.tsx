@@ -645,13 +645,14 @@ function App() {
 
         {/* State 3: Editor Layout */}
         {recordingState === 'editor' && (
-          <div className="flex-1 flex flex-col overflow-hidden animate-fade-in">
-            {/* Split controls & editor */}
-            <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 flex overflow-hidden animate-fade-in">
+            <aside className="h-full shrink-0">
               <SidebarControls
                 settings={settings}
                 onChangeSettings={(updates) => setSettings({ ...settings, ...updates })}
               />
+            </aside>
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
               <CanvasEditor 
                 canvasRef={canvasRef}
                 videoElement={editorVideoEl}
@@ -659,21 +660,19 @@ function App() {
                 showWebcamOverlay={useWebcam && !recordingIncludesWebcam && Boolean(cameraSrc)}
                 settings={settings}
               />
+              <Timeline
+                duration={duration}
+                currentTime={currentTime}
+                onTimeUpdate={handleSeek}
+                isPlaying={isPlaying}
+                onTogglePlay={handleTogglePlay}
+                trimStart={trimStart}
+                trimEnd={trimEnd}
+                onTrimChange={handleTrimChange}
+                playbackRate={playbackRate}
+                onPlaybackRateChange={handlePlaybackRate}
+              />
             </div>
-
-            {/* Video timeline controls */}
-            <Timeline 
-              duration={duration}
-              currentTime={currentTime}
-              onTimeUpdate={handleSeek}
-              isPlaying={isPlaying}
-              onTogglePlay={handleTogglePlay}
-              trimStart={trimStart}
-              trimEnd={trimEnd}
-              onTrimChange={handleTrimChange}
-              playbackRate={playbackRate}
-              onPlaybackRateChange={handlePlaybackRate}
-            />
           </div>
         )}
 
