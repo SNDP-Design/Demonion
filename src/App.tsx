@@ -33,6 +33,7 @@ function App() {
   const [trimEnd, setTrimEnd] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [recordingIncludesWebcam, setRecordingIncludesWebcam] = useState(false);
 
   // Recorder flags
   const [useMic, setUseMic] = useState(true);
@@ -44,6 +45,7 @@ function App() {
   const webcamStreamRef = useRef<MediaStream | null>(null);
   const webcamRequestRef = useRef<Promise<boolean> | null>(null);
   const screenRecorderRef = useRef<MediaRecorder | null>(null);
+  const compositeRecordingRef = useRef<{ frameId: number; screenVideo: HTMLVideoElement } | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<any>(null);
   const [recTime, setRecTime] = useState(0);
@@ -53,6 +55,20 @@ function App() {
   const [webcamVideoEl, setWebcamVideoEl] = useState<HTMLVideoElement | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const waitForVideoFrame = useCallback((video: HTMLVideoElement) => {
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) return Promise.resolve(true);
+
+    return new Promise<boolean>((resolve) => {
+      const finish = () => {
+        video.removeEventListener('loadeddata', finish);
+        clearTimeout(timeout);
+        resolve(video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA);
+      };
+      const timeout = window.setTimeout(finish, 5000);
+      video.addEventListener('loadeddata', finish, { once: true });
+    });
+  }, []);
 
   const connectWebcamVideo = useCallback(async (stream: MediaStream) => {
     const video = webcamVideoRef.current;
@@ -69,18 +85,8 @@ function App() {
       return false;
     }
 
-    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) return true;
-
-    return new Promise<boolean>((resolve) => {
-      const finish = () => {
-        video.removeEventListener('loadeddata', finish);
-        clearTimeout(timeout);
-        resolve(video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA);
-      };
-      const timeout = window.setTimeout(finish, 5000);
-      video.addEventListener('loadeddata', finish, { once: true });
-    });
-  }, []);
+    return waitForVideoFrame(video);
+  }, [waitForVideoFrame]);
 
   const ensureWebcamStream = useCallback(async () => {
     const existingStream = webcamStreamRef.current;
@@ -162,10 +168,11 @@ function App() {
       }
 
       // 3. Make sure the camera feed is connected before the countdown begins.
+      let includeWebcam = false;
       if (useWebcam) {
         try {
-          const cameraReady = await ensureWebcamStream();
-          if (!cameraReady) {
+          includeWebcam = await ensureWebcamStream();
+          if (!includeWebcam) {
             throw new Error('Camera video did not become ready in time.');
           }
         } catch (error) {
@@ -173,6 +180,97 @@ function App() {
           setUseWebcam(false);
         }
       }
+
+      const startCompositeRecording = async () => {
+        const screenVideo = document.createElement('video');
+        screenVideo.srcObject = screenStream;
+        screenVideo.muted = true;
+        screenVideo.playsInline = true;
+        await screenVideo.play();
+
+        const screenReady = await waitForVideoFrame(screenVideo);
+        if (!screenReady) throw new Error('Screen video did not become ready in time.');
+
+        const compositeCanvas = document.createElement('canvas');
+        compositeCanvas.width = screenVideo.videoWidth || 1920;
+        compositeCanvas.height = screenVideo.videoHeight || 1080;
+        const context = compositeCanvas.getContext('2d');
+        if (!context) throw new Error('Could not prepare the recording canvas.');
+
+        const drawFrame = () => {
+          const width = compositeCanvas.width;
+          const height = compositeCanvas.height;
+          context.drawImage(screenVideo, 0, 0, width, height);
+
+          const cameraVideo = webcamVideoRef.current;
+          if (includeWebcam && settings.cameraPosition !== 'none' && cameraVideo && cameraVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+            const size = Math.round(Math.min(width, height) * 0.2);
+            const radius = size / 2;
+            const margin = Math.round(Math.min(width, height) * 0.035);
+            let centerX = margin + radius;
+            let centerY = margin + radius;
+
+            if (settings.cameraPosition === 'top-right' || settings.cameraPosition === 'bottom-right') centerX = width - margin - radius;
+            if (settings.cameraPosition === 'bottom-left' || settings.cameraPosition === 'bottom-right') centerY = height - margin - radius;
+
+            const sourceWidth = cameraVideo.videoWidth;
+            const sourceHeight = cameraVideo.videoHeight;
+            const cropSize = Math.min(sourceWidth, sourceHeight);
+            context.save();
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            context.clip();
+            context.drawImage(cameraVideo, (sourceWidth - cropSize) / 2, (sourceHeight - cropSize) / 2, cropSize, cropSize, centerX - radius, centerY - radius, size, size);
+            context.restore();
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            context.lineWidth = Math.max(3, Math.round(size * 0.025));
+            context.strokeStyle = '#ffffff';
+            context.stroke();
+          }
+
+          compositeRecordingRef.current = { frameId: requestAnimationFrame(drawFrame), screenVideo };
+        };
+        drawFrame();
+
+        recordedChunksRef.current = [];
+        const recordingStream = compositeCanvas.captureStream(60);
+        screenStream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+        if (recordingStream.getAudioTracks().length === 0) {
+          activeMicStream?.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+        }
+
+        let recordMimeType = 'video/webm;codecs=vp9';
+        if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = 'video/webm;codecs=vp8';
+        if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = 'video/webm';
+        if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = '';
+
+        const recorder = new MediaRecorder(recordingStream, {
+          mimeType: recordMimeType || undefined,
+          videoBitsPerSecond: 25000000,
+        });
+        screenRecorderRef.current = recorder;
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) recordedChunksRef.current.push(event.data);
+        };
+        recorder.onstop = () => {
+          if (compositeRecordingRef.current) {
+            cancelAnimationFrame(compositeRecordingRef.current.frameId);
+            compositeRecordingRef.current.screenVideo.pause();
+            compositeRecordingRef.current.screenVideo.srcObject = null;
+            compositeRecordingRef.current = null;
+          }
+          const blob = new Blob(recordedChunksRef.current, { type: recordMimeType || 'video/webm' });
+          setRecordingIncludesWebcam(includeWebcam);
+          setVideoSrc(URL.createObjectURL(blob));
+          setRecordingState('editor');
+          screenStream.getTracks().forEach((track) => track.stop());
+        };
+        recorder.start();
+        setRecordingState('recording');
+        setRecTime(0);
+        timerRef.current = setInterval(() => setRecTime((time) => time + 1), 1000);
+      };
 
       // Start countdown
       setCountdown(3);
@@ -183,52 +281,11 @@ function App() {
             clearInterval(counter);
             setCountdown(null);
             
-            // Start recording action
-            recordedChunksRef.current = [];
-            
-            // Create recorder (we record screen stream video)
-            let recordMimeType = 'video/webm;codecs=vp9';
-            if (!MediaRecorder.isTypeSupported(recordMimeType)) {
-              recordMimeType = 'video/webm;codecs=vp8';
-            }
-            if (!MediaRecorder.isTypeSupported(recordMimeType)) {
-              recordMimeType = 'video/webm';
-            }
-            if (!MediaRecorder.isTypeSupported(recordMimeType)) {
-              recordMimeType = 'video/mp4;codecs=h264';
-            }
-            if (!MediaRecorder.isTypeSupported(recordMimeType)) {
-              recordMimeType = '';
-            }
-
-            const recorder = new MediaRecorder(screenStream, {
-              mimeType: recordMimeType || undefined,
-              videoBitsPerSecond: 25000000 // 25 Mbps high quality screen capture
+            void startCompositeRecording().catch((error) => {
+              console.error('Could not start the combined recording:', error);
+              screenStream.getTracks().forEach((track) => track.stop());
+              setRecordingState('idle');
             });
-            screenRecorderRef.current = recorder;
-
-            recorder.ondataavailable = (e) => {
-              if (e.data && e.data.size > 0) {
-                recordedChunksRef.current.push(e.data);
-              }
-            };
-
-            recorder.onstop = () => {
-              const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
-              const url = URL.createObjectURL(blob);
-              setVideoSrc(url);
-              setRecordingState('editor');
-              
-              // Stop screen stream tracks
-              screenStream.getTracks().forEach(t => t.stop());
-            };
-
-            recorder.start();
-            setRecordingState('recording');
-            setRecTime(0);
-            timerRef.current = setInterval(() => {
-              setRecTime(t => t + 1);
-            }, 1000);
 
             return null;
           }
@@ -365,6 +422,7 @@ function App() {
                 if (window.confirm('Discard current video and start over?')) {
                   setRecordingState('idle');
                   setVideoSrc('');
+                  setRecordingIncludesWebcam(false);
                 }
               }}
               className="xg-button xg-button-secondary"
@@ -506,7 +564,7 @@ function App() {
               <CanvasEditor 
                 canvasRef={canvasRef}
                 videoElement={editorVideoEl}
-                webcamElement={useWebcam ? webcamVideoEl : null}
+                webcamElement={useWebcam && !recordingIncludesWebcam ? webcamVideoEl : null}
                 settings={settings}
               />
             </div>
