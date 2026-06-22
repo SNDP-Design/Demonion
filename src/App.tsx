@@ -104,7 +104,11 @@ function App() {
 
     const request = (async () => {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: {
+          width: { ideal: 640, max: 1280 },
+          height: { ideal: 360, max: 720 },
+          frameRate: { ideal: 30, max: 30 },
+        },
         audio: false,
       });
       webcamStreamRef.current = stream;
@@ -155,9 +159,9 @@ function App() {
       const screenStream = await navigator.mediaDevices.getDisplayMedia({
         video: { 
           displaySurface: 'monitor',
-          width: { ideal: 2560, max: 3840 },
-          height: { ideal: 1600, max: 2160 },
-          frameRate: { ideal: 60 }
+          width: { ideal: 1920, max: 1920 },
+          height: { ideal: 1080, max: 1080 },
+          frameRate: { ideal: 30, max: 30 }
         },
         audio: true
       });
@@ -198,49 +202,56 @@ function App() {
         if (!screenReady) throw new Error('Screen video did not become ready in time.');
 
         const compositeCanvas = document.createElement('canvas');
-        compositeCanvas.width = screenVideo.videoWidth || 1920;
-        compositeCanvas.height = screenVideo.videoHeight || 1080;
+        const sourceWidth = screenVideo.videoWidth || 1920;
+        const sourceHeight = screenVideo.videoHeight || 1080;
+        const outputScale = Math.min(1, 1920 / sourceWidth, 1080 / sourceHeight);
+        compositeCanvas.width = Math.round(sourceWidth * outputScale);
+        compositeCanvas.height = Math.round(sourceHeight * outputScale);
         const context = compositeCanvas.getContext('2d');
         if (!context) throw new Error('Could not prepare the recording canvas.');
 
-        const drawFrame = () => {
-          const width = compositeCanvas.width;
-          const height = compositeCanvas.height;
-          context.drawImage(screenVideo, 0, 0, width, height);
+        let lastDrawTime = 0;
+        const drawFrame = (now: number) => {
+          if (now - lastDrawTime >= 1000 / 30) {
+            lastDrawTime = now;
+            const width = compositeCanvas.width;
+            const height = compositeCanvas.height;
+            context.drawImage(screenVideo, 0, 0, width, height);
 
-          const cameraVideo = webcamVideoRef.current;
-          if (includeWebcam && settings.cameraPosition !== 'none' && cameraVideo && cameraVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-            const size = Math.round(Math.min(width, height) * 0.2);
-            const radius = size / 2;
-            const margin = Math.round(Math.min(width, height) * 0.035);
-            let centerX = margin + radius;
-            let centerY = margin + radius;
+            const cameraVideo = webcamVideoRef.current;
+            if (includeWebcam && settings.cameraPosition !== 'none' && cameraVideo && cameraVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+              const size = Math.round(Math.min(width, height) * 0.2);
+              const radius = size / 2;
+              const margin = Math.round(Math.min(width, height) * 0.035);
+              let centerX = margin + radius;
+              let centerY = margin + radius;
 
-            if (settings.cameraPosition === 'top-right' || settings.cameraPosition === 'bottom-right') centerX = width - margin - radius;
-            if (settings.cameraPosition === 'bottom-left' || settings.cameraPosition === 'bottom-right') centerY = height - margin - radius;
+              if (settings.cameraPosition === 'top-right' || settings.cameraPosition === 'bottom-right') centerX = width - margin - radius;
+              if (settings.cameraPosition === 'bottom-left' || settings.cameraPosition === 'bottom-right') centerY = height - margin - radius;
 
-            const sourceWidth = cameraVideo.videoWidth;
-            const sourceHeight = cameraVideo.videoHeight;
-            const cropSize = Math.min(sourceWidth, sourceHeight);
-            context.save();
-            context.beginPath();
-            context.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            context.clip();
-            context.drawImage(cameraVideo, (sourceWidth - cropSize) / 2, (sourceHeight - cropSize) / 2, cropSize, cropSize, centerX - radius, centerY - radius, size, size);
-            context.restore();
-            context.beginPath();
-            context.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            context.lineWidth = Math.max(3, Math.round(size * 0.025));
-            context.strokeStyle = '#ffffff';
-            context.stroke();
+              const sourceWidth = cameraVideo.videoWidth;
+              const sourceHeight = cameraVideo.videoHeight;
+              const cropSize = Math.min(sourceWidth, sourceHeight);
+              context.save();
+              context.beginPath();
+              context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+              context.clip();
+              context.drawImage(cameraVideo, (sourceWidth - cropSize) / 2, (sourceHeight - cropSize) / 2, cropSize, cropSize, centerX - radius, centerY - radius, size, size);
+              context.restore();
+              context.beginPath();
+              context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+              context.lineWidth = Math.max(3, Math.round(size * 0.025));
+              context.strokeStyle = '#ffffff';
+              context.stroke();
+            }
           }
 
           compositeRecordingRef.current = { frameId: requestAnimationFrame(drawFrame), screenVideo };
         };
-        drawFrame();
+        drawFrame(performance.now());
 
         recordedChunksRef.current = [];
-        const recordingStream = compositeCanvas.captureStream(60);
+        const recordingStream = compositeCanvas.captureStream(30);
         screenStream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
         if (recordingStream.getAudioTracks().length === 0) {
           activeMicStream?.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
@@ -465,7 +476,7 @@ function App() {
       />
       <video
         ref={setWebcamVideoRef}
-        style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0.001, pointerEvents: 'none', zIndex: -1000 }}
+        style={{ position: 'fixed', right: '8px', bottom: '8px', width: '160px', height: '90px', opacity: 0.01, pointerEvents: 'none', zIndex: 0 }}
         autoPlay
         playsInline
         muted
