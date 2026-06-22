@@ -159,8 +159,8 @@ function App() {
       const screenStream = await navigator.mediaDevices.getDisplayMedia({
         video: { 
           displaySurface: 'monitor',
-          width: { ideal: 1920, max: 1920 },
-          height: { ideal: 1080, max: 1080 },
+          width: { ideal: 3840, max: 3840 },
+          height: { ideal: 2160, max: 2160 },
           frameRate: { ideal: 60, max: 60 }
         },
         audio: true
@@ -204,9 +204,8 @@ function App() {
         const compositeCanvas = document.createElement('canvas');
         const sourceWidth = screenVideo.videoWidth || 1920;
         const sourceHeight = screenVideo.videoHeight || 1080;
-        const outputScale = Math.min(1, 1920 / sourceWidth, 1080 / sourceHeight);
-        compositeCanvas.width = Math.round(sourceWidth * outputScale);
-        compositeCanvas.height = Math.round(sourceHeight * outputScale);
+        compositeCanvas.width = sourceWidth;
+        compositeCanvas.height = sourceHeight;
         const context = compositeCanvas.getContext('2d');
         if (!context) throw new Error('Could not prepare the recording canvas.');
 
@@ -264,7 +263,7 @@ function App() {
 
         const recorder = new MediaRecorder(recordingStream, {
           mimeType: recordMimeType || undefined,
-          videoBitsPerSecond: 25000000,
+          videoBitsPerSecond: 45000000,
         });
         screenRecorderRef.current = recorder;
         recorder.ondataavailable = (event) => {
