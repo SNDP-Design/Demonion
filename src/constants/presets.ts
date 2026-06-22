@@ -25,7 +25,7 @@ export const DEFAULT_SETTINGS: EditorSettings = {
   cameraPosition: 'bottom-right',
   cameraShape: 'circle',
   cameraSize: 120,
-  cameraBorderColor: '#8b5cf6',
+  cameraBorderColor: '#ffffff',
   trimStart: 0,
   trimEnd: 0,
 };
