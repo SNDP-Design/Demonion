@@ -65,8 +65,22 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       // 1. Temporarily request 4K resolution buffer on canvas
       onChangeSettings({ exportResolution: '4k' });
 
-      // 2. Wait a brief moment for React state and DOM resize to settle
-      await new Promise(r => setTimeout(r, 150));
+      // 2. Wait until the canvas has reached its true 4K export size.
+      const expectedSize = settings.aspectRatio === '9-16'
+        ? { width: 2160, height: 3840 }
+        : settings.aspectRatio === '1-1'
+          ? { width: 2160, height: 2160 }
+          : settings.aspectRatio === '4-3'
+            ? { width: 2880, height: 2160 }
+            : { width: 3840, height: 2160 };
+      const resizeDeadline = performance.now() + 2000;
+      while ((canvasElement.width < expectedSize.width || canvasElement.height < expectedSize.height) && performance.now() < resizeDeadline) {
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      }
+
+      if (canvasElement.width < expectedSize.width || canvasElement.height < expectedSize.height) {
+        throw new Error('The 4K export canvas was not ready. Please try again.');
+      }
 
       setExportState('rendering');
       setProgress(0);
@@ -193,7 +207,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
       const recorder = new MediaRecorder(outputStream, {
         mimeType: mimeType || undefined,
-        videoBitsPerSecond: 40000000 // 40 Mbps ultra-sharp compressed 4K
+        videoBitsPerSecond: 80000000 // High-quality compressed 4K at 60 FPS
       });
       recorderRef.current = recorder;
 
