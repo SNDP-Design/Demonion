@@ -565,6 +565,7 @@ function App() {
                 canvasRef={canvasRef}
                 videoElement={editorVideoEl}
                 webcamElement={useWebcam && !recordingIncludesWebcam ? webcamVideoEl : null}
+                showWebcamOverlay={useWebcam && !recordingIncludesWebcam}
                 settings={settings}
               />
             </div>

@@ -5,6 +5,7 @@ interface CanvasEditorProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   videoElement: HTMLVideoElement | null;
   webcamElement: HTMLVideoElement | null;
+  showWebcamOverlay: boolean;
   settings: EditorSettings;
 }
 
@@ -12,6 +13,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   canvasRef,
   videoElement,
   webcamElement,
+  showWebcamOverlay,
   settings
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -230,7 +232,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       }
 
       // Draw Circular Webcam overlay inside the card (so it scale clips perfectly)
-      if (settings.cameraPosition !== 'none') {
+      if (showWebcamOverlay && settings.cameraPosition !== 'none') {
         const r = settings.cameraSize / 2;
         const margin = 20;
         let cx = x0 + r + margin;
@@ -263,22 +265,6 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             wsx, wsy, sq, sq,
             cx - r, cy - r, 2 * r, 2 * r
           );
-        } else {
-          // Fallback: Draw a premium stylized gradient avatar preview
-          let camGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
-          camGrad.addColorStop(0, '#ffffff'); 
-          camGrad.addColorStop(1, '#a3a3a3'); 
-          ctx.fillStyle = camGrad;
-          ctx.beginPath();
-          ctx.arc(cx, cy, r, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Draw mock webcam camera silhouette icon
-          ctx.fillStyle = '#0a0a0a';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.font = `bold ${Math.round(r * 0.4)}px Inter`;
-          ctx.fillText('CAM', cx, cy);
         }
         ctx.restore();
 
