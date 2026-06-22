@@ -10,14 +10,20 @@ import {
   Video, 
   Mic, 
   Camera, 
+  CheckCircle2,
+  Clapperboard,
   Disc, 
   Download,
+  ArrowRight,
+  MonitorUp,
   RotateCcw,
+  Scissors,
   FileVideo
 } from 'lucide-react';
 
 function App() {
   const [recordingState, setRecordingState] = useState<'idle' | 'recording' | 'editor'>('idle');
+  const [showLandingPage, setShowLandingPage] = useState(true);
   const [countdown, setCountdown] = useState<number | null>(null);
   
   // Streams
@@ -409,13 +415,19 @@ function App() {
               <p>Browser Studio</p>
             </div>
           </div>
-          <div className="xg-nav-links" aria-label="Workspace sections">
-            <span className="active">Studio</span>
-            <span>Capture</span>
-            <span>Export</span>
+          <div className="xg-nav-links" aria-label="Main sections">
+            <span className={showLandingPage ? 'active' : ''}>Home</span>
+            <span>How it works</span>
+            <span>Features</span>
           </div>
 
-          {recordingState === 'editor' && (
+          {showLandingPage ? (
+            <div className="xg-nav-actions">
+              <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary">
+                Open studio <ArrowRight size={15} />
+              </button>
+            </div>
+          ) : recordingState === 'editor' && (
           <div className="xg-nav-actions">
             <button 
               onClick={() => {
@@ -459,7 +471,43 @@ function App() {
       />
 
       {/* Layout Content Body */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className={showLandingPage ? 'flex-1 overflow-y-auto' : 'flex-1 flex overflow-hidden'}>
+
+        {showLandingPage ? (
+          <section className="screentor-landing animate-fade-in">
+            <div className="landing-hero">
+              <span className="xg-pill"><span className="xg-status-dot" /> Your browser recording studio</span>
+              <h2>Make every product demo<br /><span>feel ready to share.</span></h2>
+              <p>Record your screen, camera, and voice in one place. Trim the rough edges, then export a polished video—without installing anything.</p>
+              <div className="landing-hero-actions">
+                <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary landing-primary-action">
+                  Start recording free <ArrowRight size={16} />
+                </button>
+                <a className="xg-button xg-button-secondary" href="#how-it-works">See how it works</a>
+              </div>
+              <p className="landing-note"><CheckCircle2 size={14} /> Works directly in your browser</p>
+            </div>
+
+            <div className="landing-preview" aria-label="Screentor app preview">
+              <div className="landing-preview-bar"><span /><span /><span /><b>Screentor Studio</b></div>
+              <div className="landing-preview-body">
+                <aside><div className="preview-brand"><Sparkles size={14} /> Screentor</div><div className="preview-menu active">New recording</div><div className="preview-menu">My clips</div><div className="preview-menu">Exports</div></aside>
+                <div className="preview-canvas"><div className="preview-canvas-pill">● Recording preview</div><div className="preview-window"><div className="preview-window-top"><i /><i /><i /></div><div className="preview-window-copy"><b>Ship a clear demo.</b><span>Capture the work, not the friction.</span></div><div className="preview-camera"><Camera size={20} /></div></div></div>
+              </div>
+            </div>
+
+            <section className="landing-features" id="features">
+              <article><span className="landing-feature-icon"><MonitorUp size={20} /></span><h3>Capture in one click</h3><p>Choose a browser tab, app window, or your whole screen. Keep your voice and camera with it.</p></article>
+              <article><span className="landing-feature-icon"><Scissors size={20} /></span><h3>Make it feel intentional</h3><p>Trim the start and end, choose your framing, and keep the recording focused on the work.</p></article>
+              <article><span className="landing-feature-icon"><Clapperboard size={20} /></span><h3>Export and share</h3><p>Create a high-quality video directly from your browser when the demo is ready to send.</p></article>
+            </section>
+
+            <section className="landing-workflow" id="how-it-works">
+              <div><span className="landing-kicker">A simple workflow</span><h3>From screen to shareable video.</h3></div>
+              <ol><li><b>01</b><span>Choose what to capture</span></li><li><b>02</b><span>Record your walkthrough</span></li><li><b>03</b><span>Trim and export your demo</span></li></ol>
+            </section>
+          </section>
+        ) : <>
 
         {/* State 1: Dashboard Setup */}
         {recordingState === 'idle' && (
@@ -586,6 +634,7 @@ function App() {
           </div>
         )}
 
+        </>}
       </div>
 
       {/* Export Modal */}
