@@ -108,7 +108,7 @@ export const Timeline: React.FC<TimelineProps> = ({
         <div className="flex items-center gap-3">
           <button 
             onClick={onTogglePlay} 
-            className="w-8 h-8 rounded-full bg-violet-600 hover:bg-violet-500 text-white flex-center transition-all cursor-pointer shadow-lg active:scale-95"
+            className="xg-button xg-button-primary xg-icon-button"
           >
             {isPlaying ? <Pause size={14} fill="currentColor" /> : <Play size={14} className="ml-0.5" fill="currentColor" />}
           </button>
@@ -125,7 +125,7 @@ export const Timeline: React.FC<TimelineProps> = ({
               <button
                 key={rate}
                 onClick={() => onPlaybackRateChange(rate)}
-                className={`px-1.5 py-0.5 rounded text-[10px] font-semibold transition-all ${playbackRate === rate ? 'bg-violet-soft-20 text-violet-400 border border-violet-soft-30' : 'hover-bg-glass hover:text-white'}`}
+                className={`xg-segment-button ${playbackRate === rate ? 'active' : ''}`}
               >
                 {rate}x
               </button>

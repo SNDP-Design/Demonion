@@ -325,12 +325,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({
               {/* FPS Selector */}
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-gray-300">Frame Rate (FPS)</span>
-                <div className="flex bg-white-5 p-0.5 rounded-lg border border-glass">
+                <div className="xg-segmented-control">
                   {[30, 60].map((f) => (
                     <button
                       key={f}
                       onClick={() => setFps(f as any)}
-                      className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${fps === f ? 'bg-violet-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                      className={`xg-segment-button ${fps === f ? 'active' : ''}`}
                     >
                       {f} FPS
                     </button>
