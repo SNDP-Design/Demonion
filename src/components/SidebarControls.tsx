@@ -14,8 +14,8 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
   return (
     <aside className="glass-panel sidebar flex flex-col h-full w-[350px] border-r border-glass text-sm select-none rounded-none">
       <div className="sidebar-content space-y-6">
-        <section className="space-y-4">
-          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Camera size={14} /> Facecam Overlay</h3>
+        <section className="sidebar-module">
+          <h3 className="sidebar-module-title"><Camera size={14} /> Facecam Overlay</h3>
           <div className="facecam-position-row">
             {[
               { id: 'top-left', name: 'Top left', icon: CornerUpLeft },
@@ -47,23 +47,23 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
           </div>}
         </section>
 
-        <section className="browser-window-section border-t border-glass pt-5">
-          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Layout size={14} /> Browser Window</h3>
+        <section className="sidebar-module browser-window-section border-t border-glass pt-5">
+          <h3 className="sidebar-module-title"><Layout size={14} /> Browser Window</h3>
           <div className="browser-window-controls">
-            <div className="browser-aspect-control"><label className="text-[11px] text-gray-500 font-bold uppercase">Aspect Ratio</label>
+            <div className="browser-aspect-control"><label className="sidebar-feature-title">Aspect Ratio</label>
               <div className="browser-aspect-row">{[
                 { id: '16-9', name: '16:9 Desktop' }, { id: '4-3', name: '4:3 Tablet' },
               ].map((ratio) => <button key={ratio.id} onClick={() => update('aspectRatio', ratio.id as AspectRatio)} className={`facecam-position-button browser-aspect-button ${settings.aspectRatio === ratio.id ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}>{ratio.name}</button>)}</div>
             </div>
             <Slider label="Window Padding" value={`${Math.round(settings.scale * 100)}%`} min="0.5" max="1.1" step="0.01" current={settings.scale} onChange={(value) => update('scale', value)} />
             <Slider label="Shadow Blur" value={`${settings.shadowIntensity}px`} min="0" max="100" current={settings.shadowIntensity} onChange={(value) => update('shadowIntensity', value)} />
-            <label className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass text-xs text-gray-300"><span>macOS Title Dots</span><span className="switch-container"><input type="checkbox" checked={settings.macOSHeader} onChange={(event) => update('macOSHeader', event.target.checked)} className="switch-input" /><span className="switch-slider" /></span></label>
+            <label className="sidebar-toggle-label"><span>macOS Title Dots</span><span className="switch-container"><input type="checkbox" checked={settings.macOSHeader} onChange={(event) => update('macOSHeader', event.target.checked)} className="switch-input" /><span className="switch-slider" /></span></label>
           </div>
         </section>
 
-        <section className="space-y-4 border-t border-glass pt-5">
-          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Paintbrush size={14} /> Background</h3>
-          <label className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass text-xs text-gray-300"><span>Flat Color</span><input type="color" value={settings.solidColor} onChange={(event) => onChangeSettings({ solidColor: event.target.value, backgroundType: 'solid' })} className="color-picker" /></label>
+        <section className="sidebar-module border-t border-glass pt-5">
+          <h3 className="sidebar-module-title"><Paintbrush size={14} /> Background</h3>
+          <label className="sidebar-flat-color"><span>Flat Color</span><input type="color" value={settings.solidColor} onChange={(event) => onChangeSettings({ solidColor: event.target.value, backgroundType: 'solid' })} className="color-picker" /></label>
           <div className="gradient-thumbnail-grid">{GRADIENT_PRESETS.map((preset) => <button key={preset.id} onClick={() => onChangeSettings({ gradientPresetId: preset.id, backgroundType: 'gradient' })} title={preset.name} aria-label={preset.name} className={`gradient-thumbnail ${settings.gradientPresetId === preset.id && settings.backgroundType === 'gradient' ? 'active-pink' : 'border-glass hover:border-white/10'}`}><span style={{ background: preset.css }} /></button>)}</div>
         </section>
       </div>
