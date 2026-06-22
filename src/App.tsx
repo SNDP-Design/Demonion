@@ -415,11 +415,11 @@ function App() {
               <p>Browser Studio</p>
             </div>
           </div>
-          <div className="xg-nav-links" aria-label="Main sections">
-            <span className={showLandingPage ? 'active' : ''}>Home</span>
-            <span>How it works</span>
-            <span>Features</span>
-          </div>
+          <nav className="xg-nav-links" aria-label="Main sections">
+            <a href="#home" className={showLandingPage ? 'active' : ''}>Home</a>
+            <a href="#how-it-works">How it works</a>
+            <a href="#features">Features</a>
+          </nav>
 
           {showLandingPage ? (
             <div className="xg-nav-actions">
@@ -474,7 +474,7 @@ function App() {
       <div className={showLandingPage ? 'landing-scroll-container flex-1' : 'flex-1 flex overflow-hidden'}>
 
         {showLandingPage ? (
-          <section className="screentor-landing animate-fade-in">
+          <section className="screentor-landing animate-fade-in" id="home">
             <div className="landing-hero">
               <span className="xg-pill"><span className="xg-status-dot" /> Your browser recording studio</span>
               <h2><span className="landing-heading-line">Make every product</span><span className="landing-heading-line landing-heading-muted">demo feel ready to share.</span></h2>
@@ -506,6 +506,57 @@ function App() {
               <div><span className="landing-kicker">A simple workflow</span><h3>From screen to shareable video.</h3></div>
               <ol><li><b>01</b><span>Choose what to capture</span></li><li><b>02</b><span>Record your walkthrough</span></li><li><b>03</b><span>Trim and export your demo</span></li></ol>
             </section>
+
+            <section className="landing-story" id="why-screentor">
+              <div className="landing-story-intro">
+                <span className="landing-kicker">Made for clear explanations</span>
+                <h3>Your product is easier to understand when people can see it.</h3>
+                <p>Screentor helps you turn a quick walkthrough into a video that is calm, focused, and easy to follow. It is for the moments when a screenshot is not enough.</p>
+              </div>
+              <div className="landing-story-list">
+                <article><b>Show, don’t describe</b><p>Walk a client through a feature, a teammate through a process, or a customer through a fix.</p></article>
+                <article><b>Keep the important parts in view</b><p>Use your camera when it adds a human touch, and trim away the moments that do not help the story.</p></article>
+                <article><b>Stay in the browser</b><p>Record and export without a heavy desktop app, a complicated timeline, or an account setup wall.</p></article>
+              </div>
+            </section>
+
+            <section className="landing-use-cases">
+              <div className="landing-section-heading"><span className="landing-kicker">Use Screentor for</span><h3>More than just a demo.</h3><p>Whenever you need to explain something on screen, you can make it easier to watch.</p></div>
+              <div className="landing-use-case-grid">
+                <article><span>01</span><h4>Product walkthroughs</h4><p>Give prospects and customers a clear view of how your product works.</p></article>
+                <article><span>02</span><h4>Release updates</h4><p>Show what changed instead of writing a long summary that people have to imagine.</p></article>
+                <article><span>03</span><h4>Support answers</h4><p>Record a helpful answer once and send it whenever the same question comes back.</p></article>
+                <article><span>04</span><h4>Internal handovers</h4><p>Give your team context for a design, task, or workflow without another meeting.</p></article>
+              </div>
+            </section>
+
+            <section className="landing-assurance">
+              <div><span className="landing-kicker">Simple by design</span><h3>No complicated setup.<br />No hidden workflow.</h3></div>
+              <ul><li><CheckCircle2 size={17} /> Pick your screen, window, or browser tab</li><li><CheckCircle2 size={17} /> Add your voice and camera if you want to</li><li><CheckCircle2 size={17} /> Trim the recording and export the video</li></ul>
+            </section>
+
+            <section className="landing-faq" id="faq">
+              <div className="landing-section-heading"><span className="landing-kicker">Questions, answered</span><h3>Good to know before you record.</h3></div>
+              <div className="landing-faq-list">
+                <details open><summary>Do I need to install anything?<span>+</span></summary><p>No. Screentor runs in a modern web browser. You choose what to share using your browser’s normal screen-sharing window.</p></details>
+                <details><summary>Can I include my camera and microphone?<span>+</span></summary><p>Yes. Turn on the camera and microphone choices before you start. Your browser will ask for permission the first time.</p></details>
+                <details><summary>Can I record only my browser tab?<span>+</span></summary><p>Yes. When you start, choose the tab, app window, or full screen you want to capture.</p></details>
+                <details><summary>Can I make a video without the camera?<span>+</span></summary><p>Yes. Turn the camera choice off before recording, or hide it in the recording settings.</p></details>
+              </div>
+            </section>
+
+            <section className="landing-final-cta">
+              <span className="xg-pill"><span className="xg-status-dot" /> Ready when you are</span>
+              <h3>Make the next explanation<br /><span>easy to watch.</span></h3>
+              <p>Open Screentor and record your first clear walkthrough in a few clicks.</p>
+              <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary landing-primary-action">Open Screentor <ArrowRight size={16} /></button>
+            </section>
+
+            <footer className="landing-footer">
+              <div className="landing-footer-brand"><span className="xg-brand-mark"><Sparkles size={15} /></span><div><b>Screentor</b><small>A browser recording studio for clear product videos.</small></div></div>
+              <div className="landing-footer-links"><a href="#home">Home</a><a href="#features">Features</a><a href="#how-it-works">How it works</a><a href="#faq">FAQ</a></div>
+              <p>© 2026 Screentor</p>
+            </footer>
           </section>
         ) : <>
 
