@@ -1113,3 +1113,26 @@ aside.sidebar {
 .landing-workflow { display: grid; grid-template-columns: 1fr 1.2fr; gap: 48px; align-items: start; padding: 52px 0 0; border-top: 1px solid var(--border-glass); }.landing-kicker { color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }.landing-workflow h3 { max-width: 350px; margin-top: 13px; font-size: clamp(27px, 3vw, 38px); line-height: 1.12; letter-spacing: -1px; }.landing-workflow ol { list-style: none; }.landing-workflow li { display: flex; gap: 18px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border-glass); color: #dedede; font-size: 15px; }.landing-workflow li:first-child { border-top: 1px solid var(--border-glass); }.landing-workflow b { color: #777; font-size: 12px; font-variant-numeric: tabular-nums; }
 
 @media (max-width: 720px) { .landing-hero { padding: 72px 0 48px; }.landing-hero h2 { letter-spacing: -1.5px; }.landing-hero > p:not(.landing-note) { font-size: 16px; }.landing-preview-body { grid-template-columns: 1fr; min-height: 360px; }.landing-preview-body aside { display: none; }.preview-canvas { padding: 48px 18px 28px; }.landing-features, .landing-workflow { grid-template-columns: 1fr; }.landing-features { margin: 62px 0; }.landing-workflow { gap: 30px; } }
+
+/* Landing page layout refinements */
+.landing-scroll-container { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.xg-nav { height: 84px; }
+.xg-nav-inner { width: min(1320px, 100%); padding-inline: 32px; gap: 42px; }
+.xg-nav-links { gap: 12px; }
+.xg-nav-links span { padding: 9px 15px; }
+.landing-hero { max-width: 1000px; padding-top: 96px; }
+.landing-hero h2 { font-size: clamp(46px, 5vw, 64px); line-height: 1.08; letter-spacing: -2px; }
+.landing-heading-line { display: block; white-space: nowrap; }
+.landing-hero h2 .landing-heading-muted { color: #a3a3a3; }
+.landing-hero h2 span { color: inherit; }
+
+@media (max-width: 900px) {
+  .xg-nav-inner { padding-inline: 22px; gap: 20px; }
+  .landing-heading-line { white-space: normal; }
+}
+
+@media (max-width: 640px) {
+  .xg-nav { height: 72px; }
+  .xg-nav-inner { padding-inline: 14px; }
+  .landing-hero { padding-top: 64px; }
+}

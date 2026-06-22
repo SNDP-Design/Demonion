@@ -471,13 +471,13 @@ function App() {
       />
 
       {/* Layout Content Body */}
-      <div className={showLandingPage ? 'flex-1 overflow-y-auto' : 'flex-1 flex overflow-hidden'}>
+      <div className={showLandingPage ? 'landing-scroll-container flex-1' : 'flex-1 flex overflow-hidden'}>
 
         {showLandingPage ? (
           <section className="screentor-landing animate-fade-in">
             <div className="landing-hero">
               <span className="xg-pill"><span className="xg-status-dot" /> Your browser recording studio</span>
-              <h2>Make every product demo<br /><span>feel ready to share.</span></h2>
+              <h2><span className="landing-heading-line">Make every product</span><span className="landing-heading-line landing-heading-muted">demo feel ready to share.</span></h2>
               <p>Record your screen, camera, and voice in one place. Trim the rough edges, then export a polished video—without installing anything.</p>
               <div className="landing-hero-actions">
                 <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary landing-primary-action">
