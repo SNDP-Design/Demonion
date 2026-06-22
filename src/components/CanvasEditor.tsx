@@ -233,8 +233,12 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
       // Draw Circular Webcam overlay inside the card (so it scale clips perfectly)
       if (showWebcamOverlay && settings.cameraPosition !== 'none') {
-        const r = settings.cameraSize / 2;
-        const margin = 20;
+        // The preview canvas is 1080p and the export canvas is 4K. Scale all
+        // camera measurements together so the bubble keeps its chosen size.
+        const renderScale = settings.exportResolution === '4k' ? 2 : 1;
+        const cameraSize = settings.cameraSize * renderScale;
+        const r = cameraSize / 2;
+        const margin = 20 * renderScale;
         let cx = x0 + r + margin;
         let cy = y0 + r + margin + headerH;
 
@@ -248,7 +252,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         }
 
         const isCircleCamera = settings.cameraShape === 'circle';
-        const cameraCornerRadius = isCircleCamera ? r : settings.cameraSize * 0.2;
+        const cameraCornerRadius = isCircleCamera ? r : cameraSize * 0.2;
         const cameraX = cx - r;
         const cameraY = cy - r;
 
@@ -257,7 +261,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         if (isCircleCamera) {
           ctx.arc(cx, cy, r, 0, Math.PI * 2);
         } else {
-          ctx.roundRect(cameraX, cameraY, settings.cameraSize, settings.cameraSize, cameraCornerRadius);
+          ctx.roundRect(cameraX, cameraY, cameraSize, cameraSize, cameraCornerRadius);
         }
         ctx.clip();
 
@@ -272,7 +276,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           ctx.drawImage(
             webcamElement,
             wsx, wsy, sq, sq,
-            cameraX, cameraY, settings.cameraSize, settings.cameraSize
+            cameraX, cameraY, cameraSize, cameraSize
           );
         }
         ctx.restore();
@@ -282,9 +286,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         if (isCircleCamera) {
           ctx.arc(cx, cy, r, 0, Math.PI * 2);
         } else {
-          ctx.roundRect(cameraX, cameraY, settings.cameraSize, settings.cameraSize, cameraCornerRadius);
+          ctx.roundRect(cameraX, cameraY, cameraSize, cameraSize, cameraCornerRadius);
         }
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 3 * renderScale;
         ctx.strokeStyle = settings.cameraBorderColor;
         ctx.stroke();
       }
