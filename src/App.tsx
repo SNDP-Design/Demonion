@@ -206,7 +206,31 @@ function App() {
         if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = 'video/webm';
         if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = '';
 
-        const recorder = new MediaRecorder(screenStream, {
+        const recordingStream = new MediaStream();
+        screenStream.getVideoTracks().forEach((track) => recordingStream.addTrack(track));
+
+        let audioContext: AudioContext | null = null;
+        try {
+          audioContext = new AudioContext();
+          const audioDestination = audioContext.createMediaStreamDestination();
+          let hasAudio = false;
+
+          if (screenStream.getAudioTracks().length > 0) {
+            audioContext.createMediaStreamSource(screenStream).connect(audioDestination);
+            hasAudio = true;
+          }
+          if (activeMicStream?.getAudioTracks().length) {
+            audioContext.createMediaStreamSource(activeMicStream).connect(audioDestination);
+            hasAudio = true;
+          }
+          if (hasAudio) audioDestination.stream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+        } catch (error) {
+          console.warn('Could not mix audio sources:', error);
+          screenStream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+          activeMicStream?.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+        }
+
+        const recorder = new MediaRecorder(recordingStream, {
           mimeType: recordMimeType || undefined,
           videoBitsPerSecond: 45000000,
         });
@@ -228,6 +252,7 @@ function App() {
         recorder.onstop = () => {
           const blob = new Blob(recordedChunksRef.current, { type: recordMimeType || 'video/webm' });
           if (cameraRecorderRef.current?.state === 'recording') cameraRecorderRef.current.stop();
+          audioContext?.close();
           setRecordingIncludesWebcam(false);
           setVideoSrc(URL.createObjectURL(blob));
           setRecordingState('editor');
@@ -371,7 +396,7 @@ function App() {
       
       {/* Header Bar */}
       <header className="xg-nav select-none">
-        <div className="xg-nav-inner">
+        <div className={`xg-nav-inner ${showLandingPage ? '' : 'studio-nav-inner'}`}>
           <div className="xg-brand">
             <div className="xg-brand-mark"><Sparkles size={16} /></div>
             <div>
