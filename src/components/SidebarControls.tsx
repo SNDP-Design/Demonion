@@ -1,7 +1,7 @@
 import React from 'react';
 import type { AspectRatio, EditorSettings } from '../types';
 import { GRADIENT_PRESETS } from '../constants/presets';
-import { Camera, Layout, Paintbrush, SlidersHorizontal } from 'lucide-react';
+import { Camera, CameraOff, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Paintbrush, SlidersHorizontal } from 'lucide-react';
 
 interface SidebarControlsProps {
   settings: EditorSettings;
@@ -21,15 +21,17 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
       <div className="sidebar-content space-y-6">
         <section className="space-y-4">
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><Camera size={14} /> Facecam Overlay</h3>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="facecam-position-row">
             {[
-              { id: 'top-left', name: 'Top Left' }, { id: 'top-right', name: 'Top Right' },
-              { id: 'bottom-left', name: 'Bottom Left' }, { id: 'bottom-right', name: 'Bottom Right' },
-              { id: 'none', name: 'Hide Camera' },
+              { id: 'top-left', name: 'Top left', icon: CornerUpLeft },
+              { id: 'top-right', name: 'Top right', icon: CornerUpRight },
+              { id: 'bottom-left', name: 'Bottom left', icon: CornerDownLeft },
+              { id: 'bottom-right', name: 'Bottom right', icon: CornerDownRight },
+              { id: 'none', name: 'Hide camera', icon: CameraOff },
             ].map((position) => (
-              <button key={position.id} onClick={() => update('cameraPosition', position.id as EditorSettings['cameraPosition'])}
-                className={`p-2.5 rounded-lg border text-xs font-semibold text-center transition-all ${settings.cameraPosition === position.id ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'} ${position.id === 'none' ? 'col-span-2' : ''}`}>
-                {position.name}
+              <button key={position.id} onClick={() => update('cameraPosition', position.id as EditorSettings['cameraPosition'])} title={position.name} aria-label={position.name}
+                className={`facecam-position-button ${settings.cameraPosition === position.id ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}>
+                <position.icon size={17} strokeWidth={2.2} />
               </button>
             ))}
           </div>
