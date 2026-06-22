@@ -23,7 +23,6 @@ function App() {
   // Streams
   const [videoSrc, setVideoSrc] = useState<string>('');
   const [micStream, setMicStream] = useState<MediaStream | null>(null);
-  const [webcamStream, setWebcamStream] = useState<MediaStream | null>(null);
 
   // Editor states
   const [settings, setSettings] = useState<EditorSettings>(DEFAULT_SETTINGS);
@@ -42,6 +41,7 @@ function App() {
   // Refs
   const editorVideoRef = useRef<HTMLVideoElement | null>(null);
   const webcamVideoRef = useRef<HTMLVideoElement | null>(null);
+  const webcamStreamRef = useRef<MediaStream | null>(null);
   const screenRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<any>(null);
@@ -53,6 +53,48 @@ function App() {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  const connectWebcamVideo = useCallback(async (stream: MediaStream) => {
+    const video = webcamVideoRef.current;
+    if (!video) return false;
+
+    if (video.srcObject !== stream) {
+      video.srcObject = stream;
+    }
+
+    try {
+      await video.play();
+    } catch (error) {
+      console.warn('Camera preview could not start:', error);
+      return false;
+    }
+
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) return true;
+
+    return new Promise<boolean>((resolve) => {
+      const finish = () => {
+        video.removeEventListener('loadeddata', finish);
+        clearTimeout(timeout);
+        resolve(video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA);
+      };
+      const timeout = window.setTimeout(finish, 1500);
+      video.addEventListener('loadeddata', finish, { once: true });
+    });
+  }, []);
+
+  const ensureWebcamStream = useCallback(async () => {
+    const existingStream = webcamStreamRef.current;
+    if (existingStream?.getVideoTracks().some((track) => track.readyState === 'live')) {
+      return connectWebcamVideo(existingStream);
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false,
+    });
+    webcamStreamRef.current = stream;
+    return connectWebcamVideo(stream);
+  }, [connectWebcamVideo]);
+
   const setEditorVideoRef = useCallback((el: HTMLVideoElement | null) => {
     editorVideoRef.current = el;
     setEditorVideoEl((current) => current === el ? current : el);
@@ -61,7 +103,10 @@ function App() {
   const setWebcamVideoRef = useCallback((el: HTMLVideoElement | null) => {
     webcamVideoRef.current = el;
     setWebcamVideoEl((current) => current === el ? current : el);
-  }, []);
+    if (el && webcamStreamRef.current) {
+      void connectWebcamVideo(webcamStreamRef.current);
+    }
+  }, [connectWebcamVideo]);
 
   // Auto clean blob url
   useEffect(() => {
@@ -70,38 +115,21 @@ function App() {
     };
   }, [videoSrc]);
 
-  // Request/Release Webcam Overlay Stream based on settings toggle/editor state
+  // Keep one camera stream connected to the hidden video element used by the canvas.
   useEffect(() => {
-    const initWebcam = async () => {
-      if (useWebcam && recordingState === 'idle') {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { width: { ideal: 1280 }, height: { ideal: 720 } }, 
-            audio: false 
-          });
-          setWebcamStream(stream);
-          if (webcamVideoRef.current) {
-            webcamVideoRef.current.srcObject = stream;
-            webcamVideoRef.current.play().catch(err => console.warn('Webcam play failed:', err));
-          }
-        } catch (e) {
-          console.error('Webcam permission denied:', e);
-          setUseWebcam(false);
-        }
-      }
-    };
+    if (recordingState !== 'idle') return;
 
-    if (recordingState === 'idle') {
-      if (useWebcam) {
-        initWebcam();
-      } else {
-        if (webcamStream) {
-          webcamStream.getTracks().forEach(track => track.stop());
-          setWebcamStream(null);
-        }
-      }
+    if (useWebcam) {
+      ensureWebcamStream().catch((error) => {
+        console.error('Camera permission was not granted:', error);
+        setUseWebcam(false);
+      });
+    } else {
+      webcamStreamRef.current?.getTracks().forEach((track) => track.stop());
+      webcamStreamRef.current = null;
+      if (webcamVideoRef.current) webcamVideoRef.current.srcObject = null;
     }
-  }, [useWebcam, recordingState]);
+  }, [ensureWebcamStream, recordingState, useWebcam]);
 
   // Handle countdown overlay before screen recording starts
   const handleStartScreenRecording = async () => {
@@ -128,20 +156,15 @@ function App() {
         }
       }
 
-      // 3. Request webcam if requested
-      let activeWebcamStream: MediaStream | null = null;
+      // 3. Make sure the camera feed is connected before the countdown begins.
       if (useWebcam) {
         try {
-          activeWebcamStream = await navigator.mediaDevices.getUserMedia({ 
-            video: { width: { ideal: 1280 }, height: { ideal: 720 } } 
-          });
-          setWebcamStream(activeWebcamStream);
-          if (webcamVideoRef.current) {
-            webcamVideoRef.current.srcObject = activeWebcamStream;
-            webcamVideoRef.current.play().catch(err => console.warn('Webcam start failed:', err));
+          const cameraReady = await ensureWebcamStream();
+          if (!cameraReady) {
+            throw new Error('Camera video did not become ready in time.');
           }
-        } catch (e) {
-          console.warn('Webcam access denied.');
+        } catch (error) {
+          console.warn('Camera could not be included in this recording:', error);
           setUseWebcam(false);
         }
       }
