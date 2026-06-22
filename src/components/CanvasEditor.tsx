@@ -247,9 +247,18 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           cy = y0 + totalH - r - margin;
         }
 
+        const isCircleCamera = settings.cameraShape === 'circle';
+        const cameraCornerRadius = isCircleCamera ? r : settings.cameraSize * 0.2;
+        const cameraX = cx - r;
+        const cameraY = cy - r;
+
         ctx.save();
         ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        if (isCircleCamera) {
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        } else {
+          ctx.roundRect(cameraX, cameraY, settings.cameraSize, settings.cameraSize, cameraCornerRadius);
+        }
         ctx.clip();
 
         if (webcamElement && webcamElement.readyState >= 2) {
@@ -263,14 +272,18 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           ctx.drawImage(
             webcamElement,
             wsx, wsy, sq, sq,
-            cx - r, cy - r, 2 * r, 2 * r
+            cameraX, cameraY, settings.cameraSize, settings.cameraSize
           );
         }
         ctx.restore();
 
         // Stroke Webcam Border
         ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        if (isCircleCamera) {
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        } else {
+          ctx.roundRect(cameraX, cameraY, settings.cameraSize, settings.cameraSize, cameraCornerRadius);
+        }
         ctx.lineWidth = 3;
         ctx.strokeStyle = settings.cameraBorderColor;
         ctx.stroke();

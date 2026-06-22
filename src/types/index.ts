@@ -18,6 +18,7 @@ export interface EditorSettings {
   scale: number; // 0.3 to 1.2
   macOSHeader: boolean;
   cameraPosition: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'none';
+  cameraShape: 'circle' | 'rounded';
   cameraSize: number; // pixels (80 to 200)
   cameraBorderColor: string;
   trimStart: number; // in seconds

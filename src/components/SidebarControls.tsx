@@ -1,7 +1,7 @@
 import React from 'react';
 import type { AspectRatio, EditorSettings } from '../types';
 import { GRADIENT_PRESETS } from '../constants/presets';
-import { Camera, CameraOff, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Paintbrush } from 'lucide-react';
+import { Camera, CameraOff, Circle, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Paintbrush, Square } from 'lucide-react';
 
 interface SidebarControlsProps {
   settings: EditorSettings;
@@ -29,6 +29,13 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
                 <position.icon size={17} strokeWidth={2.2} />
               </button>
             ))}
+          </div>
+          <div className="facecam-shape-row">
+            <span>Camera Shape</span>
+            <div className="facecam-shape-buttons">
+              <button onClick={() => update('cameraShape', 'circle')} title="Circle camera" aria-label="Circle camera" className={`facecam-position-button ${settings.cameraShape === 'circle' ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}><Circle size={17} /></button>
+              <button onClick={() => update('cameraShape', 'rounded')} title="Rounded square camera" aria-label="Rounded square camera" className={`facecam-position-button ${settings.cameraShape === 'rounded' ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}><Square size={17} /></button>
+            </div>
           </div>
           {settings.cameraPosition !== 'none' && <div className="space-y-3.5 pt-1">
             <label className="space-y-1.5 block"><span className="flex justify-between text-xs text-gray-400"><span>Camera Bubble Size</span><b>{settings.cameraSize}px</b></span>
