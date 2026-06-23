@@ -261,6 +261,8 @@ function App() {
           if (cameraRecorderRef.current?.state === 'recording') cameraRecorderRef.current.stop();
           else releaseWebcam();
           audioContext?.close();
+          activeMicStream?.getTracks().forEach((track) => track.stop());
+          setMicStream(null);
           setRecordingIncludesWebcam(false);
           setVideoSrc(URL.createObjectURL(blob));
           setRecordingState('editor');
