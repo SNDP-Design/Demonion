@@ -66,6 +66,13 @@ function App() {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  const releaseWebcam = useCallback(() => {
+    webcamVideoRef.current?.pause();
+    if (webcamVideoRef.current) webcamVideoRef.current.srcObject = null;
+    webcamStreamRef.current?.getTracks().forEach((track) => track.stop());
+    webcamStreamRef.current = null;
+  }, []);
+
   const waitForVideoFrame = useCallback((video: HTMLVideoElement) => {
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) return Promise.resolve(true);
 
@@ -154,11 +161,9 @@ function App() {
   // Release the camera when the user turns the camera option off.
   useEffect(() => {
     if (!useWebcam) {
-      webcamStreamRef.current?.getTracks().forEach((track) => track.stop());
-      webcamStreamRef.current = null;
-      if (webcamVideoRef.current) webcamVideoRef.current.srcObject = null;
+      releaseWebcam();
     }
-  }, [useWebcam]);
+  }, [releaseWebcam, useWebcam]);
 
   // Handle countdown overlay before screen recording starts
   const handleStartScreenRecording = async () => {
@@ -244,6 +249,7 @@ function App() {
           cameraRecorder.ondataavailable = (event) => { if (event.data.size > 0) recordedCameraChunksRef.current.push(event.data); };
           cameraRecorder.onstop = () => {
             if (recordedCameraChunksRef.current.length > 0) setCameraSrc(URL.createObjectURL(new Blob(recordedCameraChunksRef.current, { type: recordMimeType || 'video/webm' })));
+            releaseWebcam();
           };
           cameraRecorder.start();
         }
@@ -253,6 +259,7 @@ function App() {
         recorder.onstop = () => {
           const blob = new Blob(recordedChunksRef.current, { type: recordMimeType || 'video/webm' });
           if (cameraRecorderRef.current?.state === 'recording') cameraRecorderRef.current.stop();
+          else releaseWebcam();
           audioContext?.close();
           setRecordingIncludesWebcam(false);
           setVideoSrc(URL.createObjectURL(blob));

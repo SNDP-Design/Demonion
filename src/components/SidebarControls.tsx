@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import type { AspectRatio, EditorSettings } from '../types';
 import { GRADIENT_PRESETS } from '../constants/presets';
-import { Camera, CameraOff, Circle, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Paintbrush, Square } from 'lucide-react';
+import { Camera, CameraOff, Circle, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Paintbrush, Pencil, Square } from 'lucide-react';
 
 interface SidebarControlsProps {
   settings: EditorSettings;
@@ -10,6 +10,7 @@ interface SidebarControlsProps {
 
 export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onChangeSettings }) => {
   const update = <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) => onChangeSettings({ [key]: value });
+  const flatColorInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <aside className="glass-panel sidebar flex flex-col h-full w-[350px] border-r border-glass text-sm select-none rounded-none">
@@ -63,8 +64,10 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
 
         <section className="sidebar-module border-t border-glass pt-5">
           <h3 className="sidebar-module-title"><Paintbrush size={14} /> Background</h3>
-          <label className="sidebar-flat-color"><span>Flat Color</span><input type="color" value={settings.solidColor} onChange={(event) => onChangeSettings({ solidColor: event.target.value, backgroundType: 'solid' })} className="color-picker" /></label>
-          <div className="gradient-thumbnail-grid">{GRADIENT_PRESETS.map((preset) => <button key={preset.id} onClick={() => onChangeSettings({ gradientPresetId: preset.id, backgroundType: 'gradient' })} title={preset.name} aria-label={preset.name} className={`gradient-thumbnail ${settings.gradientPresetId === preset.id && settings.backgroundType === 'gradient' ? 'active-pink' : 'border-glass hover:border-white/10'}`}><span style={{ background: preset.css }} /></button>)}</div>
+          <div className="gradient-thumbnail-grid">{GRADIENT_PRESETS.map((preset) => <button key={preset.id} onClick={() => onChangeSettings({ gradientPresetId: preset.id, backgroundType: 'gradient' })} title={preset.name} aria-label={preset.name} className={`gradient-thumbnail ${settings.gradientPresetId === preset.id && settings.backgroundType === 'gradient' ? 'active-pink' : 'border-glass hover:border-white/10'}`}><span style={{ background: preset.css }} /></button>)}
+            <button type="button" onClick={() => flatColorInputRef.current?.click()} title="Choose a flat color" aria-label="Choose a flat color" className={`flat-color-thumbnail ${settings.backgroundType === 'solid' ? 'active-pink' : 'border-glass hover:border-white/10'}`}><span style={{ background: settings.solidColor }} /><i><Pencil size={12} /></i></button>
+            <input ref={flatColorInputRef} type="color" value={settings.solidColor} onChange={(event) => onChangeSettings({ solidColor: event.target.value, backgroundType: 'solid' })} className="flat-color-picker-input" />
+          </div>
         </section>
       </div>
     </aside>

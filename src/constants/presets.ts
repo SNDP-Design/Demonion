@@ -6,7 +6,6 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
   { id: 'aurora', name: 'Northern Aurora', css: 'linear-gradient(135deg, #10b981 0%, #06b6d4 50%, #3b82f6 100%)' },
   { id: 'nebula', name: 'Cosmic Nebula', css: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #db2777 100%)' },
   { id: 'ocean', name: 'Deep Blue', css: 'linear-gradient(135deg, #1e3a8a 0%, #0284c7 50%, #0d9488 100%)' },
-  { id: 'mono-dark', name: 'Studio Dark', css: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)' },
 ];
 
 export const DEFAULT_SETTINGS: EditorSettings = {
