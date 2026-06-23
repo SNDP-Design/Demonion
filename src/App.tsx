@@ -5,6 +5,7 @@ import { SidebarControls } from './components/SidebarControls';
 import { CanvasEditor } from './components/CanvasEditor';
 import { Timeline } from './components/Timeline';
 import { ExportModal } from './components/ExportModal';
+import { LandingPage } from './components/LandingPage';
 import { 
   Sparkles, 
   Video, 
@@ -486,6 +487,9 @@ function App() {
       <div className={showLandingPage ? 'landing-scroll-container flex-1' : 'flex-1 flex overflow-hidden'}>
 
         {showLandingPage ? (
+          <>
+          <LandingPage onOpenStudio={() => setShowLandingPage(false)} />
+          {false && (
           <section className="screentor-landing animate-fade-in" id="home">
             <div className="landing-hero">
               <span className="xg-pill"><span className="xg-status-dot" /> Your browser recording studio</span>
@@ -570,6 +574,8 @@ function App() {
               <p>© 2026 Screentor</p>
             </footer>
           </section>
+          )}
+          </>
         ) : <>
 
         {/* State 1: Dashboard Setup */}
