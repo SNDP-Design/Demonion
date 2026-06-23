@@ -26,7 +26,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
               { id: 'none', name: 'Hide camera', icon: CameraOff },
             ].map((position) => (
               <button key={position.id} onClick={() => update('cameraPosition', position.id as EditorSettings['cameraPosition'])} title={position.name} aria-label={position.name}
-                className={`facecam-position-button ${settings.cameraPosition === position.id ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}>
+                className={`facecam-position-button ${settings.cameraPosition === position.id ? 'sidebar-control-active' : 'border-glass hover-bg-glass text-gray-400'}`}>
                 <position.icon size={17} strokeWidth={2.2} />
               </button>
             ))}
@@ -34,8 +34,8 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
           <div className="facecam-shape-row">
             <span>Camera Shape</span>
             <div className="facecam-shape-buttons">
-              <button onClick={() => update('cameraShape', 'circle')} title="Circle camera" aria-label="Circle camera" className={`facecam-position-button ${settings.cameraShape === 'circle' ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}><Circle size={17} /></button>
-              <button onClick={() => update('cameraShape', 'rounded')} title="Rounded square camera" aria-label="Rounded square camera" className={`facecam-position-button ${settings.cameraShape === 'rounded' ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}><Square size={17} /></button>
+              <button onClick={() => update('cameraShape', 'circle')} title="Circle camera" aria-label="Circle camera" className={`facecam-position-button ${settings.cameraShape === 'circle' ? 'sidebar-control-active' : 'border-glass hover-bg-glass text-gray-400'}`}><Circle size={17} /></button>
+              <button onClick={() => update('cameraShape', 'rounded')} title="Rounded square camera" aria-label="Rounded square camera" className={`facecam-position-button ${settings.cameraShape === 'rounded' ? 'sidebar-control-active' : 'border-glass hover-bg-glass text-gray-400'}`}><Square size={17} /></button>
             </div>
           </div>
           {settings.cameraPosition !== 'none' && <div className="camera-overlay-settings pt-1">
@@ -43,7 +43,10 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
               <input type="range" min="80" max="200" value={settings.cameraSize} onChange={(event) => update('cameraSize', Number(event.target.value))} />
             </label>
             <label className="sidebar-field-label"><span>Border Color</span>
-              <input type="color" value={settings.cameraBorderColor} onChange={(event) => update('cameraBorderColor', event.target.value)} className="color-picker" />
+              <span className="camera-border-options">
+                <button type="button" onClick={() => update('cameraBorderColor', '#000000')} aria-label="Use black camera border" title="Black border" className={`camera-border-option camera-border-black ${settings.cameraBorderColor.toLowerCase() === '#000000' ? 'sidebar-control-active' : ''}`} />
+                <button type="button" onClick={() => update('cameraBorderColor', '#ffffff')} aria-label="Use white camera border" title="White border" className={`camera-border-option camera-border-white ${settings.cameraBorderColor.toLowerCase() === '#ffffff' ? 'sidebar-control-active' : ''}`} />
+              </span>
             </label>
           </div>}
         </section>
@@ -54,7 +57,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
             <div className="browser-aspect-control"><label className="sidebar-feature-title">Aspect Ratio</label>
               <div className="browser-aspect-row">{[
                 { id: '16-9', name: '16:9 Desktop' }, { id: '4-3', name: '4:3 Tablet' },
-              ].map((ratio) => <button key={ratio.id} onClick={() => update('aspectRatio', ratio.id as AspectRatio)} className={`facecam-position-button browser-aspect-button ${settings.aspectRatio === ratio.id ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'}`}>{ratio.name}</button>)}</div>
+              ].map((ratio) => <button key={ratio.id} onClick={() => update('aspectRatio', ratio.id as AspectRatio)} className={`facecam-position-button browser-aspect-button ${settings.aspectRatio === ratio.id ? 'sidebar-control-active' : 'border-glass hover-bg-glass text-gray-400'}`}>{ratio.name}</button>)}</div>
             </div>
             <Slider label="Window Padding" value={`${Math.round(settings.scale * 100)}%`} min="0.5" max="1.1" step="0.01" current={settings.scale} onChange={(value) => update('scale', value)} />
             <Slider label="Shadow Blur" value={`${settings.shadowIntensity}px`} min="0" max="100" current={settings.shadowIntensity} onChange={(value) => update('shadowIntensity', value)} />

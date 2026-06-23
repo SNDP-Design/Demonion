@@ -20,7 +20,7 @@ export const DEFAULT_SETTINGS: EditorSettings = {
   scale: 0.85,
   macOSHeader: true,
   cameraPosition: 'bottom-right',
-  cameraShape: 'circle',
+  cameraShape: 'rounded',
   cameraSize: 120,
   cameraBorderColor: '#ffffff',
   trimStart: 0,
