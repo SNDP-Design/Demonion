@@ -6,8 +6,8 @@ import { CanvasEditor } from './components/CanvasEditor';
 import { Timeline } from './components/Timeline';
 import { ExportModal } from './components/ExportModal';
 import { LandingPage } from './components/LandingPage';
+import { DemonierLogo } from './components/DemonierLogo';
 import { 
-  Sparkles, 
   Video, 
   Mic, 
   Camera, 
@@ -428,7 +428,7 @@ function App() {
       <header className="xg-nav select-none">
         <div className={`xg-nav-inner ${showLandingPage ? '' : 'studio-nav-inner'}`}>
           <div className="xg-brand">
-            <div className="xg-brand-mark"><Sparkles size={16} /></div>
+            <div className="xg-brand-mark"><DemonierLogo /></div>
             <div>
               <h1>Demonier</h1>
             </div>
@@ -527,7 +527,7 @@ function App() {
             <div className="landing-preview" aria-label="Demonier app preview">
               <div className="landing-preview-bar"><span /><span /><span /><b>Demonier Studio</b></div>
               <div className="landing-preview-body">
-                <aside><div className="preview-brand"><Sparkles size={14} /> Demonier</div><div className="preview-menu active">New recording</div><div className="preview-menu">My clips</div><div className="preview-menu">Exports</div></aside>
+                <aside><div className="preview-brand"><DemonierLogo /> Demonier</div><div className="preview-menu active">New recording</div><div className="preview-menu">My clips</div><div className="preview-menu">Exports</div></aside>
                 <div className="preview-canvas"><div className="preview-canvas-pill">● Recording preview</div><div className="preview-window"><div className="preview-window-top"><i /><i /><i /></div><div className="preview-window-copy"><b>Ship a clear demo.</b><span>Capture the work, not the friction.</span></div><div className="preview-camera"><Camera size={20} /></div></div></div>
               </div>
             </div>
@@ -589,7 +589,7 @@ function App() {
             </section>
 
             <footer className="landing-footer">
-              <div className="landing-footer-brand"><span className="xg-brand-mark"><Sparkles size={15} /></span><div><b>Demonier</b><small>A browser recording studio for clear product videos.</small></div></div>
+              <div className="landing-footer-brand"><span className="xg-brand-mark"><DemonierLogo /></span><div><b>Demonier</b><small>A browser recording studio for clear product videos.</small></div></div>
               <div className="landing-footer-links"><a href="#home">Home</a><a href="#features">Features</a><a href="#how-it-works">How it works</a><a href="#faq">FAQ</a></div>
               <p>© 2026 Demonier</p>
             </footer>

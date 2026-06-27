@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight, Check, Film, Layers3, MonitorUp, MousePointer2, Scissors, Sparkles, Upload, Video, WandSparkles } from 'lucide-react';
+import { DemonierLogo } from './DemonierLogo';
 
 interface LandingPageProps {
   onOpenStudio: () => void;
@@ -64,7 +65,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
 
       <section className="framer-final"><div className="framer-final-grid" /><span className="framer-kicker">Ready when you are</span><h3>Make something<br /><em>worth watching.</em></h3><p>Your next clear walkthrough is one browser tab away.</p><button onClick={onOpenStudio} className="framer-primary">Start recording free <ArrowRight size={17} /></button></section>
 
-      <footer className="framer-footer"><div><span className="framer-footer-logo"><Sparkles size={15} /></span><b>Demonier</b></div><p>Screen recording for ideas worth sharing.</p><span>© 2026 Demonier</span></footer>
+      <footer className="framer-footer"><div><span className="framer-footer-logo"><DemonierLogo /></span><b>Demonier</b></div><p>Screen recording for ideas worth sharing.</p><span>© 2026 Demonier</span></footer>
     </main>
   );
 };
