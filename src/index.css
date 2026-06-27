@@ -998,7 +998,7 @@ aside.sidebar {
 .xg-option-row + .xg-option-row { border-top: 1px solid rgba(255,255,255,.05); }
 .xg-option-row span { display: flex; align-items: center; gap: 9px; }
 .xg-record-button { width: 100%; min-height: 46px; }
-.facecam-position-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 7px; }
+.facecam-position-row { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px; }
 .facecam-position-button { height: 40px; display: inline-grid; place-items: center; border: 1px solid var(--border-glass); border-radius: 9px; background: transparent; cursor: pointer; transition: background .2s, border-color .2s, color .2s, transform .2s; }
 .facecam-position-button:hover { color: var(--text-primary); border-color: #5a5a5a; background: rgba(255,255,255,.03); transform: translateY(-1px); }
 .sidebar-module { display: flex; flex-direction: column; gap: 32px; }

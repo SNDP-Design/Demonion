@@ -402,6 +402,25 @@ function App() {
     return `${m}:${sec.toString().padStart(2, '0')}`;
   };
 
+  const showRecordingCameraPreview = recordingState === 'recording' && useWebcam && settings.cameraPosition !== 'none';
+  const recordingCameraPreviewPosition = (() => {
+    switch (settings.cameraPosition) {
+      case 'top-left':
+        return { left: '32px', right: 'auto', top: '32px', bottom: 'auto' };
+      case 'top-right':
+        return { left: 'auto', right: '32px', top: '32px', bottom: 'auto' };
+      case 'bottom-left':
+        return { left: '32px', right: 'auto', top: 'auto', bottom: '32px' };
+      case 'side-left':
+        return { left: '32px', right: 'auto', top: '50%', bottom: 'auto', transform: 'translateY(-50%)' };
+      case 'side-right':
+        return { left: 'auto', right: '32px', top: '50%', bottom: 'auto', transform: 'translateY(-50%)' };
+      case 'bottom-right':
+      default:
+        return { left: 'auto', right: '32px', top: 'auto', bottom: '32px' };
+    }
+  })();
+
   return (
     <main className="xg-app h-screen w-screen flex flex-col text-white font-sans overflow-hidden">
       
@@ -470,8 +489,9 @@ function App() {
       />
       <video
         ref={setWebcamVideoRef}
-        className={recordingState === 'recording' && useWebcam ? 'recording-camera-preview' : undefined}
-        style={recordingState === 'recording' && useWebcam ? {
+        className={showRecordingCameraPreview ? 'recording-camera-preview' : undefined}
+        style={showRecordingCameraPreview ? {
+          ...recordingCameraPreviewPosition,
           width: `${Math.min(220, Math.max(110, settings.cameraSize))}px`,
           aspectRatio: '1 / 1',
           borderRadius: settings.cameraShape === 'circle' ? '50%' : '20%',

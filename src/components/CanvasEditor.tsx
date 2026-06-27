@@ -163,14 +163,82 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         videoRatio = videoElement.videoHeight / videoElement.videoWidth;
       }
 
+      const renderScale = settings.exportResolution === '4k' ? 2 : 1;
+      const isSideCamera = showWebcamOverlay && (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right');
       const baseCardW = cw * 0.8;
-      const finalW = baseCardW * settings.scale;
+      const desiredCardW = baseCardW * settings.scale;
+      const sideGap = isSideCamera ? 24 * renderScale : 0;
+      const sideCameraSize = isSideCamera ? Math.min(settings.cameraSize * 2 * renderScale, cw * 0.28) : 0;
+      const maxLayoutW = cw * 0.92;
+      const maxCardW = isSideCamera ? Math.max(cw * 0.48, maxLayoutW - sideCameraSize - sideGap) : desiredCardW;
+      const finalW = Math.min(desiredCardW, maxCardW);
       const finalH = finalW * videoRatio;
       const headerH = settings.macOSHeader ? 32 : 0;
       const totalH = finalH + headerH;
 
-      const x0 = (cw - finalW) / 2;
+      const groupW = isSideCamera ? finalW + sideGap + sideCameraSize : finalW;
+      const groupX = (cw - groupW) / 2;
+      const x0 = isSideCamera && settings.cameraPosition === 'side-left' ? groupX + sideCameraSize + sideGap : groupX;
       const y0 = (ch - totalH) / 2;
+
+      const drawCamera = (cameraX: number, cameraY: number, cameraSize: number, shadow = false) => {
+        const r = cameraSize / 2;
+        const isCircleCamera = settings.cameraShape === 'circle';
+        const cameraCornerRadius = isCircleCamera ? r : cameraSize * 0.2;
+
+        if (shadow) {
+          ctx.save();
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+          ctx.shadowBlur = 34 * renderScale;
+          ctx.shadowOffsetY = 14 * renderScale;
+          ctx.beginPath();
+          if (isCircleCamera) {
+            ctx.arc(cameraX + r, cameraY + r, r, 0, Math.PI * 2);
+          } else {
+            ctx.roundRect(cameraX, cameraY, cameraSize, cameraSize, cameraCornerRadius);
+          }
+          ctx.fillStyle = '#101010';
+          ctx.fill();
+          ctx.restore();
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        if (isCircleCamera) {
+          ctx.arc(cameraX + r, cameraY + r, r, 0, Math.PI * 2);
+        } else {
+          ctx.roundRect(cameraX, cameraY, cameraSize, cameraSize, cameraCornerRadius);
+        }
+        ctx.clip();
+
+        if (webcamElement && webcamElement.readyState >= 2) {
+          const webW = webcamElement.videoWidth;
+          const webH = webcamElement.videoHeight;
+          const sq = Math.min(webW, webH);
+          const wsx = (webW - sq) / 2;
+          const wsy = (webH - sq) / 2;
+
+          ctx.drawImage(
+            webcamElement,
+            wsx, wsy, sq, sq,
+            cameraX, cameraY, cameraSize, cameraSize
+          );
+        } else {
+          ctx.fillStyle = '#151515';
+          ctx.fillRect(cameraX, cameraY, cameraSize, cameraSize);
+        }
+        ctx.restore();
+
+        ctx.beginPath();
+        if (isCircleCamera) {
+          ctx.arc(cameraX + r, cameraY + r, r, 0, Math.PI * 2);
+        } else {
+          ctx.roundRect(cameraX, cameraY, cameraSize, cameraSize, cameraCornerRadius);
+        }
+        ctx.lineWidth = 3 * renderScale;
+        ctx.strokeStyle = settings.cameraBorderColor;
+        ctx.stroke();
+      };
 
       // 3. Draw Box Shadow
       if (settings.shadowIntensity > 0) {
@@ -231,11 +299,8 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillText('Screen Recording Preview', x0 + finalW / 2, y0 + headerH + finalH / 2);
       }
 
-      // Draw Circular Webcam overlay inside the card (so it scale clips perfectly)
-      if (showWebcamOverlay && settings.cameraPosition !== 'none') {
-        // The preview canvas is 1080p and the export canvas is 4K. Scale all
-        // camera measurements together so the bubble keeps its chosen size.
-        const renderScale = settings.exportResolution === '4k' ? 2 : 1;
+      // Draw the small webcam bubble inside the screen card.
+      if (showWebcamOverlay && settings.cameraPosition !== 'none' && !isSideCamera) {
         const cameraSize = settings.cameraSize * renderScale;
         const r = cameraSize / 2;
         const margin = 20 * renderScale;
@@ -251,46 +316,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           cy = y0 + totalH - r - margin;
         }
 
-        const isCircleCamera = settings.cameraShape === 'circle';
-        const cameraCornerRadius = isCircleCamera ? r : cameraSize * 0.2;
         const cameraX = cx - r;
         const cameraY = cy - r;
-
-        ctx.save();
-        ctx.beginPath();
-        if (isCircleCamera) {
-          ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        } else {
-          ctx.roundRect(cameraX, cameraY, cameraSize, cameraSize, cameraCornerRadius);
-        }
-        ctx.clip();
-
-        if (webcamElement && webcamElement.readyState >= 2) {
-          // Crop webcam square
-          const webW = webcamElement.videoWidth;
-          const webH = webcamElement.videoHeight;
-          const sq = Math.min(webW, webH);
-          const wsx = (webW - sq) / 2;
-          const wsy = (webH - sq) / 2;
-
-          ctx.drawImage(
-            webcamElement,
-            wsx, wsy, sq, sq,
-            cameraX, cameraY, cameraSize, cameraSize
-          );
-        }
-        ctx.restore();
-
-        // Stroke Webcam Border
-        ctx.beginPath();
-        if (isCircleCamera) {
-          ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        } else {
-          ctx.roundRect(cameraX, cameraY, cameraSize, cameraSize, cameraCornerRadius);
-        }
-        ctx.lineWidth = 3 * renderScale;
-        ctx.strokeStyle = settings.cameraBorderColor;
-        ctx.stroke();
+        drawCamera(cameraX, cameraY, cameraSize);
       }
 
       // Draw Card Border
@@ -303,6 +331,12 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       }
 
       ctx.restore();
+
+      if (isSideCamera) {
+        const cameraX = settings.cameraPosition === 'side-left' ? groupX : x0 + finalW + sideGap;
+        const cameraY = y0 + (totalH - sideCameraSize) / 2;
+        drawCamera(cameraX, cameraY, sideCameraSize, true);
+      }
 
       animId = requestAnimationFrame(render);
     };

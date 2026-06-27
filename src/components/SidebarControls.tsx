@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import type { AspectRatio, EditorSettings } from '../types';
 import { GRADIENT_PRESETS } from '../constants/presets';
-import { Camera, CameraOff, Circle, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Paintbrush, Pencil, Square } from 'lucide-react';
+import { Camera, CameraOff, Circle, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, PanelLeft, PanelRight, Paintbrush, Pencil, Square } from 'lucide-react';
 
 interface SidebarControlsProps {
   settings: EditorSettings;
@@ -23,6 +23,8 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
               { id: 'top-right', name: 'Top right', icon: CornerUpRight },
               { id: 'bottom-left', name: 'Bottom left', icon: CornerDownLeft },
               { id: 'bottom-right', name: 'Bottom right', icon: CornerDownRight },
+              { id: 'side-left', name: 'Left side', icon: PanelLeft },
+              { id: 'side-right', name: 'Right side', icon: PanelRight },
               { id: 'none', name: 'Hide camera', icon: CameraOff },
             ].map((position) => (
               <button key={position.id} onClick={() => update('cameraPosition', position.id as EditorSettings['cameraPosition'])} title={position.name} aria-label={position.name}
@@ -39,8 +41,8 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
             </div>
           </div>
           {settings.cameraPosition !== 'none' && <div className="camera-overlay-settings pt-1">
-            <label className="space-y-1.5 block"><span className="sidebar-slider-label"><span>Camera Bubble Size</span><b>{settings.cameraSize}px</b></span>
-              <input type="range" min="80" max="200" value={settings.cameraSize} onChange={(event) => update('cameraSize', Number(event.target.value))} />
+            <label className="space-y-1.5 block"><span className="sidebar-slider-label"><span>Camera Size</span><b>{settings.cameraSize}px</b></span>
+              <input type="range" min="80" max="320" value={settings.cameraSize} onChange={(event) => update('cameraSize', Number(event.target.value))} />
             </label>
             <label className="sidebar-field-label"><span>Border Color</span>
               <span className="camera-border-options">
