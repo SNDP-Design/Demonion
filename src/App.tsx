@@ -411,7 +411,7 @@ function App() {
           <div className="xg-brand">
             <div className="xg-brand-mark"><Sparkles size={16} /></div>
             <div>
-              <h1>Screentor</h1>
+              <h1>Demonier</h1>
             </div>
           </div>
           {showLandingPage && (
@@ -490,7 +490,7 @@ function App() {
           <>
           <LandingPage onOpenStudio={() => setShowLandingPage(false)} />
           {false && (
-          <section className="screentor-landing animate-fade-in" id="home">
+          <section className="demonier-landing animate-fade-in" id="home">
             <div className="landing-hero">
               <span className="xg-pill"><span className="xg-status-dot" /> Your browser recording studio</span>
               <h2><span className="landing-heading-line">Make every product</span><span className="landing-heading-line landing-heading-muted">demo feel ready to share.</span></h2>
@@ -504,10 +504,10 @@ function App() {
               <p className="landing-note"><CheckCircle2 size={14} /> Works directly in your browser</p>
             </div>
 
-            <div className="landing-preview" aria-label="Screentor app preview">
-              <div className="landing-preview-bar"><span /><span /><span /><b>Screentor Studio</b></div>
+            <div className="landing-preview" aria-label="Demonier app preview">
+              <div className="landing-preview-bar"><span /><span /><span /><b>Demonier Studio</b></div>
               <div className="landing-preview-body">
-                <aside><div className="preview-brand"><Sparkles size={14} /> Screentor</div><div className="preview-menu active">New recording</div><div className="preview-menu">My clips</div><div className="preview-menu">Exports</div></aside>
+                <aside><div className="preview-brand"><Sparkles size={14} /> Demonier</div><div className="preview-menu active">New recording</div><div className="preview-menu">My clips</div><div className="preview-menu">Exports</div></aside>
                 <div className="preview-canvas"><div className="preview-canvas-pill">● Recording preview</div><div className="preview-window"><div className="preview-window-top"><i /><i /><i /></div><div className="preview-window-copy"><b>Ship a clear demo.</b><span>Capture the work, not the friction.</span></div><div className="preview-camera"><Camera size={20} /></div></div></div>
               </div>
             </div>
@@ -523,11 +523,11 @@ function App() {
               <ol><li><b>01</b><span>Choose what to capture</span></li><li><b>02</b><span>Record your walkthrough</span></li><li><b>03</b><span>Trim and export your demo</span></li></ol>
             </section>
 
-            <section className="landing-story" id="why-screentor">
+            <section className="landing-story" id="why-demonier">
               <div className="landing-story-intro">
                 <span className="landing-kicker">Made for clear explanations</span>
                 <h3>Your product is easier to understand when people can see it.</h3>
-                <p>Screentor helps you turn a quick walkthrough into a video that is calm, focused, and easy to follow. It is for the moments when a screenshot is not enough.</p>
+                <p>Demonier helps you turn a quick walkthrough into a video that is calm, focused, and easy to follow. It is for the moments when a screenshot is not enough.</p>
               </div>
               <div className="landing-story-list">
                 <article><b>Show, don’t describe</b><p>Walk a client through a feature, a teammate through a process, or a customer through a fix.</p></article>
@@ -537,7 +537,7 @@ function App() {
             </section>
 
             <section className="landing-use-cases">
-              <div className="landing-section-heading"><span className="landing-kicker">Use Screentor for</span><h3>More than just a demo.</h3><p>Whenever you need to explain something on screen, you can make it easier to watch.</p></div>
+              <div className="landing-section-heading"><span className="landing-kicker">Use Demonier for</span><h3>More than just a demo.</h3><p>Whenever you need to explain something on screen, you can make it easier to watch.</p></div>
               <div className="landing-use-case-grid">
                 <article><span>01</span><h4>Product walkthroughs</h4><p>Give prospects and customers a clear view of how your product works.</p></article>
                 <article><span>02</span><h4>Release updates</h4><p>Show what changed instead of writing a long summary that people have to imagine.</p></article>
@@ -554,7 +554,7 @@ function App() {
             <section className="landing-faq" id="faq">
               <div className="landing-section-heading"><span className="landing-kicker">Questions, answered</span><h3>Good to know before you record.</h3></div>
               <div className="landing-faq-list">
-                <details open><summary>Do I need to install anything?<span>+</span></summary><p>No. Screentor runs in a modern web browser. You choose what to share using your browser’s normal screen-sharing window.</p></details>
+                <details open><summary>Do I need to install anything?<span>+</span></summary><p>No. Demonier runs in a modern web browser. You choose what to share using your browser’s normal screen-sharing window.</p></details>
                 <details><summary>Can I include my camera and microphone?<span>+</span></summary><p>Yes. Turn on the camera and microphone choices before you start. Your browser will ask for permission the first time.</p></details>
                 <details><summary>Can I record only my browser tab?<span>+</span></summary><p>Yes. When you start, choose the tab, app window, or full screen you want to capture.</p></details>
                 <details><summary>Can I make a video without the camera?<span>+</span></summary><p>Yes. Turn the camera choice off before recording, or hide it in the recording settings.</p></details>
@@ -564,14 +564,14 @@ function App() {
             <section className="landing-final-cta">
               <span className="xg-pill"><span className="xg-status-dot" /> Ready when you are</span>
               <h3>Make the next explanation<br /><span>easy to watch.</span></h3>
-              <p>Open Screentor and record your first clear walkthrough in a few clicks.</p>
-              <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary landing-primary-action">Open Screentor <ArrowRight size={16} /></button>
+              <p>Open Demonier and record your first clear walkthrough in a few clicks.</p>
+              <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary landing-primary-action">Open Demonier <ArrowRight size={16} /></button>
             </section>
 
             <footer className="landing-footer">
-              <div className="landing-footer-brand"><span className="xg-brand-mark"><Sparkles size={15} /></span><div><b>Screentor</b><small>A browser recording studio for clear product videos.</small></div></div>
+              <div className="landing-footer-brand"><span className="xg-brand-mark"><Sparkles size={15} /></span><div><b>Demonier</b><small>A browser recording studio for clear product videos.</small></div></div>
               <div className="landing-footer-links"><a href="#home">Home</a><a href="#features">Features</a><a href="#how-it-works">How it works</a><a href="#faq">FAQ</a></div>
-              <p>© 2026 Screentor</p>
+              <p>© 2026 Demonier</p>
             </footer>
           </section>
           )}

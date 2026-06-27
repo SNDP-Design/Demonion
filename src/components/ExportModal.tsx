@@ -150,7 +150,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `screentor-${Date.now()}.${extension}`;
+        link.download = `demonier-${Date.now()}.${extension}`;
         document.body.appendChild(link);
         link.click();
         link.remove();
