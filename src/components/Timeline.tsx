@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Gauge, Pause, Play, RotateCcw, Scissors } from 'lucide-react';
 
 interface TimelineProps {
@@ -27,14 +27,14 @@ export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTim
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${tenths}`;
   };
 
-  const updateFromPointer = (clientX: number, activeItem = draggingItem) => {
+  const updateFromPointer = useCallback((clientX: number, activeItem = draggingItem) => {
     if (!trackRef.current || duration <= 0) return;
     const rect = trackRef.current.getBoundingClientRect();
     const targetTime = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) * duration;
     if (activeItem === 'trim-start') onTrimChange(Math.min(targetTime, endTime - 0.2), endTime);
     else if (activeItem === 'trim-end') onTrimChange(trimStart, Math.max(targetTime, trimStart + 0.2));
     else onTimeUpdate(targetTime);
-  };
+  }, [draggingItem, duration, endTime, onTimeUpdate, onTrimChange, trimStart]);
 
   useEffect(() => {
     if (!draggingItem) return;
@@ -46,7 +46,7 @@ export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTim
       window.removeEventListener('mousemove', move);
       window.removeEventListener('mouseup', up);
     };
-  }, [draggingItem, duration, trimStart, endTime]);
+  }, [draggingItem, updateFromPointer]);
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
   const trimStartPercent = duration > 0 ? (trimStart / duration) * 100 : 0;

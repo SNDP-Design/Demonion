@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import type { EditorSettings } from '../types';
 
 interface ExportModalProps {
@@ -37,15 +37,15 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   const originalTimeRef = useRef(0);
   const hasStartedRef = useRef(false);
 
-  const restoreEditor = () => {
+  const restoreEditor = useCallback(() => {
     onChangeSettings({ exportResolution: '1080p' });
     if (audioCtxRef.current) {
       void audioCtxRef.current.close();
       audioCtxRef.current = null;
     }
-  };
+  }, [onChangeSettings]);
 
-  const startExport = async () => {
+  const startExport = useCallback(async () => {
     if (!canvasElement || !videoElement) {
       onError('Your video preview is not ready yet. Please wait a moment and try again.');
       onClose();
@@ -187,7 +187,21 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       onError(message);
       onClose();
     }
-  };
+  }, [
+    canvasElement,
+    cameraVideoElement,
+    duration,
+    micStream,
+    onChangeSettings,
+    onClose,
+    onError,
+    onProgress,
+    restoreEditor,
+    settings.aspectRatio,
+    settings.trimEnd,
+    settings.trimStart,
+    videoElement
+  ]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -198,7 +212,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       hasStartedRef.current = true;
       void startExport();
     }
-  }, [isOpen]);
+  }, [isOpen, startExport]);
 
   return null;
 };

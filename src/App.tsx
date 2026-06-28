@@ -11,14 +11,10 @@ import {
   Video, 
   Mic, 
   Camera, 
-  CheckCircle2,
-  Clapperboard,
   Disc, 
   Download,
   ArrowRight,
-  MonitorUp,
   RotateCcw,
-  Scissors,
   FileVideo
 } from 'lucide-react';
 
@@ -58,12 +54,13 @@ function App() {
   const cameraRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordedCameraChunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<any>(null);
+  const timerRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
   const [recTime, setRecTime] = useState(0);
 
   // Callback ref states to ensure preview render loop updates when DOM elements mount
   const [editorVideoEl, setEditorVideoEl] = useState<HTMLVideoElement | null>(null);
   const [recordedCameraVideoEl, setRecordedCameraVideoEl] = useState<HTMLVideoElement | null>(null);
+  const [canvasEl, setCanvasEl] = useState<HTMLCanvasElement | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -223,7 +220,7 @@ function App() {
         try {
           activeMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
           setMicStream(activeMicStream);
-        } catch (e) {
+        } catch {
           console.warn('Microphone access denied, proceeding with system audio only.');
         }
       }
@@ -336,7 +333,10 @@ function App() {
     if (screenRecorderRef.current && screenRecorderRef.current.state === 'recording') {
       screenRecorderRef.current.stop();
       if (cameraRecorderRef.current?.state === 'recording') cameraRecorderRef.current.stop();
-      clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
       void exitCameraPictureInPicture();
     }
   };
@@ -550,95 +550,7 @@ function App() {
       <div className={showLandingPage ? 'landing-scroll-container flex-1' : 'flex-1 flex overflow-hidden'}>
 
         {showLandingPage ? (
-          <>
           <LandingPage onOpenStudio={() => setShowLandingPage(false)} />
-          {false && (
-          <section className="demonier-landing animate-fade-in" id="home">
-            <div className="landing-hero">
-              <span className="xg-pill"><span className="xg-status-dot" /> Your browser recording studio</span>
-              <h2><span className="landing-heading-line">Make every product</span><span className="landing-heading-line landing-heading-muted">demo feel ready to share.</span></h2>
-              <p>Record your screen, camera, and voice in one place. Trim the rough edges, then export a polished video—without installing anything.</p>
-              <div className="landing-hero-actions">
-                <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary landing-primary-action">
-                  Start recording free <ArrowRight size={16} />
-                </button>
-                <a className="xg-button xg-button-secondary" href="#how-it-works">See how it works</a>
-              </div>
-              <p className="landing-note"><CheckCircle2 size={14} /> Works directly in your browser</p>
-            </div>
-
-            <div className="landing-preview" aria-label="Demonier app preview">
-              <div className="landing-preview-bar"><span /><span /><span /><b>Demonier Studio</b></div>
-              <div className="landing-preview-body">
-                <aside><div className="preview-brand"><DemonierLogo /> Demonier</div><div className="preview-menu active">New recording</div><div className="preview-menu">My clips</div><div className="preview-menu">Exports</div></aside>
-                <div className="preview-canvas"><div className="preview-canvas-pill">● Recording preview</div><div className="preview-window"><div className="preview-window-top"><i /><i /><i /></div><div className="preview-window-copy"><b>Ship a clear demo.</b><span>Capture the work, not the friction.</span></div><div className="preview-camera"><Camera size={20} /></div></div></div>
-              </div>
-            </div>
-
-            <section className="landing-features" id="features">
-              <article><span className="landing-feature-icon"><MonitorUp size={20} /></span><h3>Capture in one click</h3><p>Choose a browser tab, app window, or your whole screen. Keep your voice and camera with it.</p></article>
-              <article><span className="landing-feature-icon"><Scissors size={20} /></span><h3>Make it feel intentional</h3><p>Trim the start and end, choose your framing, and keep the recording focused on the work.</p></article>
-              <article><span className="landing-feature-icon"><Clapperboard size={20} /></span><h3>Export and share</h3><p>Create a high-quality video directly from your browser when the demo is ready to send.</p></article>
-            </section>
-
-            <section className="landing-workflow" id="how-it-works">
-              <div><span className="landing-kicker">A simple workflow</span><h3>From screen to shareable video.</h3></div>
-              <ol><li><b>01</b><span>Choose what to capture</span></li><li><b>02</b><span>Record your walkthrough</span></li><li><b>03</b><span>Trim and export your demo</span></li></ol>
-            </section>
-
-            <section className="landing-story" id="why-demonier">
-              <div className="landing-story-intro">
-                <span className="landing-kicker">Made for clear explanations</span>
-                <h3>Your product is easier to understand when people can see it.</h3>
-                <p>Demonier helps you turn a quick walkthrough into a video that is calm, focused, and easy to follow. It is for the moments when a screenshot is not enough.</p>
-              </div>
-              <div className="landing-story-list">
-                <article><b>Show, don’t describe</b><p>Walk a client through a feature, a teammate through a process, or a customer through a fix.</p></article>
-                <article><b>Keep the important parts in view</b><p>Use your camera when it adds a human touch, and trim away the moments that do not help the story.</p></article>
-                <article><b>Stay in the browser</b><p>Record and export without a heavy desktop app, a complicated timeline, or an account setup wall.</p></article>
-              </div>
-            </section>
-
-            <section className="landing-use-cases">
-              <div className="landing-section-heading"><span className="landing-kicker">Use Demonier for</span><h3>More than just a demo.</h3><p>Whenever you need to explain something on screen, you can make it easier to watch.</p></div>
-              <div className="landing-use-case-grid">
-                <article><span>01</span><h4>Product walkthroughs</h4><p>Give prospects and customers a clear view of how your product works.</p></article>
-                <article><span>02</span><h4>Release updates</h4><p>Show what changed instead of writing a long summary that people have to imagine.</p></article>
-                <article><span>03</span><h4>Support answers</h4><p>Record a helpful answer once and send it whenever the same question comes back.</p></article>
-                <article><span>04</span><h4>Internal handovers</h4><p>Give your team context for a design, task, or workflow without another meeting.</p></article>
-              </div>
-            </section>
-
-            <section className="landing-assurance">
-              <div><span className="landing-kicker">Simple by design</span><h3>No complicated setup.<br />No hidden workflow.</h3></div>
-              <ul><li><CheckCircle2 size={17} /> Pick your screen, window, or browser tab</li><li><CheckCircle2 size={17} /> Add your voice and camera if you want to</li><li><CheckCircle2 size={17} /> Trim the recording and export the video</li></ul>
-            </section>
-
-            <section className="landing-faq" id="faq">
-              <div className="landing-section-heading"><span className="landing-kicker">Questions, answered</span><h3>Good to know before you record.</h3></div>
-              <div className="landing-faq-list">
-                <details open><summary>Do I need to install anything?<span>+</span></summary><p>No. Demonier runs in a modern web browser. You choose what to share using your browser’s normal screen-sharing window.</p></details>
-                <details><summary>Can I include my camera and microphone?<span>+</span></summary><p>Yes. Turn on the camera and microphone choices before you start. Your browser will ask for permission the first time.</p></details>
-                <details><summary>Can I record only my browser tab?<span>+</span></summary><p>Yes. When you start, choose the tab, app window, or full screen you want to capture.</p></details>
-                <details><summary>Can I make a video without the camera?<span>+</span></summary><p>Yes. Turn the camera choice off before recording, or hide it in the recording settings.</p></details>
-              </div>
-            </section>
-
-            <section className="landing-final-cta">
-              <span className="xg-pill"><span className="xg-status-dot" /> Ready when you are</span>
-              <h3>Make the next explanation<br /><span>easy to watch.</span></h3>
-              <p>Open Demonier and record your first clear walkthrough in a few clicks.</p>
-              <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary landing-primary-action">Open Demonier <ArrowRight size={16} /></button>
-            </section>
-
-            <footer className="landing-footer">
-              <div className="landing-footer-brand"><span className="xg-brand-mark"><DemonierLogo /></span><div><b>Demonier</b><small>A browser recording studio for clear product videos.</small></div></div>
-              <div className="landing-footer-links"><a href="#home">Home</a><a href="#features">Features</a><a href="#how-it-works">How it works</a><a href="#faq">FAQ</a></div>
-              <p>© 2026 Demonier</p>
-            </footer>
-          </section>
-          )}
-          </>
         ) : <>
 
         {/* State 1: Dashboard Setup */}
@@ -744,6 +656,7 @@ function App() {
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
               <CanvasEditor 
                 canvasRef={canvasRef}
+                onCanvasElementChange={setCanvasEl}
                 videoElement={editorVideoEl}
                 webcamElement={useWebcam && !recordingIncludesWebcam ? recordedCameraVideoEl : null}
                 showWebcamOverlay={useWebcam && !recordingIncludesWebcam && Boolean(cameraSrc)}
@@ -777,7 +690,7 @@ function App() {
         }}
         onProgress={setExportProgress}
         onError={(message) => window.alert(message)}
-        canvasElement={canvasRef.current}
+        canvasElement={canvasEl}
         videoElement={editorVideoEl}
         cameraVideoElement={recordedCameraVideoEl}
         micStream={micStream}

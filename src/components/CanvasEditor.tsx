@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback } from 'react';
 import type { EditorSettings } from '../types';
 
 interface CanvasEditorProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  onCanvasElementChange?: (canvas: HTMLCanvasElement | null) => void;
   videoElement: HTMLVideoElement | null;
   webcamElement: HTMLVideoElement | null;
   showWebcamOverlay: boolean;
@@ -11,26 +12,28 @@ interface CanvasEditorProps {
 
 export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   canvasRef,
+  onCanvasElementChange,
   videoElement,
   webcamElement,
   showWebcamOverlay,
   settings
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [canvasDimensions, setCanvasDimensions] = useState({ width: 1920, height: 1080 });
 
   // Refs for tracking values inside the high-frequency animation loop without restarting it
   const settingsRef = useRef(settings);
   const videoElementRef = useRef(videoElement);
   const webcamElementRef = useRef(webcamElement);
+  const showWebcamOverlayRef = useRef(showWebcamOverlay);
 
   useEffect(() => {
     settingsRef.current = settings;
     videoElementRef.current = videoElement;
     webcamElementRef.current = webcamElement;
+    showWebcamOverlayRef.current = showWebcamOverlay;
   });
 
-  useEffect(() => {
+  const canvasDimensions = useMemo(() => {
     let width = 1920;
     let height = 1080;
     const is4K = settings.exportResolution === '4k';
@@ -58,8 +61,13 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         break;
     }
 
-    setCanvasDimensions({ width, height });
+    return { width, height };
   }, [settings.aspectRatio, settings.exportResolution]);
+
+  const setCanvasElement = useCallback((canvas: HTMLCanvasElement | null) => {
+    canvasRef.current = canvas;
+    onCanvasElementChange?.(canvas);
+  }, [canvasRef, onCanvasElementChange]);
 
   // Canvas drawing loop
   useEffect(() => {
@@ -77,6 +85,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const settings = settingsRef.current;
       const videoElement = videoElementRef.current;
       const webcamElement = webcamElementRef.current;
+      const showWebcamOverlay = showWebcamOverlayRef.current;
 
       // Enable high-quality image smoothing
       ctx.imageSmoothingEnabled = true;
@@ -90,7 +99,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillRect(0, 0, cw, ch);
       } else {
         // Preset linear gradient
-        let grad = ctx.createLinearGradient(0, 0, cw, ch);
+        const grad = ctx.createLinearGradient(0, 0, cw, ch);
         if (settings.gradientPresetId === 'sunset') {
           grad.addColorStop(0, '#f97316');
           grad.addColorStop(0.5, '#ec4899');
@@ -122,25 +131,25 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           ctx.fillRect(0, 0, cw, ch);
           
           ctx.globalCompositeOperation = 'screen';
-          let g1 = ctx.createRadialGradient(0, 0, 10, 0, 0, cw * 0.6);
+          const g1 = ctx.createRadialGradient(0, 0, 10, 0, 0, cw * 0.6);
           g1.addColorStop(0, 'rgba(192, 132, 252, 0.4)');
           g1.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = g1;
           ctx.fillRect(0,0,cw,ch);
 
-          let g2 = ctx.createRadialGradient(cw, 0, 10, cw, 0, cw * 0.6);
+          const g2 = ctx.createRadialGradient(cw, 0, 10, cw, 0, cw * 0.6);
           g2.addColorStop(0, 'rgba(244, 114, 182, 0.4)');
           g2.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = g2;
           ctx.fillRect(0,0,cw,ch);
 
-          let g3 = ctx.createRadialGradient(cw, ch, 10, cw, ch, cw * 0.6);
+          const g3 = ctx.createRadialGradient(cw, ch, 10, cw, ch, cw * 0.6);
           g3.addColorStop(0, 'rgba(96, 165, 250, 0.4)');
           g3.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = g3;
           ctx.fillRect(0,0,cw,ch);
 
-          let g4 = ctx.createRadialGradient(0, ch, 10, 0, ch, cw * 0.6);
+          const g4 = ctx.createRadialGradient(0, ch, 10, 0, ch, cw * 0.6);
           g4.addColorStop(0, 'rgba(52, 211, 153, 0.4)');
           g4.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = g4;
@@ -378,7 +387,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       style={{ minHeight: '350px' }}
     >
       <canvas
-        ref={canvasRef}
+        ref={setCanvasElement}
         width={canvasDimensions.width}
         height={canvasDimensions.height}
         className="max-w-full max-h-full aspect-video rounded-xl shadow-2xl border border-glass bg-black transition-shadow hover:shadow-[0_0_50px_rgba(139,92,246,0.1)]"
