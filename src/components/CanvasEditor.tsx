@@ -195,10 +195,10 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const x0 = isSideCamera && settings.cameraPosition === 'side-left' ? groupX + sideCameraW + sideGap : groupX;
       const y0 = (ch - totalH) / 2;
 
-      const drawCamera = (cameraX: number, cameraY: number, cameraW: number, cameraH: number, shadow = false) => {
+      const drawCamera = (cameraX: number, cameraY: number, cameraW: number, cameraH: number, shadow = false, cornerRoundness = 0.2) => {
         const r = Math.min(cameraW, cameraH) / 2;
         const isCircleCamera = settings.cameraShape === 'circle';
-        const cameraCornerRadius = isCircleCamera ? r : Math.min(cameraW, cameraH) * 0.2;
+        const cameraCornerRadius = isCircleCamera ? r : Math.min(cameraW, cameraH) * cornerRoundness;
         const centerX = cameraX + cameraW / 2;
         const centerY = cameraY + cameraH / 2;
 
@@ -360,7 +360,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       if (isSideCamera) {
         const cameraX = settings.cameraPosition === 'side-left' ? groupX : x0 + finalW + sideGap;
         const cameraY = y0 + (totalH - sideCameraH) / 2;
-        drawCamera(cameraX, cameraY, sideCameraW, sideCameraH, true);
+        drawCamera(cameraX, cameraY, sideCameraW, sideCameraH, true, 0.08);
       }
 
       animId = requestAnimationFrame(render);
