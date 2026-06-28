@@ -107,7 +107,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         try {
           const videoAudio = audioCtx.createMediaElementSource(videoElement);
           videoAudio.connect(destination);
-          videoAudio.connect(audioCtx.destination);
           hasAudioInput = true;
         } catch {
           // Some browser recordings have no audio source. Microphone audio can still be mixed below.

@@ -197,7 +197,7 @@ function App() {
           height: { ideal: 2160, max: 2160 },
           frameRate: { ideal: 60, max: 60 }
         },
-        audio: true
+        audio: false
       });
 
       // 2. Request mic if requested
@@ -242,10 +242,6 @@ function App() {
           const audioDestination = audioContext.createMediaStreamDestination();
           let hasAudio = false;
 
-          if (screenStream.getAudioTracks().length > 0) {
-            audioContext.createMediaStreamSource(screenStream).connect(audioDestination);
-            hasAudio = true;
-          }
           if (activeMicStream?.getAudioTracks().length) {
             audioContext.createMediaStreamSource(activeMicStream).connect(audioDestination);
             hasAudio = true;
@@ -253,7 +249,6 @@ function App() {
           if (hasAudio) audioDestination.stream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
         } catch (error) {
           console.warn('Could not mix audio sources:', error);
-          screenStream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
           activeMicStream?.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
         }
 
