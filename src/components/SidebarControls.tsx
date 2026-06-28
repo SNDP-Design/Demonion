@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import type { AspectRatio, EditorSettings } from '../types';
+import type { EditorSettings } from '../types';
 import { GRADIENT_PRESETS } from '../constants/presets';
 import { Camera, CameraOff, Circle, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, PanelLeft, PanelRight, Paintbrush, Pencil, Square } from 'lucide-react';
 
@@ -56,11 +56,6 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
         <section className="sidebar-module browser-window-section border-t border-glass pt-5">
           <h3 className="sidebar-module-title"><Layout size={14} /> Browser Window</h3>
           <div className="browser-window-controls">
-            <div className="browser-aspect-control"><label className="sidebar-feature-title">Aspect Ratio</label>
-              <div className="browser-aspect-row">{[
-                { id: '16-9', name: '16:9 Desktop' }, { id: '4-3', name: '4:3 Tablet' },
-              ].map((ratio) => <button key={ratio.id} onClick={() => update('aspectRatio', ratio.id as AspectRatio)} className={`facecam-position-button browser-aspect-button ${settings.aspectRatio === ratio.id ? 'sidebar-control-active' : 'border-glass hover-bg-glass text-gray-400'}`}>{ratio.name}</button>)}</div>
-            </div>
             <Slider label="Window Padding" value={`${Math.round(settings.scale * 100)}%`} min="0.5" max="1.1" step="0.01" current={settings.scale} onChange={(value) => update('scale', value)} />
             <Slider label="Shadow Blur" value={`${settings.shadowIntensity}px`} min="0" max="100" current={settings.shadowIntensity} onChange={(value) => update('shadowIntensity', value)} />
             <label className="sidebar-toggle-label"><span>macOS Title Dots</span><span className="switch-container"><input type="checkbox" checked={settings.macOSHeader} onChange={(event) => update('macOSHeader', event.target.checked)} className="switch-input" /><span className="switch-slider" /></span></label>
