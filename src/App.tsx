@@ -372,6 +372,9 @@ function App() {
       const end = trimEnd > 0 ? trimEnd : duration;
       if (video.currentTime >= end) {
         video.currentTime = trimStart;
+        if (recordedCameraVideoRef.current) {
+          recordedCameraVideoRef.current.currentTime = trimStart;
+        }
       }
       video.play().catch(e => console.error(e));
       recordedCameraVideoRef.current?.play().catch(e => console.error(e));
@@ -407,6 +410,9 @@ function App() {
     if (editorVideoRef.current) {
       editorVideoRef.current.playbackRate = rate;
     }
+    if (recordedCameraVideoRef.current) {
+      recordedCameraVideoRef.current.playbackRate = rate;
+    }
   };
 
   // Video looping inside trim boundaries
@@ -414,21 +420,34 @@ function App() {
     const video = editorVideoRef.current;
     if (!video) return;
 
+    const restartLoop = () => {
+      video.currentTime = trimStart;
+      if (recordedCameraVideoRef.current) {
+        recordedCameraVideoRef.current.currentTime = trimStart;
+      }
+      setCurrentTime(trimStart);
+    };
+
     const handleLoopCheck = () => {
       const end = trimEnd > 0 ? trimEnd : duration;
       if (video.currentTime >= end) {
         if (isPlaying) {
-          video.currentTime = trimStart;
+          restartLoop();
+          void video.play().catch((error) => console.error(error));
+          void recordedCameraVideoRef.current?.play().catch((error) => console.error(error));
         } else {
           video.pause();
-          video.currentTime = trimStart;
+          recordedCameraVideoRef.current?.pause();
+          restartLoop();
         }
       }
     };
 
     video.addEventListener('timeupdate', handleLoopCheck);
+    video.addEventListener('ended', handleLoopCheck);
     return () => {
       video.removeEventListener('timeupdate', handleLoopCheck);
+      video.removeEventListener('ended', handleLoopCheck);
     };
   }, [trimStart, trimEnd, duration, isPlaying]);
 

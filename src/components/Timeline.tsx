@@ -76,9 +76,6 @@ export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTim
         </div>
       </div>
 
-      <div className="video-editor-details">
-        <span>Drag the white handles to remove unwanted parts.</span>
-      </div>
     </section>
   );
 };
