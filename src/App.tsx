@@ -486,6 +486,37 @@ function App() {
                 Open studio <ArrowRight size={15} />
               </button>
             </div>
+          ) : recordingState === 'idle' ? (
+            <div className="xg-nav-actions studio-record-actions">
+              <label className="studio-record-toggle">
+                <Mic size={14} />
+                <span>Mic</span>
+                <input 
+                  type="checkbox" 
+                  checked={useMic} 
+                  onChange={(e) => setUseMic(e.target.checked)} 
+                  className="switch-input"
+                />
+                <span className="studio-toggle-track" />
+              </label>
+              <label className="studio-record-toggle">
+                <Camera size={14} />
+                <span>Camera</span>
+                <input 
+                  type="checkbox" 
+                  checked={useWebcam} 
+                  onChange={(e) => setUseWebcam(e.target.checked)} 
+                  className="switch-input"
+                />
+                <span className="studio-toggle-track" />
+              </label>
+              <button 
+                onClick={handleStartScreenRecording}
+                className="xg-button xg-button-primary"
+              >
+                <Video size={14} /> Start Recording
+              </button>
+            </div>
           ) : recordingState === 'editor' && (
           <div className="xg-nav-actions">
             <button 
@@ -553,62 +584,7 @@ function App() {
           <LandingPage onOpenStudio={() => setShowLandingPage(false)} />
         ) : <>
 
-        {/* State 1: Dashboard Setup */}
-        {recordingState === 'idle' && (
-          <section className="xg-hero animate-fade-in">
-            <div className="xg-hero-copy">
-              <span className="xg-pill"><span className="xg-status-dot" /> Ready to record</span>
-              <h2>Record product demos<br /><span>that look polished.</span></h2>
-              <p>Capture your screen, camera, and voice in one quiet, focused studio. Then trim your recording and export it when it is ready.</p>
-            </div>
-
-            {/* Recorder controls panel */}
-            <div className="xg-recorder-card">
-                <div className="xg-recorder-heading">
-                  <div className="xg-recorder-icon">
-                    <Video size={24} />
-                  </div>
-                  <div>
-                    <h3>New recording</h3>
-                    <p>Choose what to include, then select your browser tab or window.</p>
-                  </div>
-                </div>
-                <div className="xg-recorder-options">
-                    <div className="xg-option-row">
-                      <span><Mic size={15} /> Voice microphone</span>
-                      <label className="switch-container">
-                        <input 
-                          type="checkbox" 
-                          checked={useMic} 
-                          onChange={(e) => setUseMic(e.target.checked)} 
-                          className="switch-input"
-                        />
-                        <div className="switch-slider"></div>
-                      </label>
-                    </div>
-                    <div className="xg-option-row">
-                      <span><Camera size={15} /> Camera overlay</span>
-                      <label className="switch-container">
-                        <input 
-                          type="checkbox" 
-                          checked={useWebcam} 
-                          onChange={(e) => setUseWebcam(e.target.checked)} 
-                          className="switch-input"
-                        />
-                        <div className="switch-slider"></div>
-                      </label>
-                    </div>
-                </div>
-
-                <button 
-                  onClick={handleStartScreenRecording}
-                  className="xg-button xg-button-primary xg-record-button"
-                >
-                  Start recording <span aria-hidden="true">→</span>
-                </button>
-            </div>
-          </section>
-        )}
+        {recordingState === 'idle' && <section className="studio-empty-space animate-fade-in" aria-label="Recording ready" />}
 
         {/* Countdown overlay screen */}
         {countdown !== null && (
