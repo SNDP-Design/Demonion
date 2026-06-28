@@ -161,11 +161,20 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillRect(Math.random() * cw, Math.random() * ch, 2, 2);
       }
 
-      // 2. Card Dimensions (adapts to video aspect ratio to prevent stretching)
-      let videoRatio = 9 / 16;
-      if (videoElement && videoElement.videoWidth && videoElement.videoHeight) {
-        videoRatio = videoElement.videoHeight / videoElement.videoWidth;
-      }
+      const frameRatio = (() => {
+        switch (settings.aspectRatio) {
+          case '16-10':
+            return 10 / 16;
+          case '16-9':
+            return 9 / 16;
+          case '9-16':
+            return 16 / 9;
+          case '1-1':
+            return 1;
+          case '4-3':
+            return 3 / 4;
+        }
+      })();
 
       const renderScale = settings.exportResolution === '4k' ? 2 : 1;
       const isSideCamera = showWebcamOverlay && (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right');
@@ -177,7 +186,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const sideCameraW = isSideCamera ? sideCameraH * (2 / 3) : 0;
       const sideCardW = Math.max(cw * 0.48, cw - sideOuterMargin * 2 - sideCameraW - sideGap);
       const finalW = isSideCamera ? sideCardW : defaultCardW;
-      const finalH = finalW * videoRatio;
+      const finalH = finalW * frameRatio;
       const headerH = settings.macOSHeader ? 32 : 0;
       const totalH = finalH + headerH;
 
@@ -293,10 +302,16 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       if (videoElement && videoElement.readyState >= 2) {
         const vWidth = videoElement.videoWidth || 1920;
         const vHeight = videoElement.videoHeight || 1080;
+        const targetRatio = finalW / finalH;
+        const sourceRatio = vWidth / vHeight;
+        const sourceW = sourceRatio > targetRatio ? vHeight * targetRatio : vWidth;
+        const sourceH = sourceRatio > targetRatio ? vHeight : vWidth / targetRatio;
+        const sourceX = (vWidth - sourceW) / 2;
+        const sourceY = (vHeight - sourceH) / 2;
 
         ctx.drawImage(
           videoElement,
-          0, 0, vWidth, vHeight,
+          sourceX, sourceY, sourceW, sourceH,
           x0, y0 + headerH, finalW, finalH
         );
       } else {
