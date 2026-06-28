@@ -464,7 +464,7 @@ function App() {
     <main className="xg-app h-screen w-screen flex flex-col text-white font-sans overflow-hidden">
       
       {/* Header Bar */}
-      <header className="xg-nav select-none">
+      <header className={`xg-nav select-none ${showLandingPage ? '' : 'studio-nav'}`}>
         <div className={`xg-nav-inner ${showLandingPage ? '' : 'studio-nav-inner'}`}>
           <div className="xg-brand">
             <div className="xg-brand-mark"><DemonierLogo /></div>
