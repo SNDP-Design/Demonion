@@ -170,18 +170,18 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const renderScale = settings.exportResolution === '4k' ? 2 : 1;
       const isSideCamera = showWebcamOverlay && (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right');
       const baseCardW = cw * 0.8;
-      const desiredCardW = baseCardW * settings.scale;
-      const sideGap = isSideCamera ? 24 * renderScale : 0;
+      const defaultCardW = baseCardW * settings.scale;
+      const sideOuterMargin = isSideCamera ? 16 * renderScale : 0;
+      const sideGap = isSideCamera ? 16 * renderScale : 0;
       const sideCameraSize = isSideCamera ? Math.min(settings.cameraSize * 2 * renderScale, cw * 0.28) : 0;
-      const maxLayoutW = cw * 0.92;
-      const maxCardW = isSideCamera ? Math.max(cw * 0.48, maxLayoutW - sideCameraSize - sideGap) : desiredCardW;
-      const finalW = Math.min(desiredCardW, maxCardW);
+      const sideCardW = Math.max(cw * 0.48, cw - sideOuterMargin * 2 - sideCameraSize - sideGap);
+      const finalW = isSideCamera ? sideCardW : defaultCardW;
       const finalH = finalW * videoRatio;
       const headerH = settings.macOSHeader ? 32 : 0;
       const totalH = finalH + headerH;
 
       const groupW = isSideCamera ? finalW + sideGap + sideCameraSize : finalW;
-      const groupX = (cw - groupW) / 2;
+      const groupX = isSideCamera ? sideOuterMargin : (cw - groupW) / 2;
       const x0 = isSideCamera && settings.cameraPosition === 'side-left' ? groupX + sideCameraSize + sideGap : groupX;
       const y0 = (ch - totalH) / 2;
 
