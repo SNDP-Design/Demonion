@@ -146,22 +146,6 @@ function App() {
     }
   }, [connectWebcamVideo]);
 
-  const showFloatingCameraPreview = useCallback(async () => {
-    const video = webcamVideoRef.current;
-    if (!video || !document.pictureInPictureEnabled || document.pictureInPictureElement) return false;
-
-    const isReady = await waitForVideoFrame(video);
-    if (!isReady) return false;
-
-    try {
-      await video.requestPictureInPicture();
-      return true;
-    } catch (error) {
-      console.warn('Camera floating preview could not start:', error);
-      return false;
-    }
-  }, [waitForVideoFrame]);
-
   const setEditorVideoRef = useCallback((el: HTMLVideoElement | null) => {
     editorVideoRef.current = el;
     setEditorVideoEl((current) => current === el ? current : el);
@@ -193,6 +177,15 @@ function App() {
     }
   }, [releaseWebcam, useWebcam]);
 
+  useEffect(() => {
+    if (!showLandingPage && recordingState === 'idle' && useWebcam) {
+      void ensureWebcamStream().catch((error) => {
+        console.warn('Camera preview could not start:', error);
+        setUseWebcam(false);
+      });
+    }
+  }, [ensureWebcamStream, recordingState, showLandingPage, useWebcam]);
+
   // Handle countdown overlay before screen recording starts
   const handleStartScreenRecording = async () => {
     try {
@@ -220,14 +213,12 @@ function App() {
 
       // 3. Make sure the camera feed is connected before the countdown begins.
       let includeWebcam = false;
-      let floatingCameraPreviewStarted = false;
       if (useWebcam) {
         try {
           includeWebcam = await ensureWebcamStream();
           if (!includeWebcam) {
             throw new Error('Camera video did not become ready in time.');
           }
-          floatingCameraPreviewStarted = await showFloatingCameraPreview();
         } catch (error) {
           console.warn('Camera could not be included in this recording:', error);
           setUseWebcam(false);
@@ -293,7 +284,7 @@ function App() {
           audioContext?.close();
           activeMicStream?.getTracks().forEach((track) => track.stop());
           setMicStream(null);
-          setRecordingIncludesWebcam(floatingCameraPreviewStarted);
+          setRecordingIncludesWebcam(false);
           setVideoSrc(URL.createObjectURL(blob));
           setRecordingState('editor');
           screenStream.getTracks().forEach((track) => track.stop());
@@ -432,7 +423,7 @@ function App() {
     return `${m}:${sec.toString().padStart(2, '0')}`;
   };
 
-  const showRecordingCameraPreview = recordingState === 'recording' && useWebcam && settings.cameraPosition !== 'none';
+  const showRecordingCameraPreview = !showLandingPage && (recordingState === 'idle' || recordingState === 'recording') && useWebcam && settings.cameraPosition !== 'none';
   const isSideCameraPreview = settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right';
   const recordingCameraPreviewPosition = (() => {
     switch (settings.cameraPosition) {
