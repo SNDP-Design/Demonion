@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 import { ArrowRight, Check, Film, Layers3, MonitorUp, MousePointer2, Scissors, Sparkles, Upload, Video, WandSparkles } from 'lucide-react';
 import { DemonierLogo } from './DemonierLogo';
 
@@ -14,14 +14,31 @@ const previewModes = [
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
   const [activeMode, setActiveMode] = useState(0);
+  const [orbOffset, setOrbOffset] = useState({ x: 0, y: 0 });
   const active = previewModes[activeMode];
   const ActiveIcon = active.icon;
+  const landingStyle = {
+    '--orb-x': `${orbOffset.x}px`,
+    '--orb-y': `${orbOffset.y}px`,
+  } as CSSProperties;
 
   return (
-    <main className="framer-landing" id="home">
+    <main
+      className="framer-landing"
+      id="home"
+      style={landingStyle}
+      onPointerMove={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        setOrbOffset({
+          x: ((event.clientX - rect.left) / rect.width - 0.5) * 34,
+          y: ((event.clientY - rect.top) / rect.height - 0.5) * 34,
+        });
+      }}
+      onPointerLeave={() => setOrbOffset({ x: 0, y: 0 })}
+    >
       <section className="framer-hero">
-        <div className="framer-orb framer-orb-one" />
-        <div className="framer-orb framer-orb-two" />
+        <div className="framer-orb framer-orb-one" aria-hidden="true" />
+        <div className="framer-orb framer-orb-two" aria-hidden="true" />
         <div className="framer-eyebrow"><span /><b>Browser-native screen recording</b><em>No installs. No account wall.</em></div>
         <h2>Make your next<br /><span>demo impossible to ignore.</span></h2>
         <p>Record your screen, camera, and voice. Shape it into a polished walkthrough—right where you work.</p>
