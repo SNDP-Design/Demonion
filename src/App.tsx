@@ -424,8 +424,13 @@ function App() {
   };
 
   const showRecordingCameraPreview = !showLandingPage && (recordingState === 'idle' || recordingState === 'recording') && useWebcam && settings.cameraPosition !== 'none';
-  const isSideCameraPreview = settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right';
+  const isLiveRecordingPreview = recordingState === 'recording';
+  const isSideCameraPreview = isLiveRecordingPreview || settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right';
   const recordingCameraPreviewPosition = (() => {
+    if (isLiveRecordingPreview) {
+      return { left: 'auto', right: '32px', top: 'auto', bottom: '32px' };
+    }
+
     switch (settings.cameraPosition) {
       case 'top-left':
         return { left: '32px', right: 'auto', top: '32px', bottom: 'auto' };
@@ -516,7 +521,7 @@ function App() {
           ...recordingCameraPreviewPosition,
           width: `${Math.min(220, Math.max(110, settings.cameraSize))}px`,
           aspectRatio: isSideCameraPreview ? '4 / 5' : '1 / 1',
-          borderRadius: settings.cameraShape === 'circle' ? '50%' : '20%',
+          borderRadius: isLiveRecordingPreview ? '8%' : settings.cameraShape === 'circle' ? '50%' : '20%',
           borderColor: settings.cameraBorderColor,
         } : { position: 'fixed', right: '8px', bottom: '8px', width: '160px', height: '90px', opacity: 0.01, pointerEvents: 'none', zIndex: 0 }}
         autoPlay
