@@ -173,22 +173,25 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const defaultCardW = baseCardW * settings.scale;
       const sideOuterMargin = isSideCamera ? 16 * renderScale : 0;
       const sideGap = isSideCamera ? 16 * renderScale : 0;
-      const sideCameraSize = isSideCamera ? Math.min(settings.cameraSize * 2 * renderScale, cw * 0.28) : 0;
-      const sideCardW = Math.max(cw * 0.48, cw - sideOuterMargin * 2 - sideCameraSize - sideGap);
+      const sideCameraH = isSideCamera ? Math.min(settings.cameraSize * 3 * renderScale, ch * 0.56) : 0;
+      const sideCameraW = isSideCamera ? sideCameraH * (2 / 3) : 0;
+      const sideCardW = Math.max(cw * 0.48, cw - sideOuterMargin * 2 - sideCameraW - sideGap);
       const finalW = isSideCamera ? sideCardW : defaultCardW;
       const finalH = finalW * videoRatio;
       const headerH = settings.macOSHeader ? 32 : 0;
       const totalH = finalH + headerH;
 
-      const groupW = isSideCamera ? finalW + sideGap + sideCameraSize : finalW;
+      const groupW = isSideCamera ? finalW + sideGap + sideCameraW : finalW;
       const groupX = isSideCamera ? sideOuterMargin : (cw - groupW) / 2;
-      const x0 = isSideCamera && settings.cameraPosition === 'side-left' ? groupX + sideCameraSize + sideGap : groupX;
+      const x0 = isSideCamera && settings.cameraPosition === 'side-left' ? groupX + sideCameraW + sideGap : groupX;
       const y0 = (ch - totalH) / 2;
 
-      const drawCamera = (cameraX: number, cameraY: number, cameraSize: number, shadow = false) => {
-        const r = cameraSize / 2;
+      const drawCamera = (cameraX: number, cameraY: number, cameraW: number, cameraH: number, shadow = false) => {
+        const r = Math.min(cameraW, cameraH) / 2;
         const isCircleCamera = settings.cameraShape === 'circle';
-        const cameraCornerRadius = isCircleCamera ? r : cameraSize * 0.2;
+        const cameraCornerRadius = isCircleCamera ? r : Math.min(cameraW, cameraH) * 0.2;
+        const centerX = cameraX + cameraW / 2;
+        const centerY = cameraY + cameraH / 2;
 
         if (shadow) {
           ctx.save();
@@ -197,9 +200,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           ctx.shadowOffsetY = 14 * renderScale;
           ctx.beginPath();
           if (isCircleCamera) {
-            ctx.arc(cameraX + r, cameraY + r, r, 0, Math.PI * 2);
+            ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
           } else {
-            ctx.roundRect(cameraX, cameraY, cameraSize, cameraSize, cameraCornerRadius);
+            ctx.roundRect(cameraX, cameraY, cameraW, cameraH, cameraCornerRadius);
           }
           ctx.fillStyle = '#101010';
           ctx.fill();
@@ -209,35 +212,38 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.save();
         ctx.beginPath();
         if (isCircleCamera) {
-          ctx.arc(cameraX + r, cameraY + r, r, 0, Math.PI * 2);
+          ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
         } else {
-          ctx.roundRect(cameraX, cameraY, cameraSize, cameraSize, cameraCornerRadius);
+          ctx.roundRect(cameraX, cameraY, cameraW, cameraH, cameraCornerRadius);
         }
         ctx.clip();
 
         if (webcamElement && webcamElement.readyState >= 2) {
           const webW = webcamElement.videoWidth;
           const webH = webcamElement.videoHeight;
-          const sq = Math.min(webW, webH);
-          const wsx = (webW - sq) / 2;
-          const wsy = (webH - sq) / 2;
+          const targetRatio = cameraW / cameraH;
+          const sourceRatio = webW / webH;
+          const sourceW = sourceRatio > targetRatio ? webH * targetRatio : webW;
+          const sourceH = sourceRatio > targetRatio ? webH : webW / targetRatio;
+          const wsx = (webW - sourceW) / 2;
+          const wsy = (webH - sourceH) / 2;
 
           ctx.drawImage(
             webcamElement,
-            wsx, wsy, sq, sq,
-            cameraX, cameraY, cameraSize, cameraSize
+            wsx, wsy, sourceW, sourceH,
+            cameraX, cameraY, cameraW, cameraH
           );
         } else {
           ctx.fillStyle = '#151515';
-          ctx.fillRect(cameraX, cameraY, cameraSize, cameraSize);
+          ctx.fillRect(cameraX, cameraY, cameraW, cameraH);
         }
         ctx.restore();
 
         ctx.beginPath();
         if (isCircleCamera) {
-          ctx.arc(cameraX + r, cameraY + r, r, 0, Math.PI * 2);
+          ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
         } else {
-          ctx.roundRect(cameraX, cameraY, cameraSize, cameraSize, cameraCornerRadius);
+          ctx.roundRect(cameraX, cameraY, cameraW, cameraH, cameraCornerRadius);
         }
         ctx.lineWidth = 3 * renderScale;
         ctx.strokeStyle = settings.cameraBorderColor;
@@ -322,7 +328,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
         const cameraX = cx - r;
         const cameraY = cy - r;
-        drawCamera(cameraX, cameraY, cameraSize);
+        drawCamera(cameraX, cameraY, cameraSize, cameraSize);
       }
 
       // Draw Card Border
@@ -338,8 +344,8 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
       if (isSideCamera) {
         const cameraX = settings.cameraPosition === 'side-left' ? groupX : x0 + finalW + sideGap;
-        const cameraY = y0 + (totalH - sideCameraSize) / 2;
-        drawCamera(cameraX, cameraY, sideCameraSize, true);
+        const cameraY = y0 + (totalH - sideCameraH) / 2;
+        drawCamera(cameraX, cameraY, sideCameraW, sideCameraH, true);
       }
 
       animId = requestAnimationFrame(render);

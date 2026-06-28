@@ -403,6 +403,7 @@ function App() {
   };
 
   const showRecordingCameraPreview = recordingState === 'recording' && useWebcam && settings.cameraPosition !== 'none';
+  const isSideCameraPreview = settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right';
   const recordingCameraPreviewPosition = (() => {
     switch (settings.cameraPosition) {
       case 'top-left':
@@ -493,7 +494,7 @@ function App() {
         style={showRecordingCameraPreview ? {
           ...recordingCameraPreviewPosition,
           width: `${Math.min(220, Math.max(110, settings.cameraSize))}px`,
-          aspectRatio: '1 / 1',
+          aspectRatio: isSideCameraPreview ? '2 / 3' : '1 / 1',
           borderRadius: settings.cameraShape === 'circle' ? '50%' : '20%',
           borderColor: settings.cameraBorderColor,
         } : { position: 'fixed', right: '8px', bottom: '8px', width: '160px', height: '90px', opacity: 0.01, pointerEvents: 'none', zIndex: 0 }}
