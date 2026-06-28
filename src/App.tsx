@@ -67,12 +67,23 @@ function App() {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  const exitCameraPictureInPicture = useCallback(async () => {
+    try {
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+      }
+    } catch (error) {
+      console.warn('Camera floating preview could not be closed:', error);
+    }
+  }, []);
+
   const releaseWebcam = useCallback(() => {
+    void exitCameraPictureInPicture();
     webcamVideoRef.current?.pause();
     if (webcamVideoRef.current) webcamVideoRef.current.srcObject = null;
     webcamStreamRef.current?.getTracks().forEach((track) => track.stop());
     webcamStreamRef.current = null;
-  }, []);
+  }, [exitCameraPictureInPicture]);
 
   const waitForVideoFrame = useCallback((video: HTMLVideoElement) => {
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) return Promise.resolve(true);
@@ -134,6 +145,20 @@ function App() {
       webcamRequestRef.current = null;
     }
   }, [connectWebcamVideo]);
+
+  const showFloatingCameraPreview = useCallback(async () => {
+    const video = webcamVideoRef.current;
+    if (!video || !document.pictureInPictureEnabled || document.pictureInPictureElement) return;
+
+    const isReady = await waitForVideoFrame(video);
+    if (!isReady) return;
+
+    try {
+      await video.requestPictureInPicture();
+    } catch (error) {
+      console.warn('Camera floating preview could not start:', error);
+    }
+  }, [waitForVideoFrame]);
 
   const setEditorVideoRef = useCallback((el: HTMLVideoElement | null) => {
     editorVideoRef.current = el;
@@ -199,6 +224,7 @@ function App() {
           if (!includeWebcam) {
             throw new Error('Camera video did not become ready in time.');
           }
+          void showFloatingCameraPreview();
         } catch (error) {
           console.warn('Camera could not be included in this recording:', error);
           setUseWebcam(false);
@@ -302,6 +328,7 @@ function App() {
       screenRecorderRef.current.stop();
       if (cameraRecorderRef.current?.state === 'recording') cameraRecorderRef.current.stop();
       clearInterval(timerRef.current);
+      void exitCameraPictureInPicture();
     }
   };
 
