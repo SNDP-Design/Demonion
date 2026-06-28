@@ -148,15 +148,17 @@ function App() {
 
   const showFloatingCameraPreview = useCallback(async () => {
     const video = webcamVideoRef.current;
-    if (!video || !document.pictureInPictureEnabled || document.pictureInPictureElement) return;
+    if (!video || !document.pictureInPictureEnabled || document.pictureInPictureElement) return false;
 
     const isReady = await waitForVideoFrame(video);
-    if (!isReady) return;
+    if (!isReady) return false;
 
     try {
       await video.requestPictureInPicture();
+      return true;
     } catch (error) {
       console.warn('Camera floating preview could not start:', error);
+      return false;
     }
   }, [waitForVideoFrame]);
 
@@ -218,13 +220,14 @@ function App() {
 
       // 3. Make sure the camera feed is connected before the countdown begins.
       let includeWebcam = false;
+      let floatingCameraPreviewStarted = false;
       if (useWebcam) {
         try {
           includeWebcam = await ensureWebcamStream();
           if (!includeWebcam) {
             throw new Error('Camera video did not become ready in time.');
           }
-          void showFloatingCameraPreview();
+          floatingCameraPreviewStarted = await showFloatingCameraPreview();
         } catch (error) {
           console.warn('Camera could not be included in this recording:', error);
           setUseWebcam(false);
@@ -290,7 +293,7 @@ function App() {
           audioContext?.close();
           activeMicStream?.getTracks().forEach((track) => track.stop());
           setMicStream(null);
-          setRecordingIncludesWebcam(false);
+          setRecordingIncludesWebcam(floatingCameraPreviewStarted);
           setVideoSrc(URL.createObjectURL(blob));
           setRecordingState('editor');
           screenStream.getTracks().forEach((track) => track.stop());
