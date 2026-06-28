@@ -36,6 +36,10 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     const is4K = settings.exportResolution === '4k';
 
     switch (settings.aspectRatio) {
+      case '16-10':
+        width = is4K ? 3840 : 1920;
+        height = is4K ? 2400 : 1200;
+        break;
       case '16-9':
         width = is4K ? 3840 : 1920;
         height = is4K ? 2160 : 1080;

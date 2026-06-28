@@ -460,7 +460,7 @@ function App() {
               }}
               className="xg-button xg-button-secondary"
             >
-              <RotateCcw size={13} /> Reset Video
+              <RotateCcw size={13} /> Record New
             </button>
             <button 
               onClick={() => {
