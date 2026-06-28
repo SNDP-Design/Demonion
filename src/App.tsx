@@ -146,6 +146,20 @@ function App() {
     }
   }, [connectWebcamVideo]);
 
+  const showFloatingCameraPreview = useCallback(async () => {
+    const video = webcamVideoRef.current;
+    if (!video || !document.pictureInPictureEnabled || document.pictureInPictureElement) return;
+
+    const isReady = await waitForVideoFrame(video);
+    if (!isReady) return;
+
+    try {
+      await video.requestPictureInPicture();
+    } catch (error) {
+      console.warn('Camera floating preview could not start:', error);
+    }
+  }, [waitForVideoFrame]);
+
   const setEditorVideoRef = useCallback((el: HTMLVideoElement | null) => {
     editorVideoRef.current = el;
     setEditorVideoEl((current) => current === el ? current : el);
@@ -199,6 +213,9 @@ function App() {
         },
         audio: false
       });
+      const screenTrack = screenStream.getVideoTracks()[0];
+      const displaySurface = (screenTrack?.getSettings() as MediaTrackSettings & { displaySurface?: string }).displaySurface;
+      const isBrowserTabRecording = displaySurface === 'browser';
 
       // 2. Request mic if requested
       let activeMicStream: MediaStream | null = null;
@@ -218,6 +235,9 @@ function App() {
           includeWebcam = await ensureWebcamStream();
           if (!includeWebcam) {
             throw new Error('Camera video did not become ready in time.');
+          }
+          if (isBrowserTabRecording) {
+            void showFloatingCameraPreview();
           }
         } catch (error) {
           console.warn('Camera could not be included in this recording:', error);
