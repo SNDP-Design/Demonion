@@ -38,6 +38,22 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     let height = 1080;
     const is4K = settings.exportResolution === '4k';
 
+    if (settings.layoutMode === 'screen-only' && videoElement?.videoWidth && videoElement.videoHeight) {
+      const maxWidth = is4K ? 3840 : 1920;
+      const maxHeight = is4K ? 2160 : 1080;
+      const videoRatio = videoElement.videoWidth / videoElement.videoHeight;
+
+      if (videoRatio >= maxWidth / maxHeight) {
+        width = maxWidth;
+        height = Math.round(maxWidth / videoRatio);
+      } else {
+        height = maxHeight;
+        width = Math.round(maxHeight * videoRatio);
+      }
+
+      return { width, height };
+    }
+
     switch (settings.aspectRatio) {
       case '16-10':
         width = is4K ? 3840 : 1920;
@@ -62,24 +78,24 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     }
 
     return { width, height };
-  }, [settings.aspectRatio, settings.exportResolution]);
+  }, [settings.aspectRatio, settings.exportResolution, settings.layoutMode, videoElement?.videoHeight, videoElement?.videoWidth]);
 
   const setCanvasElement = useCallback((canvas: HTMLCanvasElement | null) => {
     canvasRef.current = canvas;
     onCanvasElementChange?.(canvas);
   }, [canvasRef, onCanvasElementChange]);
 
-  const getCoverRect = (sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number) => {
+  const getContainRect = (sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number) => {
     const sourceRatio = sourceWidth / sourceHeight;
     const targetRatio = targetWidth / targetHeight;
 
     if (sourceRatio > targetRatio) {
-      const width = sourceHeight * targetRatio;
-      return { sx: (sourceWidth - width) / 2, sy: 0, sw: width, sh: sourceHeight };
+      const height = targetWidth / sourceRatio;
+      return { dx: 0, dy: (targetHeight - height) / 2, dw: targetWidth, dh: height };
     }
 
-    const height = sourceWidth / targetRatio;
-    return { sx: 0, sy: (sourceHeight - height) / 2, sw: sourceWidth, sh: height };
+    const width = targetHeight * sourceRatio;
+    return { dx: (targetWidth - width) / 2, dy: 0, dw: width, dh: targetHeight };
   };
 
   // Canvas drawing loop
@@ -288,9 +304,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         if (videoElement && videoElement.readyState >= 2) {
           const vWidth = videoElement.videoWidth || 1920;
           const vHeight = videoElement.videoHeight || 1080;
-          const source = getCoverRect(vWidth, vHeight, cw, ch);
+          const target = getContainRect(vWidth, vHeight, cw, ch);
 
-          ctx.drawImage(videoElement, source.sx, source.sy, source.sw, source.sh, 0, 0, cw, ch);
+          ctx.drawImage(videoElement, 0, 0, vWidth, vHeight, target.dx, target.dy, target.dw, target.dh);
         } else {
           ctx.fillStyle = '#0a0d14';
           ctx.fillRect(0, 0, cw, ch);
@@ -461,7 +477,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           height: 'auto',
           maxWidth: '100%',
           maxHeight: '100%',
-          aspectRatio: settings.aspectRatio.replace('-', '/')
+          aspectRatio: settings.layoutMode === 'screen-only'
+            ? `${canvasDimensions.width} / ${canvasDimensions.height}`
+            : settings.aspectRatio.replace('-', '/')
         }}
       />
     </div>
