@@ -362,11 +362,11 @@ function App() {
     }
   };
 
-  const handleTogglePlay = () => {
+  const handleTogglePlay = async () => {
     const video = editorVideoRef.current;
     if (!video) return;
 
-    if (isPlaying) {
+    if (!video.paused) {
       video.pause();
       recordedCameraVideoRef.current?.pause();
       setIsPlaying(false);
@@ -378,9 +378,14 @@ function App() {
           recordedCameraVideoRef.current.currentTime = trimStart;
         }
       }
-      video.play().catch(e => console.error(e));
-      recordedCameraVideoRef.current?.play().catch(e => console.error(e));
-      setIsPlaying(true);
+      try {
+        await video.play();
+        void recordedCameraVideoRef.current?.play().catch(e => console.error(e));
+        setIsPlaying(true);
+      } catch (e) {
+        console.error(e);
+        setIsPlaying(false);
+      }
     }
   };
 
@@ -452,6 +457,26 @@ function App() {
       video.removeEventListener('ended', handleLoopCheck);
     };
   }, [trimStart, trimEnd, duration, isPlaying]);
+
+  useEffect(() => {
+    const video = editorVideoEl;
+    if (!video) return;
+
+    const markPlaying = () => setIsPlaying(true);
+    const markPaused = () => setIsPlaying(false);
+
+    video.addEventListener('play', markPlaying);
+    video.addEventListener('playing', markPlaying);
+    video.addEventListener('pause', markPaused);
+    video.addEventListener('ended', markPaused);
+
+    return () => {
+      video.removeEventListener('play', markPlaying);
+      video.removeEventListener('playing', markPlaying);
+      video.removeEventListener('pause', markPaused);
+      video.removeEventListener('ended', markPaused);
+    };
+  }, [editorVideoEl]);
 
   const formatSecs = (s: number) => {
     const m = Math.floor(s / 60);
@@ -630,7 +655,7 @@ function App() {
             <aside className="h-full shrink-0">
               <SidebarControls
                 settings={settings}
-                onChangeSettings={(updates) => setSettings({ ...settings, ...updates })}
+                onChangeSettings={(updates) => setSettings((current) => ({ ...current, ...updates }))}
               />
             </aside>
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -675,7 +700,7 @@ function App() {
         cameraVideoElement={recordedCameraVideoEl}
         micStream={micStream}
         settings={settings}
-        onChangeSettings={(updates) => setSettings({ ...settings, ...updates })}
+        onChangeSettings={(updates) => setSettings((current) => ({ ...current, ...updates }))}
         duration={duration}
       />
 
