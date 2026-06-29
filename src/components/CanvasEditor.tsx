@@ -199,7 +199,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillRect(Math.random() * cw, Math.random() * ch, 2, 2);
       }
 
-      const frameRatio = (() => {
+      const defaultFrameRatio = (() => {
         switch (settings.aspectRatio) {
           case '16-10':
             return 10 / 16;
@@ -213,6 +213,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             return 3 / 4;
         }
       })();
+      const frameRatio = videoElement?.videoWidth && videoElement.videoHeight
+        ? videoElement.videoHeight / videoElement.videoWidth
+        : defaultFrameRatio;
 
       const renderScale = settings.exportResolution === '4k' ? 2 : 1;
       const isSideCamera = showWebcamOverlay && (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right');
