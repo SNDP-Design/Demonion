@@ -10,6 +10,8 @@ interface CanvasEditorProps {
   settings: EditorSettings;
 }
 
+const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
+
 export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   canvasRef,
   onCanvasElementChange,
@@ -206,7 +208,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const sideOuterMargin = isSideCamera ? 16 * renderScale : 0;
       const sideGap = isSideCamera ? 16 * renderScale : 0;
       const sideCameraH = isSideCamera ? Math.min(settings.cameraSize * 2.5 * renderScale, ch * 0.56) : 0;
-      const sideCameraW = isSideCamera ? sideCameraH * (4 / 5) : 0;
+      const sideCameraW = isSideCamera ? sideCameraH / SIDE_CAMERA_HEIGHT_TO_WIDTH : 0;
       const sideCardW = Math.max(cw * 0.48, cw - sideOuterMargin * 2 - sideCameraW - sideGap);
       const finalW = isSideCamera ? sideCardW : defaultCardW;
       const finalH = finalW * frameRatio;
@@ -319,7 +321,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             cameraY = ch - cameraH - margin;
           } else if (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right') {
             cameraH = Math.min(settings.cameraSize * 2.5 * renderScale, ch * 0.56);
-            cameraW = cameraH * (4 / 5);
+            cameraW = cameraH / SIDE_CAMERA_HEIGHT_TO_WIDTH;
             cameraX = settings.cameraPosition === 'side-left' ? margin : cw - cameraW - margin;
             cameraY = (ch - cameraH) / 2;
           }

@@ -18,6 +18,8 @@ import {
   FileVideo
 } from 'lucide-react';
 
+const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
+
 function App() {
   const [recordingState, setRecordingState] = useState<'idle' | 'recording' | 'editor'>('idle');
   const [showLandingPage, setShowLandingPage] = useState(true);
@@ -458,7 +460,9 @@ function App() {
   };
 
   const showRecordingCameraPreview = !showLandingPage && (recordingState === 'idle' || recordingState === 'recording') && useWebcam && settings.cameraPosition !== 'none';
+  const isLiveSideCamera = settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right';
   const liveCameraPreviewWidth = Math.min(220, Math.max(110, settings.cameraSize));
+  const liveCameraPreviewHeight = isLiveSideCamera ? liveCameraPreviewWidth * SIDE_CAMERA_HEIGHT_TO_WIDTH : liveCameraPreviewWidth;
 
   return (
     <main className="xg-app h-screen w-screen flex flex-col text-white font-sans overflow-hidden">
@@ -566,9 +570,9 @@ function App() {
           top: 'auto',
           bottom: '32px',
           width: `${liveCameraPreviewWidth}px`,
-          height: `${liveCameraPreviewWidth * 1.25}px`,
-          aspectRatio: '4 / 5',
-          borderRadius: '8%',
+          height: `${liveCameraPreviewHeight}px`,
+          aspectRatio: isLiveSideCamera ? '4 / 5' : '1 / 1',
+          borderRadius: isLiveSideCamera ? '8%' : settings.cameraShape === 'circle' ? '50%' : '18%',
           borderColor: settings.cameraBorderColor,
         } : { position: 'fixed', right: '8px', bottom: '8px', width: '160px', height: '90px', opacity: 0.01, pointerEvents: 'none', zIndex: 0 }}
         autoPlay
