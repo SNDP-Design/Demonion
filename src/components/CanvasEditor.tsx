@@ -69,6 +69,19 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     onCanvasElementChange?.(canvas);
   }, [canvasRef, onCanvasElementChange]);
 
+  const getCoverRect = (sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number) => {
+    const sourceRatio = sourceWidth / sourceHeight;
+    const targetRatio = targetWidth / targetHeight;
+
+    if (sourceRatio > targetRatio) {
+      const width = sourceHeight * targetRatio;
+      return { sx: (sourceWidth - width) / 2, sy: 0, sw: width, sh: sourceHeight };
+    }
+
+    const height = sourceWidth / targetRatio;
+    return { sx: 0, sy: (sourceHeight - height) / 2, sw: sourceWidth, sh: height };
+  };
+
   // Canvas drawing loop
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -266,6 +279,55 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.lineWidth = 3 * renderScale;
         ctx.strokeStyle = settings.cameraBorderColor;
         ctx.stroke();
+      };
+
+      if (settings.layoutMode === 'screen-only') {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, cw, ch);
+
+        if (videoElement && videoElement.readyState >= 2) {
+          const vWidth = videoElement.videoWidth || 1920;
+          const vHeight = videoElement.videoHeight || 1080;
+          const source = getCoverRect(vWidth, vHeight, cw, ch);
+
+          ctx.drawImage(videoElement, source.sx, source.sy, source.sw, source.sh, 0, 0, cw, ch);
+        } else {
+          ctx.fillStyle = '#0a0d14';
+          ctx.fillRect(0, 0, cw, ch);
+          ctx.fillStyle = 'rgba(255,255,255,0.7)';
+          ctx.font = 'bold 24px Inter';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('Screen Recording Preview', cw / 2, ch / 2);
+        }
+
+        if (showWebcamOverlay && settings.cameraPosition !== 'none') {
+          const cameraSize = settings.cameraSize * renderScale;
+          const margin = 20 * renderScale;
+          let cameraW = cameraSize;
+          let cameraH = cameraSize;
+          let cameraX = margin;
+          let cameraY = margin;
+
+          if (settings.cameraPosition === 'top-right') {
+            cameraX = cw - cameraW - margin;
+          } else if (settings.cameraPosition === 'bottom-left') {
+            cameraY = ch - cameraH - margin;
+          } else if (settings.cameraPosition === 'bottom-right') {
+            cameraX = cw - cameraW - margin;
+            cameraY = ch - cameraH - margin;
+          } else if (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right') {
+            cameraH = Math.min(settings.cameraSize * 2.5 * renderScale, ch * 0.56);
+            cameraW = cameraH * (4 / 5);
+            cameraX = settings.cameraPosition === 'side-left' ? margin : cw - cameraW - margin;
+            cameraY = (ch - cameraH) / 2;
+          }
+
+          drawCamera(cameraX, cameraY, cameraW, cameraH, true, 0.08);
+        }
+
+        animId = requestAnimationFrame(render);
+        return;
       };
 
       // 3. Draw Box Shadow

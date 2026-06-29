@@ -7,6 +7,7 @@ export interface GradientPreset {
 }
 
 export interface EditorSettings {
+  layoutMode: 'framed' | 'screen-only';
   backgroundType: 'gradient' | 'solid';
   gradientPresetId: string;
   solidColor: string;
