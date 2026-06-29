@@ -68,7 +68,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
         {settings.layoutMode === 'framed' && <section className="sidebar-module browser-window-section border-t border-glass pt-5">
           <h3 className="sidebar-module-title"><Layout size={14} /> Browser Window</h3>
           <div className="browser-window-controls">
-            <Slider label="Window Padding" value={`${Math.round(settings.scale * 100)}%`} min="0.5" max="1.1" step="0.01" current={settings.scale} onChange={(value) => update('scale', value)} />
+            <Slider label="Window Padding" value={`${Math.round(settings.scale * 100)}%`} min="0.5" max="1.2" step="0.01" current={settings.scale} onChange={(value) => update('scale', value)} />
             <Slider label="Shadow Blur" value={`${settings.shadowIntensity}px`} min="0" max="100" current={settings.shadowIntensity} onChange={(value) => update('shadowIntensity', value)} />
             <label className="sidebar-toggle-label"><span>macOS Title Dots</span><span className="switch-container"><input type="checkbox" checked={settings.macOSHeader} onChange={(event) => update('macOSHeader', event.target.checked)} className="switch-input" /><span className="switch-slider" /></span></label>
           </div>

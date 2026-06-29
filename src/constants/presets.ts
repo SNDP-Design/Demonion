@@ -18,7 +18,7 @@ export const DEFAULT_SETTINGS: EditorSettings = {
   shadowIntensity: 60,
   borderWidth: 1,
   borderColor: 'rgba(255,255,255,0.15)',
-  scale: 0.85,
+  scale: 1.2,
   macOSHeader: false,
   cameraPosition: 'bottom-right',
   cameraShape: 'rounded',
