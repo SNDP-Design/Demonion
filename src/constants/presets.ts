@@ -44,6 +44,7 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
 ];
 
 export const DEFAULT_SETTINGS: EditorSettings = {
+  layoutMode: 'framed',
   backgroundType: 'gradient',
   gradientPresetId: 'sunset',
   solidColor: '#0f172a',

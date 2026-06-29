@@ -110,6 +110,29 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     };
   };
 
+  const getCoverRect = (sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number) => {
+    const sourceRatio = sourceWidth / sourceHeight;
+    const targetRatio = targetWidth / targetHeight;
+
+    if (sourceRatio > targetRatio) {
+      const width = sourceHeight * targetRatio;
+      return {
+        sx: (sourceWidth - width) / 2,
+        sy: 0,
+        sw: width,
+        sh: sourceHeight,
+      };
+    }
+
+    const height = sourceWidth / targetRatio;
+    return {
+      sx: 0,
+      sy: (sourceHeight - height) / 2,
+      sw: sourceWidth,
+      sh: height,
+    };
+  };
+
   // Canvas drawing loop
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -135,13 +158,103 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
       // 1. Draw Canvas Background
       ctx.clearRect(0, 0, cw, ch);
+
+      if (settings.layoutMode === 'screen-only') {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, cw, ch);
+
+        if (videoElement && videoElement.readyState >= 2) {
+          const vWidth = videoElement.videoWidth || 1920;
+          const vHeight = videoElement.videoHeight || 1080;
+          const zoomState = getInterpolatedZoom(time, keyframes);
+          const coverRect = getCoverRect(vWidth, vHeight, cw, ch);
+
+          const sw = coverRect.sw / zoomState.zoom;
+          const sh = coverRect.sh / zoomState.zoom;
+          const minSx = coverRect.sx;
+          const maxSx = coverRect.sx + coverRect.sw - sw;
+          const minSy = coverRect.sy;
+          const maxSy = coverRect.sy + coverRect.sh - sh;
+
+          let sx = zoomState.x * vWidth - sw / 2;
+          let sy = zoomState.y * vHeight - sh / 2;
+
+          sx = Math.max(minSx, Math.min(maxSx, sx));
+          sy = Math.max(minSy, Math.min(maxSy, sy));
+
+          ctx.drawImage(videoElement, sx, sy, sw, sh, 0, 0, cw, ch);
+        } else {
+          ctx.fillStyle = '#0a0d14';
+          ctx.fillRect(0, 0, cw, ch);
+          ctx.fillStyle = 'rgba(255,255,255,0.7)';
+          ctx.font = 'bold 24px Inter';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('Screen Recording Preview', cw / 2, ch / 2);
+        }
+
+        if (settings.cameraPosition !== 'none') {
+          const r = settings.cameraSize / 2;
+          const margin = Math.max(20, cw * 0.018);
+          let cx = r + margin;
+          let cy = r + margin;
+
+          if (settings.cameraPosition === 'top-right') {
+            cx = cw - r - margin;
+          } else if (settings.cameraPosition === 'bottom-left') {
+            cy = ch - r - margin;
+          } else if (settings.cameraPosition === 'bottom-right') {
+            cx = cw - r - margin;
+            cy = ch - r - margin;
+          }
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.clip();
+
+          if (webcamElement && webcamElement.readyState >= 2) {
+            const webW = webcamElement.videoWidth;
+            const webH = webcamElement.videoHeight;
+            const sq = Math.min(webW, webH);
+            const wsx = (webW - sq) / 2;
+            const wsy = (webH - sq) / 2;
+
+            ctx.drawImage(webcamElement, wsx, wsy, sq, sq, cx - r, cy - r, 2 * r, 2 * r);
+          } else {
+            const camGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+            camGrad.addColorStop(0, '#ffffff');
+            camGrad.addColorStop(1, '#a3a3a3');
+            ctx.fillStyle = camGrad;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#0a0a0a';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = `bold ${Math.round(r * 0.4)}px Inter`;
+            ctx.fillText('CAM', cx, cy);
+          }
+          ctx.restore();
+
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = settings.cameraBorderColor;
+          ctx.stroke();
+        }
+
+        animId = requestAnimationFrame(render);
+        return;
+      }
       
       if (settings.backgroundType === 'solid') {
         ctx.fillStyle = settings.solidColor;
         ctx.fillRect(0, 0, cw, ch);
       } else {
         // Preset linear gradient
-        let grad = ctx.createLinearGradient(0, 0, cw, ch);
+        const grad = ctx.createLinearGradient(0, 0, cw, ch);
         if (settings.gradientPresetId === 'sunset') {
           grad.addColorStop(0, '#f97316');
           grad.addColorStop(0.5, '#ec4899');
@@ -173,25 +286,25 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           ctx.fillRect(0, 0, cw, ch);
           
           ctx.globalCompositeOperation = 'screen';
-          let g1 = ctx.createRadialGradient(0, 0, 10, 0, 0, cw * 0.6);
+          const g1 = ctx.createRadialGradient(0, 0, 10, 0, 0, cw * 0.6);
           g1.addColorStop(0, 'rgba(192, 132, 252, 0.4)');
           g1.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = g1;
           ctx.fillRect(0,0,cw,ch);
 
-          let g2 = ctx.createRadialGradient(cw, 0, 10, cw, 0, cw * 0.6);
+          const g2 = ctx.createRadialGradient(cw, 0, 10, cw, 0, cw * 0.6);
           g2.addColorStop(0, 'rgba(244, 114, 182, 0.4)');
           g2.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = g2;
           ctx.fillRect(0,0,cw,ch);
 
-          let g3 = ctx.createRadialGradient(cw, ch, 10, cw, ch, cw * 0.6);
+          const g3 = ctx.createRadialGradient(cw, ch, 10, cw, ch, cw * 0.6);
           g3.addColorStop(0, 'rgba(96, 165, 250, 0.4)');
           g3.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = g3;
           ctx.fillRect(0,0,cw,ch);
 
-          let g4 = ctx.createRadialGradient(0, ch, 10, 0, ch, cw * 0.6);
+          const g4 = ctx.createRadialGradient(0, ch, 10, 0, ch, cw * 0.6);
           g4.addColorStop(0, 'rgba(52, 211, 153, 0.4)');
           g4.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = g4;
@@ -333,7 +446,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           );
         } else {
           // Fallback: Draw a premium stylized gradient avatar preview
-          let camGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+          const camGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
           camGrad.addColorStop(0, '#ffffff'); 
           camGrad.addColorStop(1, '#a3a3a3'); 
           ctx.fillStyle = camGrad;
@@ -394,6 +507,11 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
     const cw = canvas.width;
     const ch = canvas.height;
+
+    if (settings.layoutMode === 'screen-only') {
+      onCanvasClick(Math.max(0, Math.min(1, cvsX / cw)), Math.max(0, Math.min(1, cvsY / ch)));
+      return;
+    }
 
     // Adapt to video aspect ratio for canvas clicks
     let videoRatio = 9 / 16;

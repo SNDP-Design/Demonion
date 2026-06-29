@@ -4,6 +4,7 @@ import { GRADIENT_PRESETS } from '../constants/presets';
 import { 
   Camera, 
   Layout, 
+  Monitor,
   Paintbrush, 
   Settings2,
   Trash2,
@@ -27,13 +28,19 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
   keyframes,
   onAddKeyframe,
   onRemoveKeyframe,
-  onUpdateKeyframe,
-  currentTime: _currentTime,
-  duration: _duration
+  onUpdateKeyframe
 }) => {
   const updateSetting = <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) => {
     onChangeSettings({ [key]: value });
   };
+
+  const cameraPositions: Array<{ id: EditorSettings['cameraPosition']; name: string }> = [
+    { id: 'top-left', name: 'Top Left' },
+    { id: 'top-right', name: 'Top Right' },
+    { id: 'bottom-left', name: 'Bottom Left' },
+    { id: 'bottom-right', name: 'Bottom Right' },
+    { id: 'none', name: 'Hide Camera' },
+  ];
 
   return (
     <aside className="glass-panel sidebar flex flex-col h-full w-[350px] border-r border-glass text-sm select-none rounded-none">
@@ -54,16 +61,10 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
 
           {/* Camera Position buttons */}
           <div className="grid grid-cols-2 gap-2">
-            {[
-              { id: 'top-left', name: 'Top Left' },
-              { id: 'top-right', name: 'Top Right' },
-              { id: 'bottom-left', name: 'Bottom Left' },
-              { id: 'bottom-right', name: 'Bottom Right' },
-              { id: 'none', name: 'Hide Camera' },
-            ].map((pos) => (
+            {cameraPositions.map((pos) => (
               <button
                 key={pos.id}
-                onClick={() => updateSetting('cameraPosition', pos.id as any)}
+                onClick={() => updateSetting('cameraPosition', pos.id)}
                 className={`p-2.5 rounded-lg border text-xs font-semibold text-center transition-all ${settings.cameraPosition === pos.id ? 'active-purple' : 'border-glass hover-bg-glass text-gray-400'} ${pos.id === 'none' ? 'col-span-2' : ''}`}
               >
                 {pos.name}
@@ -109,6 +110,22 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
             Browser Window style
           </h3>
 
+          <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass">
+            <span className="text-xs text-gray-300 font-semibold flex items-center gap-2">
+              <Monitor size={14} className="text-blue-400" />
+              Screen Only
+            </span>
+            <label className="switch-container">
+              <input
+                type="checkbox"
+                checked={settings.layoutMode === 'screen-only'}
+                onChange={(e) => updateSetting('layoutMode', e.target.checked ? 'screen-only' : 'framed')}
+                className="switch-input"
+              />
+              <div className="switch-slider"></div>
+            </label>
+          </div>
+
           {/* Aspect Ratio */}
           <div className="space-y-2">
             <label className="text-[11px] text-gray-500 font-bold uppercase">Aspect Ratio</label>
@@ -130,68 +147,73 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
             </div>
           </div>
 
-          {/* Window Padding Scale */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs">
-              <span className="text-gray-400 font-medium">Window Padding (Scale)</span>
-              <span className="text-blue-400 font-semibold">{Math.round(settings.scale * 100)}%</span>
-            </div>
-            <input 
-              type="range" 
-              min="0.5" 
-              max="1.1" 
-              step="0.01" 
-              value={settings.scale}
-              onChange={(e) => updateSetting('scale', parseFloat(e.target.value))}
-            />
-          </div>
+          {settings.layoutMode === 'framed' && (
+            <div className="space-y-4 animate-fade-in">
+              {/* Window Padding Scale */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400 font-medium">Window Padding (Scale)</span>
+                  <span className="text-blue-400 font-semibold">{Math.round(settings.scale * 100)}%</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0.5" 
+                  max="1.1" 
+                  step="0.01" 
+                  value={settings.scale}
+                  onChange={(e) => updateSetting('scale', parseFloat(e.target.value))}
+                />
+              </div>
 
-          {/* Border Radius */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs">
-              <span className="text-gray-400 font-medium">Corner Rounding</span>
-              <span className="text-blue-400 font-semibold">{settings.borderRadius}px</span>
-            </div>
-            <input 
-              type="range" 
-              min="0" 
-              max="32" 
-              value={settings.borderRadius}
-              onChange={(e) => updateSetting('borderRadius', parseInt(e.target.value))}
-            />
-          </div>
+              {/* Border Radius */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400 font-medium">Corner Rounding</span>
+                  <span className="text-blue-400 font-semibold">{settings.borderRadius}px</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="32" 
+                  value={settings.borderRadius}
+                  onChange={(e) => updateSetting('borderRadius', parseInt(e.target.value))}
+                />
+              </div>
 
-          {/* Shadow intensity */}
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs">
-              <span className="text-gray-400 font-medium">Shadow Blur</span>
-              <span className="text-blue-400 font-semibold">{settings.shadowIntensity}px</span>
-            </div>
-            <input 
-              type="range" 
-              min="0" 
-              max="100" 
-              value={settings.shadowIntensity}
-              onChange={(e) => updateSetting('shadowIntensity', parseInt(e.target.value))}
-            />
-          </div>
+              {/* Shadow intensity */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400 font-medium">Shadow Blur</span>
+                  <span className="text-blue-400 font-semibold">{settings.shadowIntensity}px</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  value={settings.shadowIntensity}
+                  onChange={(e) => updateSetting('shadowIntensity', parseInt(e.target.value))}
+                />
+              </div>
 
-          {/* macOS window traffic lights header toggle */}
-          <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass">
-            <span className="text-xs text-gray-300 font-semibold">macOS Title Dots</span>
-            <label className="switch-container">
-              <input 
-                type="checkbox" 
-                checked={settings.macOSHeader} 
-                onChange={(e) => updateSetting('macOSHeader', e.target.checked)} 
-                className="switch-input"
-              />
-              <div className="switch-slider"></div>
-            </label>
-          </div>
+              {/* macOS window traffic lights header toggle */}
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass">
+                <span className="text-xs text-gray-300 font-semibold">macOS Title Dots</span>
+                <label className="switch-container">
+                  <input 
+                    type="checkbox" 
+                    checked={settings.macOSHeader} 
+                    onChange={(e) => updateSetting('macOSHeader', e.target.checked)} 
+                    className="switch-input"
+                  />
+                  <div className="switch-slider"></div>
+                </label>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Section 3: Canvas Background Preset */}
+        {settings.layoutMode === 'framed' && (
         <div className="space-y-4 border-t border-glass pt-5">
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
             <Paintbrush size={14} className="text-pink-400" />
@@ -221,6 +243,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
             ))}
           </div>
         </div>
+        )}
 
         {/* Section 4: Zoom Keyframe list */}
         <div className="space-y-4 border-t border-glass pt-5">
