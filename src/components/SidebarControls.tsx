@@ -19,12 +19,10 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
           <h3 className="sidebar-module-title"><Monitor size={14} /> Video Layout</h3>
           <div className="video-layout-options">
             <button type="button" onClick={() => update('layoutMode', 'screen-only')} className={`video-layout-option ${settings.layoutMode === 'screen-only' ? 'sidebar-control-active' : 'border-glass hover-bg-glass text-gray-400'}`}>
-              <strong>Screen + Camera Only</strong>
-              <span>No background color, no gradient, no browser frame.</span>
+              <strong>Screen + Camera</strong>
             </button>
             <button type="button" onClick={() => update('layoutMode', 'framed')} className={`video-layout-option ${settings.layoutMode === 'framed' ? 'sidebar-control-active' : 'border-glass hover-bg-glass text-gray-400'}`}>
               <strong>Styled Background</strong>
-              <span>Use the gradient background and browser-style frame.</span>
             </button>
           </div>
         </section>
