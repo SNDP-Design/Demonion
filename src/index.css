@@ -2562,3 +2562,712 @@ aside.sidebar {
     padding: 24px;
   }
 }
+
+/* Monzaa-inspired landing redesign */
+.monza-landing {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 0 24px;
+  color: #f4f4f5;
+}
+
+.monza-hero {
+  min-height: calc(100svh - 72px);
+  display: grid;
+  place-items: center;
+  padding: 72px 0 54px;
+  text-align: center;
+}
+
+.monza-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  color: #d4d4d8;
+  background: rgba(255,255,255,.04);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.monza-hero h2 {
+  max-width: 920px;
+  margin: 22px auto 18px;
+  color: #fff;
+  font-size: 86px;
+  line-height: .92;
+  letter-spacing: 0;
+}
+
+.monza-hero p {
+  max-width: 650px;
+  margin: 0 auto;
+  color: #a1a1aa;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.monza-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.monza-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 17px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 10px;
+  color: #f4f4f5;
+  background: rgba(255,255,255,.035);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.monza-proof {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 20px;
+  color: #8f8f98;
+  font-size: 12px;
+}
+
+.monza-proof span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.monza-proof svg {
+  color: #86efac;
+}
+
+.monza-preview-shell {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  box-shadow: 0 34px 90px rgba(0,0,0,.58), inset 0 1px rgba(255,255,255,.08);
+}
+
+.monza-preview-top {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(255,255,255,.09);
+  color: #d4d4d8;
+  font-size: 12px;
+}
+
+.monza-preview-top div,
+.monza-preview-top span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.monza-preview-top svg {
+  width: 18px;
+  height: 18px;
+}
+
+.monza-preview-top i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 12px rgba(74,222,128,.72);
+}
+
+.monza-preview-grid {
+  display: grid;
+  grid-template-columns: 1fr 190px;
+  min-height: 560px;
+}
+
+.monza-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 58px;
+  background: radial-gradient(circle at 50% 20%, rgba(255,255,255,.12), transparent 26%), #09090b;
+}
+
+.monza-screen {
+  position: relative;
+  width: min(100%, 720px);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: #101012;
+  box-shadow: 0 24px 60px rgba(0,0,0,.55);
+  transition: width .28s ease, transform .28s ease, border-radius .28s ease;
+}
+
+.monza-stage.screen-only .monza-screen {
+  width: min(100%, 780px);
+  border-radius: 9px;
+}
+
+.monza-stage.polish-view .monza-screen {
+  transform: scale(.9) translateY(-10px);
+}
+
+.monza-browser {
+  height: 31px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: #18181b;
+}
+
+.monza-stage.screen-only .monza-browser {
+  display: none;
+}
+
+.monza-browser i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #55555e;
+}
+
+.monza-browser span {
+  margin-left: 8px;
+  color: #7e7e87;
+  font-size: 9px;
+}
+
+.monza-screen-content {
+  position: absolute;
+  inset: 31px 0 0;
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  background: linear-gradient(135deg, #202025, #30303a);
+}
+
+.monza-stage.screen-only .monza-screen-content {
+  inset: 0;
+}
+
+.monza-screen-content aside {
+  padding: 15px;
+  border-right: 1px solid rgba(255,255,255,.08);
+  background: rgba(0,0,0,.2);
+}
+
+.monza-screen-content aside i {
+  display: block;
+  height: 9px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.18);
+}
+
+.monza-screen-content aside i:first-child {
+  width: 36px;
+  background: #f4f4f5;
+}
+
+.monza-screen-content > div {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 34px;
+  text-align: center;
+}
+
+.monza-screen-content > div b {
+  max-width: 380px;
+  margin-top: 12px;
+  color: #fff;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.monza-screen-content > div p {
+  max-width: 330px;
+  margin-top: 12px;
+  color: #b8b8c2;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.monza-cursor {
+  position: absolute;
+  right: 22%;
+  bottom: 23%;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  color: #111;
+  background: #f4f4f5;
+  animation: monzaCursor 3.7s ease-in-out infinite;
+}
+
+@keyframes monzaCursor {
+  0%, 100% { transform: translate3d(0,0,0); }
+  50% { transform: translate3d(-22px,-16px,0); }
+}
+
+.monza-camera {
+  position: absolute;
+  right: 76px;
+  bottom: 86px;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border: 3px solid #fff;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #4f46e5, #111 72%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  box-shadow: 0 16px 34px rgba(0,0,0,.45);
+  transition: width .28s ease, height .28s ease, right .28s ease, bottom .28s ease;
+}
+
+.monza-stage.camera-view .monza-camera {
+  right: 48px;
+  bottom: 138px;
+  width: 112px;
+  height: 140px;
+}
+
+.monza-timeline {
+  position: absolute;
+  left: 68px;
+  right: 68px;
+  bottom: 30px;
+  display: flex;
+  gap: 4px;
+  height: 8px;
+}
+
+.monza-timeline i {
+  flex: 1;
+  border-radius: 3px;
+  background: rgba(255,255,255,.18);
+}
+
+.monza-timeline b {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: 58%;
+  width: 2px;
+  background: #fff;
+}
+
+.monza-mode-list {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 16px;
+  border-left: 1px solid rgba(255,255,255,.09);
+  background: rgba(0,0,0,.22);
+}
+
+.monza-mode-list button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  color: #9f9fa8;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.monza-mode-list button.active,
+.monza-mode-list button:hover {
+  color: #fff;
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.18);
+}
+
+.monza-logos {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 22px 0 108px;
+}
+
+.monza-logos span {
+  display: grid;
+  place-items: center;
+  min-height: 56px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  color: #a1a1aa;
+  background: rgba(255,255,255,.025);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.monza-section {
+  margin: 116px 0;
+}
+
+.monza-section-heading {
+  max-width: 720px;
+  margin-bottom: 34px;
+}
+
+.monza-section-heading h3,
+.monza-band h3,
+.monza-split h3,
+.monza-free-plan h3,
+.monza-final h3 {
+  margin: 14px 0;
+  color: #fff;
+  font-size: 56px;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.monza-section-heading p,
+.monza-band p,
+.monza-free-plan p,
+.monza-final p {
+  max-width: 560px;
+  color: #9f9fa8;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.monza-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.monza-feature-grid article,
+.monza-layouts article,
+.monza-usecase-grid article,
+.monza-testimonials article,
+.monza-faq article {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  background: rgba(255,255,255,.025);
+}
+
+.monza-feature-grid article {
+  min-height: 230px;
+  padding: 24px;
+}
+
+.monza-feature-grid h4,
+.monza-layouts h4,
+.monza-usecase-grid h4,
+.monza-faq h4 {
+  margin: 16px 0 9px;
+  color: #f4f4f5;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.monza-feature-grid p,
+.monza-layouts p,
+.monza-usecase-grid p,
+.monza-faq p {
+  color: #9f9fa8;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.monza-band {
+  display: grid;
+  grid-template-columns: .82fr 1.18fr;
+  gap: 48px;
+  align-items: start;
+  margin: 116px 0;
+}
+
+.monza-layouts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.monza-layouts article {
+  min-height: 260px;
+  padding: 24px;
+}
+
+.monza-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 116px 0;
+}
+
+.monza-stats article {
+  min-height: 140px;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  background: rgba(255,255,255,.03);
+  text-align: center;
+}
+
+.monza-stats b {
+  color: #fff;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.monza-stats span {
+  color: #9f9fa8;
+  font-size: 13px;
+}
+
+.monza-split {
+  display: grid;
+  grid-template-columns: .58fr 1fr;
+  gap: 56px;
+  margin: 116px 0;
+  padding: 72px 0;
+  border-top: 1px solid rgba(255,255,255,.1);
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+
+.monza-split ol {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.monza-split li {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  background: rgba(255,255,255,.025);
+}
+
+.monza-split li b {
+  color: #7d7d86;
+  font-size: 13px;
+}
+
+.monza-split h4 {
+  color: #fff;
+  font-size: 18px;
+}
+
+.monza-split p {
+  margin-top: 5px;
+  color: #9f9fa8;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.monza-usecase-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.monza-usecase-grid article {
+  min-height: 160px;
+  padding: 22px;
+}
+
+.monza-testimonials > div:last-child {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.monza-testimonials article {
+  min-height: 210px;
+  padding: 22px;
+}
+
+.monza-testimonials article div {
+  display: flex;
+  gap: 4px;
+  color: #facc15;
+}
+
+.monza-testimonials article p {
+  margin: 22px 0;
+  color: #f4f4f5;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.monza-testimonials article span {
+  color: #9f9fa8;
+  font-size: 13px;
+}
+
+.monza-free-plan {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 40px;
+  align-items: center;
+  margin: 116px 0;
+  padding: 36px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+}
+
+.monza-free-plan ul {
+  display: grid;
+  gap: 10px;
+  min-width: 240px;
+  list-style: none;
+}
+
+.monza-free-plan li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  color: #d4d4d8;
+  background: rgba(0,0,0,.22);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.monza-free-plan li svg {
+  color: #86efac;
+}
+
+.monza-faq > div:last-child {
+  display: grid;
+  gap: 10px;
+}
+
+.monza-faq article {
+  padding: 18px 20px;
+}
+
+.monza-faq h4 {
+  margin-top: 0;
+}
+
+.monza-final {
+  display: grid;
+  place-items: center;
+  margin: 116px 0 0;
+  padding: 84px 28px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 22px;
+  background: #101012;
+  text-align: center;
+}
+
+.monza-final h3 {
+  max-width: 760px;
+}
+
+.monza-final p {
+  margin-bottom: 24px;
+}
+
+@media (max-width: 940px) {
+  .monza-preview-grid,
+  .monza-band,
+  .monza-split,
+  .monza-free-plan {
+    grid-template-columns: 1fr;
+  }
+
+  .monza-mode-list {
+    grid-template-columns: repeat(3, 1fr);
+    border-left: 0;
+    border-top: 1px solid rgba(255,255,255,.09);
+  }
+
+  .monza-feature-grid,
+  .monza-usecase-grid,
+  .monza-testimonials > div:last-child,
+  .monza-stats,
+  .monza-logos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .monza-landing {
+    padding: 0 16px;
+  }
+
+  .monza-hero h2,
+  .monza-section-heading h3,
+  .monza-band h3,
+  .monza-split h3,
+  .monza-free-plan h3,
+  .monza-final h3 {
+    font-size: 42px;
+  }
+
+  .monza-actions,
+  .monza-mode-list,
+  .monza-feature-grid,
+  .monza-layouts,
+  .monza-usecase-grid,
+  .monza-testimonials > div:last-child,
+  .monza-stats,
+  .monza-logos {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .monza-stage {
+    min-height: 390px;
+    padding: 24px 16px;
+  }
+
+  .monza-screen-content {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .monza-screen-content > div b {
+    font-size: 24px;
+  }
+
+  .monza-camera {
+    right: 28px;
+    bottom: 60px;
+    width: 68px;
+    height: 68px;
+  }
+
+  .monza-stage.camera-view .monza-camera {
+    right: 22px;
+    bottom: 94px;
+    width: 84px;
+    height: 105px;
+  }
+}
