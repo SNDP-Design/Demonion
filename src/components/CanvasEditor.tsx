@@ -38,22 +38,6 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     let height = 1080;
     const is4K = settings.exportResolution === '4k';
 
-    if (settings.layoutMode === 'screen-only' && videoElement?.videoWidth && videoElement.videoHeight) {
-      const maxWidth = is4K ? 3840 : 1920;
-      const maxHeight = is4K ? 2160 : 1080;
-      const videoRatio = videoElement.videoWidth / videoElement.videoHeight;
-
-      if (videoRatio >= maxWidth / maxHeight) {
-        width = maxWidth;
-        height = Math.round(maxWidth / videoRatio);
-      } else {
-        height = maxHeight;
-        width = Math.round(maxHeight * videoRatio);
-      }
-
-      return { width, height };
-    }
-
     switch (settings.aspectRatio) {
       case '16-10':
         width = is4K ? 3840 : 1920;
@@ -78,7 +62,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     }
 
     return { width, height };
-  }, [settings.aspectRatio, settings.exportResolution, settings.layoutMode, videoElement?.videoHeight, videoElement?.videoWidth]);
+  }, [settings.aspectRatio, settings.exportResolution]);
 
   const setCanvasElement = useCallback((canvas: HTMLCanvasElement | null) => {
     canvasRef.current = canvas;
@@ -213,9 +197,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             return 3 / 4;
         }
       })();
-      const frameRatio = videoElement?.videoWidth && videoElement.videoHeight
-        ? videoElement.videoHeight / videoElement.videoWidth
-        : defaultFrameRatio;
+      const frameRatio = defaultFrameRatio;
 
       const renderScale = settings.exportResolution === '4k' ? 2 : 1;
       const isSideCamera = showWebcamOverlay && (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right');
@@ -480,9 +462,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           height: 'auto',
           maxWidth: '100%',
           maxHeight: '100%',
-          aspectRatio: settings.layoutMode === 'screen-only'
-            ? `${canvasDimensions.width} / ${canvasDimensions.height}`
-            : settings.aspectRatio.replace('-', '/')
+          aspectRatio: settings.aspectRatio.replace('-', '/')
         }}
       />
     </div>

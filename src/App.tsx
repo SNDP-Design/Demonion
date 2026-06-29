@@ -205,7 +205,7 @@ function App() {
         video: { 
           displaySurface: 'monitor',
           width: { ideal: 3840, max: 3840 },
-          height: { ideal: 2160, max: 2160 },
+          height: { ideal: 2400, max: 2400 },
           frameRate: { ideal: 60, max: 60 }
         },
         audio: false
