@@ -199,7 +199,9 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
             return 3 / 4;
         }
       })();
-      const frameRatio = defaultFrameRatio;
+      const frameRatio = videoElement?.videoWidth && videoElement.videoHeight
+        ? videoElement.videoHeight / videoElement.videoWidth
+        : defaultFrameRatio;
 
       const renderScale = settings.exportResolution === '4k' ? 2 : 1;
       const isSideCamera = showWebcamOverlay && (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right');
@@ -376,12 +378,6 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       if (videoElement && videoElement.readyState >= 2) {
         const vWidth = videoElement.videoWidth || 1920;
         const vHeight = videoElement.videoHeight || 1080;
-        const targetRatio = finalW / finalH;
-        const sourceRatio = vWidth / vHeight;
-        const drawW = sourceRatio > targetRatio ? finalW : finalH * sourceRatio;
-        const drawH = sourceRatio > targetRatio ? finalW / sourceRatio : finalH;
-        const drawX = x0 + (finalW - drawW) / 2;
-        const drawY = y0 + headerH + (finalH - drawH) / 2;
 
         ctx.fillStyle = '#050505';
         ctx.fillRect(x0, y0 + headerH, finalW, finalH);
@@ -389,7 +385,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.drawImage(
           videoElement,
           0, 0, vWidth, vHeight,
-          drawX, drawY, drawW, drawH
+          x0, y0 + headerH, finalW, finalH
         );
       } else {
         ctx.fillStyle = '#0a0d14';
