@@ -378,18 +378,18 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         const vHeight = videoElement.videoHeight || 1080;
         const targetRatio = finalW / finalH;
         const sourceRatio = vWidth / vHeight;
-        const sourceW = sourceRatio > targetRatio ? vHeight * targetRatio : vWidth;
-        const sourceH = sourceRatio > targetRatio ? vHeight : vWidth / targetRatio;
-        const sourceX = (vWidth - sourceW) / 2;
-        const sourceY = (vHeight - sourceH) / 2;
+        const drawW = sourceRatio > targetRatio ? finalW : finalH * sourceRatio;
+        const drawH = sourceRatio > targetRatio ? finalW / sourceRatio : finalH;
+        const drawX = x0 + (finalW - drawW) / 2;
+        const drawY = y0 + headerH + (finalH - drawH) / 2;
 
         ctx.fillStyle = '#050505';
         ctx.fillRect(x0, y0 + headerH, finalW, finalH);
 
         ctx.drawImage(
           videoElement,
-          sourceX, sourceY, sourceW, sourceH,
-          x0, y0 + headerH, finalW, finalH
+          0, 0, vWidth, vHeight,
+          drawX, drawY, drawW, drawH
         );
       } else {
         ctx.fillStyle = '#0a0d14';
