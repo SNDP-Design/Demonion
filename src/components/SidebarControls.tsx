@@ -51,9 +51,34 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
       </div>
 
       <div className="sidebar-content space-y-6">
+
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+            <Monitor size={14} className="text-blue-400" />
+            Video Layout
+          </h3>
+
+          <div className="grid grid-cols-1 gap-2">
+            <button
+              onClick={() => updateSetting('layoutMode', 'screen-only')}
+              className={`p-3 rounded-lg border text-left transition-all ${settings.layoutMode === 'screen-only' ? 'active-blue' : 'border-glass hover-bg-glass text-gray-400'}`}
+            >
+              <span className="block text-xs font-bold text-white">Screen + Camera Only</span>
+              <span className="block text-[11px] mt-1 text-gray-400 leading-normal">No background color, no gradient, no browser frame.</span>
+            </button>
+
+            <button
+              onClick={() => updateSetting('layoutMode', 'framed')}
+              className={`p-3 rounded-lg border text-left transition-all ${settings.layoutMode === 'framed' ? 'active-pink' : 'border-glass hover-bg-glass text-gray-400'}`}
+            >
+              <span className="block text-xs font-bold text-white">Styled Background</span>
+              <span className="block text-[11px] mt-1 text-gray-400 leading-normal">Use the gradient background and browser-style frame.</span>
+            </button>
+          </div>
+        </div>
         
         {/* Section 1: Webcam Overlay */}
-        <div className="space-y-4">
+        <div className="space-y-4 border-t border-glass pt-5">
           <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
             <Camera size={14} className="text-purple-400" />
             Facecam Overlay
@@ -109,22 +134,6 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
             <Layout size={14} className="text-blue-400" />
             Browser Window style
           </h3>
-
-          <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/5 border border-glass">
-            <span className="text-xs text-gray-300 font-semibold flex items-center gap-2">
-              <Monitor size={14} className="text-blue-400" />
-              Screen Only
-            </span>
-            <label className="switch-container">
-              <input
-                type="checkbox"
-                checked={settings.layoutMode === 'screen-only'}
-                onChange={(e) => updateSetting('layoutMode', e.target.checked ? 'screen-only' : 'framed')}
-                className="switch-input"
-              />
-              <div className="switch-slider"></div>
-            </label>
-          </div>
 
           {/* Aspect Ratio */}
           <div className="space-y-2">
