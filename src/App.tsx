@@ -607,9 +607,10 @@ function App() {
                   </div>
                 </div>
                 <nav className="xg-nav-links" aria-label="Main sections">
-                  <a href="#home" className="active">Home</a>
-                  <a href="#how-it-works">How it works</a>
                   <a href="#features">Features</a>
+                  <a href="#how-it-works">How it works</a>
+                  <a href="#use-cases">Use cases</a>
+                  <a href="#ready">Ready</a>
                 </nav>
                 <div className="xg-nav-actions">
                   <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary">

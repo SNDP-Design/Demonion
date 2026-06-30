@@ -198,7 +198,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         </ol>
       </section>
 
-      <section className="monza-section">
+      <section className="monza-section" id="use-cases">
         <div className="monza-section-heading">
           <span className="framer-kicker">Use cases</span>
           <h3>Make videos people can actually follow.</h3>
@@ -252,7 +252,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         </div>
       </section>
 
-      <section className="monza-final">
+      <section className="monza-final" id="ready">
         <Film size={30} />
         <h3>Ready to make your next screen recording easier to watch?</h3>
         <p>Open the free studio, record your screen, and choose the style that fits.</p>
