@@ -261,7 +261,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
 
       <footer className="framer-footer">
         <div><span className="framer-footer-logo"><DemonierLogo /></span><b>Demonier</b></div>
-        <p>Screen recording for ideas worth sharing.</p>
         <span>© 2026 Demonier</span>
       </footer>
     </main>

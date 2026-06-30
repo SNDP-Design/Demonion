@@ -3221,7 +3221,8 @@ aside.sidebar {
   display: grid;
   place-items: center;
   margin: 312px 0 0;
-  padding: 208px 28px;
+  min-height: 520px;
+  padding: 96px 28px;
   border: 1px solid rgba(255,255,255,.13);
   border-radius: 22px;
   background: #101012;
@@ -3562,8 +3563,9 @@ aside.sidebar {
 
   .monza-final {
     margin-top: 184px;
-    padding-top: 152px;
-    padding-bottom: 152px;
+    min-height: 420px;
+    padding-top: 84px;
+    padding-bottom: 84px;
   }
 
   .monza-hero h1,
