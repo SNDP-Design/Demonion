@@ -3,6 +3,7 @@ import {
   ArrowRight,
   Camera,
   Check,
+  FileText,
   Film,
   Layers3,
   Maximize2,
@@ -11,6 +12,7 @@ import {
   MousePointer2,
   Play,
   Scissors,
+  ShieldCheck,
   Sparkles,
   Star,
   Video,
@@ -82,10 +84,60 @@ const faqs = [
   ['Can I make it look polished?', 'Yes. Choose Styled Background and adjust camera, padding, and background.'],
 ];
 
+type LegalPageKey = 'terms' | 'privacy';
+
+const legalPages: Record<LegalPageKey, {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  icon: typeof FileText;
+  sections: Array<{ title: string; copy: string }>;
+}> = {
+  terms: {
+    eyebrow: 'Terms of Service',
+    title: 'Simple terms for using Demonier.',
+    intro: 'These terms explain the basic rules for using the Demonier browser recording studio.',
+    icon: FileText,
+    sections: [
+      { title: 'Using Demonier', copy: 'You may use Demonier to record, style, trim, and export your own screen recordings. Please use the product only for content you are allowed to capture and share.' },
+      { title: 'Your recordings', copy: 'You are responsible for the videos you create, including any people, apps, websites, files, or private information shown in them.' },
+      { title: 'Free browser studio', copy: 'Demonier is currently offered as a browser-based workflow. Features may change as the product improves.' },
+      { title: 'No misuse', copy: 'Do not use Demonier to break laws, record private content without permission, or create harmful, misleading, or abusive material.' },
+      { title: 'Availability', copy: 'We try to keep Demonier working well, but we cannot promise it will always be available, error-free, or compatible with every browser or device.' },
+      { title: 'Changes', copy: 'We may update these terms when the product changes. The latest version will live on this page.' },
+    ],
+  },
+  privacy: {
+    eyebrow: 'Privacy Policy',
+    title: 'How Demonier handles privacy.',
+    intro: 'This page explains the basic privacy approach for the Demonier browser recording studio.',
+    icon: ShieldCheck,
+    sections: [
+      { title: 'Screen recording permission', copy: 'Your browser asks for permission before screen, camera, or microphone access. Demonier cannot record until you choose what to share.' },
+      { title: 'Local recording workflow', copy: 'The recording and editing workflow runs in your browser. Your exported video is downloaded by your browser when you choose to export.' },
+      { title: 'Camera and microphone', copy: 'Camera and microphone access is controlled by your browser. You can turn camera and microphone options on or off before recording.' },
+      { title: 'What to avoid recording', copy: 'Please avoid capturing passwords, private messages, financial information, or anything you do not want included in your final video.' },
+      { title: 'Website hosting', copy: 'Like most websites, the hosting provider may process basic technical information needed to load the site, such as device, browser, and request data.' },
+      { title: 'Updates', copy: 'We may update this privacy page as Demonier changes. The latest version will live on this page.' },
+    ],
+  },
+};
+
 export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
   const [activeMode, setActiveMode] = useState(0);
   const active = previewModes[activeMode];
   const ActiveIcon = active.icon;
+  const path = window.location.pathname;
+  const legalPageKey = path === '/terms' ? 'terms' : path === '/privacy' ? 'privacy' : null;
+
+  if (legalPageKey) {
+    return (
+      <main className="monza-landing" id="home">
+        <LegalPage pageKey={legalPageKey} />
+        <Footer />
+      </main>
+    );
+  }
 
   return (
     <main className="monza-landing" id="home">
@@ -259,10 +311,52 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         <button onClick={onOpenStudio} className="framer-primary">Start recording free <Play size={16} /></button>
       </section>
 
-      <footer className="framer-footer">
-        <div><span className="framer-footer-logo"><DemonierLogo /></span><b>Demonier</b></div>
-        <span>© 2026 Demonier</span>
-      </footer>
+      <Footer />
     </main>
   );
 };
+
+const LegalPage: React.FC<{ pageKey: LegalPageKey }> = ({ pageKey }) => {
+  const page = legalPages[pageKey];
+  const PageIcon = page.icon;
+
+  return (
+    <section className="legal-page">
+      <a href="/" className="legal-back">Back to home</a>
+      <div className="legal-hero">
+        <div className="legal-icon"><PageIcon size={24} /></div>
+        <span className="framer-kicker">{page.eyebrow}</span>
+        <h1>{page.title}</h1>
+        <p>{page.intro}</p>
+        <small>Last updated: June 30, 2026</small>
+      </div>
+      <div className="legal-grid">
+        {page.sections.map((section) => (
+          <article key={section.title}>
+            <h2>{section.title}</h2>
+            <p>{section.copy}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+const Footer: React.FC = () => (
+  <footer className="framer-footer">
+    <div className="footer-brand">
+      <span className="framer-footer-logo"><DemonierLogo /></span>
+      <div>
+        <b>Demonier</b>
+        <small>Browser studio for clear product videos.</small>
+      </div>
+    </div>
+    <nav className="footer-links" aria-label="Footer links">
+      <a href="/#features">Features</a>
+      <a href="/#how-it-works">Workflow</a>
+      <a href="/terms">Terms of Service</a>
+      <a href="/privacy">Privacy Policy</a>
+    </nav>
+    <span>© 2026 Demonier</span>
+  </footer>
+);
