@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useMemo, useCallback } from 'react';
-import type { EditorSettings } from '../types';
+import type { EditorSettings, ZoomMoment } from '../types';
 
 interface CanvasEditorProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -8,6 +8,7 @@ interface CanvasEditorProps {
   webcamElement: HTMLVideoElement | null;
   showWebcamOverlay: boolean;
   settings: EditorSettings;
+  zoomMoments?: ZoomMoment[];
 }
 
 const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
@@ -18,7 +19,8 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   videoElement,
   webcamElement,
   showWebcamOverlay,
-  settings
+  settings,
+  zoomMoments = []
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -27,12 +29,14 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   const videoElementRef = useRef(videoElement);
   const webcamElementRef = useRef(webcamElement);
   const showWebcamOverlayRef = useRef(showWebcamOverlay);
+  const zoomMomentsRef = useRef(zoomMoments);
 
   useEffect(() => {
     settingsRef.current = settings;
     videoElementRef.current = videoElement;
     webcamElementRef.current = webcamElement;
     showWebcamOverlayRef.current = showWebcamOverlay;
+    zoomMomentsRef.current = zoomMoments;
   });
 
   const canvasDimensions = useMemo(() => {
@@ -112,6 +116,64 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const videoElement = videoElementRef.current;
       const webcamElement = webcamElementRef.current;
       const showWebcamOverlay = showWebcamOverlayRef.current;
+      const zoomMoments = zoomMomentsRef.current;
+
+      const getActiveZoom = () => {
+        if (!videoElement || zoomMoments.length === 0) return { scale: 1, x: 0.5, y: 0.5 };
+
+        const currentTime = videoElement.currentTime;
+        const activeMoment = [...zoomMoments].reverse().find((moment) => {
+          const age = currentTime - moment.time;
+          const duration = moment.type === 'typing' ? 1.65 : 1.2;
+          return age >= 0 && age <= duration;
+        });
+
+        if (!activeMoment) return { scale: 1, x: 0.5, y: 0.5 };
+
+        const age = currentTime - activeMoment.time;
+        const duration = activeMoment.type === 'typing' ? 1.65 : 1.2;
+        const fadeIn = 0.18;
+        const fadeOut = activeMoment.type === 'typing' ? 0.65 : 0.42;
+        const holdEnd = Math.max(fadeIn, duration - fadeOut);
+        const smooth = (value: number) => value * value * (3 - 2 * value);
+        let amount = 1;
+
+        if (age < fadeIn) {
+          amount = smooth(age / fadeIn);
+        } else if (age > holdEnd) {
+          amount = 1 - smooth((age - holdEnd) / fadeOut);
+        }
+
+        const peakScale = activeMoment.type === 'typing' ? 1.28 : 1.34;
+        return {
+          scale: 1 + (peakScale - 1) * Math.max(0, Math.min(1, amount)),
+          x: activeMoment.x,
+          y: activeMoment.y
+        };
+      };
+
+      const drawZoomedVideo = (
+        sourceVideo: HTMLVideoElement,
+        sourceWidth: number,
+        sourceHeight: number,
+        targetX: number,
+        targetY: number,
+        targetWidth: number,
+        targetHeight: number
+      ) => {
+        const activeZoom = getActiveZoom();
+        if (activeZoom.scale <= 1.001) {
+          ctx.drawImage(sourceVideo, 0, 0, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight);
+          return;
+        }
+
+        const cropWidth = sourceWidth / activeZoom.scale;
+        const cropHeight = sourceHeight / activeZoom.scale;
+        const cropX = Math.min(sourceWidth - cropWidth, Math.max(0, activeZoom.x * sourceWidth - cropWidth / 2));
+        const cropY = Math.min(sourceHeight - cropHeight, Math.max(0, activeZoom.y * sourceHeight - cropHeight / 2));
+
+        ctx.drawImage(sourceVideo, cropX, cropY, cropWidth, cropHeight, targetX, targetY, targetWidth, targetHeight);
+      };
 
       // Enable high-quality image smoothing
       ctx.imageSmoothingEnabled = true;
@@ -306,7 +368,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           const vHeight = videoElement.videoHeight || 1080;
           const target = getContainRect(vWidth, vHeight, cw, ch);
 
-          ctx.drawImage(videoElement, 0, 0, vWidth, vHeight, target.dx, target.dy, target.dw, target.dh);
+          drawZoomedVideo(videoElement, vWidth, vHeight, target.dx, target.dy, target.dw, target.dh);
         } else {
           ctx.fillStyle = '#0a0d14';
           ctx.fillRect(0, 0, cw, ch);
@@ -393,11 +455,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillStyle = '#050505';
         ctx.fillRect(x0, y0 + headerH, finalW, finalH);
 
-        ctx.drawImage(
-          videoElement,
-          0, 0, vWidth, vHeight,
-          x0, y0 + headerH, finalW, finalH
-        );
+        drawZoomedVideo(videoElement, vWidth, vHeight, x0, y0 + headerH, finalW, finalH);
       } else {
         ctx.fillStyle = '#0a0d14';
         ctx.fillRect(x0, y0 + headerH, finalW, finalH);

@@ -26,3 +26,10 @@ export interface EditorSettings {
   trimEnd: number; // in seconds
   exportResolution?: '1080p' | '4k';
 }
+
+export interface ZoomMoment {
+  type: 'click' | 'typing';
+  time: number;
+  x: number;
+  y: number;
+}

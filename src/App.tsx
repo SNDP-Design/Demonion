@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import type { EditorSettings } from './types';
+import type { EditorSettings, ZoomMoment } from './types';
 import { DEFAULT_SETTINGS } from './constants/presets';
 import { SidebarControls } from './components/SidebarControls';
 import { CanvasEditor } from './components/CanvasEditor';
@@ -42,6 +42,7 @@ function App() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportProgress, setExportProgress] = useState<number | null>(null);
   const [recordingIncludesWebcam, setRecordingIncludesWebcam] = useState(false);
+  const [zoomMoments, setZoomMoments] = useState<ZoomMoment[]>([]);
 
   // Recorder flags
   const [useMic, setUseMic] = useState(true);
@@ -59,6 +60,9 @@ function App() {
   const cameraRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordedCameraChunksRef = useRef<Blob[]>([]);
+  const recordingStartTimeRef = useRef(0);
+  const zoomMomentsRef = useRef<ZoomMoment[]>([]);
+  const lastPointerRef = useRef({ x: 0.5, y: 0.5 });
   const timerRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
   const [recTime, setRecTime] = useState(0);
 
@@ -208,6 +212,42 @@ function App() {
     setShowLandingPage(false);
   }, []);
 
+  useEffect(() => {
+    if (recordingState !== 'recording') return;
+
+    const addZoomMoment = (moment: Omit<ZoomMoment, 'time'>) => {
+      const time = Math.max(0, (performance.now() - recordingStartTimeRef.current) / 1000);
+      zoomMomentsRef.current = [...zoomMomentsRef.current, { ...moment, time }];
+    };
+
+    const updatePointer = (event: PointerEvent | MouseEvent) => {
+      lastPointerRef.current = {
+        x: Math.min(1, Math.max(0, event.clientX / Math.max(window.innerWidth, 1))),
+        y: Math.min(1, Math.max(0, event.clientY / Math.max(window.innerHeight, 1)))
+      };
+    };
+
+    const handlePointerMove = (event: PointerEvent) => updatePointer(event);
+    const handleClick = (event: MouseEvent) => {
+      updatePointer(event);
+      addZoomMoment({ type: 'click', ...lastPointerRef.current });
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      addZoomMoment({ type: 'typing', ...lastPointerRef.current });
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, true);
+    window.addEventListener('click', handleClick, true);
+    window.addEventListener('keydown', handleKeyDown, true);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove, true);
+      window.removeEventListener('click', handleClick, true);
+      window.removeEventListener('keydown', handleKeyDown, true);
+    };
+  }, [recordingState]);
+
   const handleLandingScroll = useCallback(() => {
     const scrollTop = landingScrollRef.current?.scrollTop ?? 0;
     const previousScrollTop = lastLandingScrollTopRef.current;
@@ -271,6 +311,8 @@ function App() {
       const startSeparateRecording = () => {
         recordedChunksRef.current = [];
         recordedCameraChunksRef.current = [];
+        zoomMomentsRef.current = [];
+        setZoomMoments([]);
         let recordMimeType = 'video/webm;codecs=vp9';
         if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = 'video/webm;codecs=vp8';
         if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = 'video/webm';
@@ -323,11 +365,13 @@ function App() {
           activeMicStream?.getTracks().forEach((track) => track.stop());
           setMicStream(null);
           setRecordingIncludesWebcam(false);
+          setZoomMoments(zoomMomentsRef.current);
           setVideoSrc(URL.createObjectURL(blob));
           setRecordingState('editor');
           screenStream.getTracks().forEach((track) => track.stop());
         };
         recorder.start();
+        recordingStartTimeRef.current = performance.now();
         setRecordingState('recording');
         setRecTime(0);
         timerRef.current = setInterval(() => setRecTime((time) => time + 1), 1000);
@@ -565,6 +609,7 @@ function App() {
                   setRecordingState('idle');
                   setVideoSrc('');
                   setCameraSrc('');
+                  setZoomMoments([]);
                   setRecordingIncludesWebcam(false);
                 }
               }}
@@ -704,6 +749,7 @@ function App() {
                 webcamElement={useWebcam && !recordingIncludesWebcam ? recordedCameraVideoEl : null}
                 showWebcamOverlay={useWebcam && !recordingIncludesWebcam && Boolean(cameraSrc)}
                 settings={settings}
+                zoomMoments={zoomMoments}
               />
               <Timeline
                 duration={duration}
