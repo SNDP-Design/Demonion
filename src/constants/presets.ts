@@ -11,7 +11,7 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
 export const DEFAULT_SETTINGS: EditorSettings = {
   layoutMode: 'framed',
   backgroundType: 'gradient',
-  gradientPresetId: 'sunset',
+  gradientPresetId: 'nebula',
   solidColor: '#0f172a',
   aspectRatio: '16-10',
   borderRadius: 24,
