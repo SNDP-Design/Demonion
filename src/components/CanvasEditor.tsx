@@ -86,7 +86,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
     onAddZoomMoment({
       type: 'click',
-      time: videoElement.currentTime,
+      time: Math.max(0, videoElement.currentTime - 0.22),
       x,
       y
     });
@@ -550,6 +550,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           height: 'auto',
           maxWidth: '100%',
           maxHeight: '100%',
+          cursor: onAddZoomMoment ? 'crosshair' : 'default',
           aspectRatio: settings.aspectRatio.replace('-', '/')
         }}
       />
