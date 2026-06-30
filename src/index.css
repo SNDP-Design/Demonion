@@ -3209,6 +3209,232 @@ aside.sidebar {
   margin-bottom: 24px;
 }
 
+/* Evervault-inspired color system */
+.landing-scroll-container {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(102, 51, 238, .32), transparent 34%),
+    radial-gradient(circle at 85% 18%, rgba(190, 167, 255, .18), transparent 28%),
+    linear-gradient(180deg, #010314 0%, #0a0622 45%, #010314 100%);
+}
+
+.landing-scroll-container .xg-nav {
+  border-bottom-color: rgba(190, 167, 255, .18);
+  background: rgba(1, 3, 20, .76);
+  box-shadow: 0 1px 0 rgba(255,255,255,.04);
+}
+
+.landing-scroll-container .xg-brand-mark {
+  border-color: rgba(190, 167, 255, .24);
+  background: linear-gradient(135deg, #6633ee, #5e38ff);
+  box-shadow: 0 0 34px rgba(102, 51, 238, .32);
+}
+
+.landing-scroll-container .xg-nav-links a,
+.landing-scroll-container .xg-nav-links span {
+  color: rgba(238, 203, 255, .72);
+}
+
+.landing-scroll-container .xg-nav-links .active,
+.landing-scroll-container .xg-nav-links a:hover {
+  color: #fff;
+  background: rgba(190, 167, 255, .12);
+}
+
+.monza-landing {
+  color: #fff;
+}
+
+.monza-badge {
+  border-color: rgba(190, 167, 255, .24);
+  color: #eecbff;
+  background: rgba(190, 167, 255, .1);
+  box-shadow: inset 0 1px rgba(255,255,255,.08);
+}
+
+.monza-hero h1,
+.monza-section-heading h3,
+.monza-band h3,
+.monza-split h3,
+.monza-free-plan h3,
+.monza-final h3 {
+  color: #fff;
+}
+
+.monza-hero p,
+.monza-section-heading p,
+.monza-band p,
+.monza-free-plan p,
+.monza-final p,
+.monza-feature-grid p,
+.monza-layouts p,
+.monza-usecase-grid p,
+.monza-faq p,
+.monza-split p,
+.monza-testimonials article span,
+.monza-stats span {
+  color: rgba(238, 203, 255, .68);
+}
+
+.monza-landing .framer-primary {
+  color: #fff;
+  background: linear-gradient(135deg, #6633ee, #5e38ff);
+  box-shadow: 0 18px 44px rgba(102, 51, 238, .36), inset 0 1px rgba(255,255,255,.22);
+}
+
+.monza-landing .framer-primary:hover {
+  background: linear-gradient(135deg, #7c55ff, #6633ee);
+  box-shadow: 0 22px 54px rgba(102, 51, 238, .46), inset 0 1px rgba(255,255,255,.28);
+}
+
+.monza-secondary,
+.monza-feature-grid article,
+.monza-layouts article,
+.monza-usecase-grid article,
+.monza-testimonials article,
+.monza-faq article,
+.monza-stats article {
+  border-color: rgba(190, 167, 255, .18);
+  background: rgba(190, 167, 255, .06);
+}
+
+.monza-secondary {
+  color: #eecbff;
+}
+
+.monza-proof {
+  color: rgba(238, 203, 255, .72);
+}
+
+.monza-proof svg,
+.monza-free-plan li svg {
+  color: #bea7ff;
+}
+
+.monza-preview-shell,
+.monza-free-plan,
+.monza-final {
+  border-color: rgba(190, 167, 255, .22);
+  background: linear-gradient(145deg, rgba(190, 167, 255, .12), rgba(10, 6, 34, .72));
+  box-shadow: 0 34px 90px rgba(0,0,0,.58), 0 0 80px rgba(102, 51, 238, .16), inset 0 1px rgba(255,255,255,.1);
+}
+
+.monza-preview-top,
+.monza-mode-list,
+.monza-browser,
+.monza-split {
+  border-color: rgba(190, 167, 255, .16);
+}
+
+.monza-preview-top {
+  color: #eecbff;
+  background: rgba(1, 3, 20, .52);
+}
+
+.monza-preview-top i {
+  background: #a584ff;
+  box-shadow: 0 0 16px rgba(165, 132, 255, .74);
+}
+
+.monza-stage {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(102, 51, 238, .38), transparent 30%),
+    radial-gradient(circle at 78% 72%, rgba(238, 203, 255, .14), transparent 24%),
+    #010314;
+}
+
+.monza-screen {
+  border-color: rgba(190, 167, 255, .24);
+  background: #0a0622;
+  box-shadow: 0 28px 70px rgba(0,0,0,.62), 0 0 54px rgba(102, 51, 238, .22);
+}
+
+.monza-screen-content {
+  background: linear-gradient(135deg, #1e0561, #302755);
+}
+
+.monza-screen-content aside {
+  border-right-color: rgba(190, 167, 255, .16);
+  background: rgba(1, 3, 20, .34);
+}
+
+.monza-screen-content aside i,
+.monza-timeline i {
+  background: rgba(238, 203, 255, .24);
+}
+
+.monza-screen-content aside i:first-child,
+.monza-timeline b,
+.monza-cursor {
+  background: #eecbff;
+}
+
+.monza-screen-content > div p {
+  color: rgba(255,255,255,.74);
+}
+
+.monza-camera {
+  border-color: #eecbff;
+  background: linear-gradient(135deg, #6633ee, #010314 74%);
+  box-shadow: 0 16px 38px rgba(102, 51, 238, .42);
+}
+
+.monza-mode-list {
+  background: rgba(1, 3, 20, .44);
+}
+
+.monza-mode-list button,
+.monza-free-plan li {
+  border-color: rgba(190, 167, 255, .16);
+  color: rgba(238, 203, 255, .72);
+  background: rgba(190, 167, 255, .06);
+}
+
+.monza-mode-list button.active,
+.monza-mode-list button:hover {
+  color: #fff;
+  border-color: rgba(190, 167, 255, .32);
+  background: rgba(102, 51, 238, .24);
+}
+
+.monza-logos span {
+  border-color: rgba(190, 167, 255, .18);
+  color: rgba(238, 203, 255, .72);
+  background: rgba(190, 167, 255, .06);
+}
+
+.monza-feature-grid h4,
+.monza-layouts h4,
+.monza-usecase-grid h4,
+.monza-faq h4,
+.monza-split h4,
+.monza-stats b,
+.monza-testimonials article p {
+  color: #fff;
+}
+
+.monza-feature-grid svg,
+.monza-layouts svg {
+  color: #bea7ff;
+}
+
+.monza-split {
+  border-top-color: rgba(190, 167, 255, .16);
+  border-bottom-color: rgba(190, 167, 255, .16);
+}
+
+.monza-split li {
+  border-color: rgba(190, 167, 255, .18);
+  background: rgba(190, 167, 255, .06);
+}
+
+.monza-split li b {
+  color: #bea7ff;
+}
+
+.monza-testimonials article div {
+  color: #eecbff;
+}
+
 @media (max-width: 940px) {
   .monza-preview-grid,
   .monza-band,
