@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 
 :root {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -2592,13 +2592,20 @@ aside.sidebar {
   font-weight: 650;
 }
 
-.monza-hero h2 {
-  max-width: 920px;
+.monza-hero h1 {
+  max-width: 1080px;
   margin: 22px auto 18px;
   color: #fff;
-  font-size: 86px;
-  line-height: .92;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: clamp(58px, 6.7vw, 92px);
+  font-weight: 800;
+  line-height: .96;
   letter-spacing: 0;
+}
+
+.monza-hero h1 span {
+  display: block;
+  white-space: nowrap;
 }
 
 .monza-hero p {
@@ -3223,13 +3230,17 @@ aside.sidebar {
     padding: 0 16px;
   }
 
-  .monza-hero h2,
+  .monza-hero h1,
   .monza-section-heading h3,
   .monza-band h3,
   .monza-split h3,
   .monza-free-plan h3,
   .monza-final h3 {
     font-size: 42px;
+  }
+
+  .monza-hero h1 span {
+    white-space: normal;
   }
 
   .monza-actions,

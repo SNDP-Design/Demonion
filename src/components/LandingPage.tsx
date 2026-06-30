@@ -91,7 +91,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
     <main className="monza-landing" id="home">
       <section className="monza-hero">
         <div className="monza-badge"><Sparkles size={14} /> Screen recording studio for clear demos</div>
-        <h2>Turn screen recordings into polished product videos.</h2>
+        <h1>
+          <span>Turn screen recordings into</span>
+          <span>polished product videos.</span>
+        </h1>
         <p>
           Demonier records your screen, camera, and voice, then helps you choose the
           right layout for tutorials, demos, updates, and support videos.
