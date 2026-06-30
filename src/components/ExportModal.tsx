@@ -160,6 +160,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       };
       let progressTimer: number | null = null;
       let frameRequestTimer: number | null = null;
+      let pausedForHiddenTab = false;
       const stopTimers = () => {
         if (progressTimer !== null) {
           window.clearInterval(progressTimer);
@@ -173,10 +174,31 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       const stopRecording = () => {
         if (recorder.state === 'recording') recorder.stop();
       };
+      const handleVisibilityChange = () => {
+        if (document.hidden && recorder.state === 'recording') {
+          pausedForHiddenTab = true;
+          videoElement.pause();
+          cameraVideoElement?.pause();
+          recorder.pause();
+          return;
+        }
+
+        if (!document.hidden && pausedForHiddenTab && recorder.state === 'paused') {
+          pausedForHiddenTab = false;
+          recorder.resume();
+          void videoElement.play().catch((error) => {
+            console.warn('Video export preview could not resume:', error);
+          });
+          void cameraVideoElement?.play().catch((error) => {
+            console.warn('Camera export preview could not resume:', error);
+          });
+        }
+      };
 
       recorder.onstop = () => {
         stopTimers();
         videoElement.removeEventListener('ended', stopRecording);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
         const blob = new Blob(chunksRef.current, { type: mimeType || 'video/webm' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -196,10 +218,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         }
         restoreEditor();
         onProgress(100);
+        recorderRef.current = null;
+        hasStartedRef.current = false;
         onClose();
       };
 
       recorder.start();
+      document.addEventListener('visibilitychange', handleVisibilityChange);
       await videoElement.play();
       await cameraVideoElement?.play();
 
@@ -223,6 +248,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       checkProgress();
     } catch (error) {
       restoreEditor();
+      recorderRef.current = null;
+      hasStartedRef.current = false;
       const message = error instanceof Error ? error.message : 'The video could not be exported. Please try again.';
       onError(message);
       onClose();

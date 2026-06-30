@@ -472,6 +472,14 @@ function App() {
     }
   };
 
+  const handleAddPreviewZoom = useCallback((moment: ZoomMoment) => {
+    setZoomMoments((current) => {
+      const next = [...current, moment].sort((a, b) => a.time - b.time);
+      zoomMomentsRef.current = next;
+      return next;
+    });
+  }, []);
+
   // Trim updates
   const handleTrimChange = (start: number, end: number) => {
     setTrimStart(start);
@@ -756,6 +764,7 @@ function App() {
                 showWebcamOverlay={useWebcam && !recordingIncludesWebcam && Boolean(cameraSrc)}
                 settings={settings}
                 zoomMoments={zoomMoments}
+                onAddZoomMoment={handleAddPreviewZoom}
               />
               <Timeline
                 duration={duration}

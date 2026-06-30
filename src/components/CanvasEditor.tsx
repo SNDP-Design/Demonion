@@ -9,6 +9,7 @@ interface CanvasEditorProps {
   showWebcamOverlay: boolean;
   settings: EditorSettings;
   zoomMoments?: ZoomMoment[];
+  onAddZoomMoment?: (moment: ZoomMoment) => void;
 }
 
 const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
@@ -20,7 +21,8 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   webcamElement,
   showWebcamOverlay,
   settings,
-  zoomMoments = []
+  zoomMoments = [],
+  onAddZoomMoment
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -74,6 +76,21 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     canvasRef.current = canvas;
     onCanvasElementChange?.(canvas);
   }, [canvasRef, onCanvasElementChange]);
+
+  const handleCanvasClick = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!videoElement || !onAddZoomMoment) return;
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / Math.max(rect.width, 1)));
+    const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / Math.max(rect.height, 1)));
+
+    onAddZoomMoment({
+      type: 'click',
+      time: videoElement.currentTime,
+      x,
+      y
+    });
+  }, [onAddZoomMoment, videoElement]);
 
   const getContainRect = (sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number) => {
     const sourceRatio = sourceWidth / sourceHeight;
@@ -524,6 +541,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     >
       <canvas
         ref={setCanvasElement}
+        onClick={handleCanvasClick}
         width={canvasDimensions.width}
         height={canvasDimensions.height}
         className="max-w-full max-h-full aspect-video rounded-xl shadow-2xl border border-glass bg-black transition-shadow hover:shadow-[0_0_50px_rgba(139,92,246,0.1)]"
