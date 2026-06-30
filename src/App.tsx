@@ -190,6 +190,12 @@ function App() {
     };
   }, [videoSrc]);
 
+  useEffect(() => {
+    return () => {
+      if (cameraSrc) URL.revokeObjectURL(cameraSrc);
+    };
+  }, [cameraSrc]);
+
   // Release the camera when the user turns the camera option off.
   useEffect(() => {
     if (!useWebcam) {

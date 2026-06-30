@@ -56,11 +56,21 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       onProgress(0);
       onChangeSettings({ exportResolution: '4k' });
 
-      const expectedSize = settings.aspectRatio === '16-10'
-        ? { width: 3840, height: 2400 }
-        : settings.aspectRatio === '4-3'
-          ? { width: 2880, height: 2160 }
-          : { width: 3840, height: 2160 };
+      const expectedSize = (() => {
+        switch (settings.aspectRatio) {
+          case '16-10':
+            return { width: 3840, height: 2400 };
+          case '9-16':
+            return { width: 2160, height: 3840 };
+          case '1-1':
+            return { width: 2160, height: 2160 };
+          case '4-3':
+            return { width: 2880, height: 2160 };
+          case '16-9':
+          default:
+            return { width: 3840, height: 2160 };
+        }
+      })();
       const resizeDeadline = performance.now() + 2000;
       while ((canvasElement.width < expectedSize.width || canvasElement.height < expectedSize.height) && performance.now() < resizeDeadline) {
         await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
