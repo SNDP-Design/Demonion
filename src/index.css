@@ -1007,7 +1007,6 @@ aside.sidebar {
   cursor: pointer;
   transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s, background .2s;
 }
-.xg-nav-actions .xg-button-primary { margin-top: 6px; }
 .xg-button:active { transform: translateY(1px) scale(.98); }
 .xg-button-primary {
   color: #fff;
