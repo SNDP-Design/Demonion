@@ -372,6 +372,7 @@ function App() {
           setMicStream(null);
           setRecordingIncludesWebcam(false);
           setZoomMoments(zoomMomentsRef.current);
+          setPlaybackRate(1);
           setVideoSrc(URL.createObjectURL(blob));
           setRecordingState('editor');
           screenStream.getTracks().forEach((track) => track.stop());
@@ -430,6 +431,7 @@ function App() {
   const handleMetadata = () => {
     if (editorVideoRef.current) {
       const dur = editorVideoRef.current.duration;
+      editorVideoRef.current.playbackRate = playbackRate;
       setDuration(dur);
       setTrimStart(0);
       setTrimEnd(dur);
@@ -511,6 +513,11 @@ function App() {
       recordedCameraVideoRef.current.playbackRate = rate;
     }
   };
+
+  useEffect(() => {
+    if (editorVideoRef.current) editorVideoRef.current.playbackRate = playbackRate;
+    if (recordedCameraVideoRef.current) recordedCameraVideoRef.current.playbackRate = playbackRate;
+  }, [playbackRate, videoSrc, cameraSrc]);
 
   // Video looping inside trim boundaries
   useEffect(() => {
@@ -632,6 +639,7 @@ function App() {
                   setVideoSrc('');
                   setCameraSrc('');
                   setZoomMoments([]);
+                  setPlaybackRate(1);
                   setRecordingIncludesWebcam(false);
                 }
               }}
