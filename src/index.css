@@ -2683,7 +2683,7 @@ aside.sidebar {
 
 .monza-preview-shell {
   overflow: hidden;
-  margin-bottom: 54px;
+  margin-bottom: 108px;
   border: 1px solid rgba(255,255,255,.13);
   border-radius: 22px;
   background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
@@ -2941,7 +2941,7 @@ aside.sidebar {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
-  margin: 0 0 156px;
+  margin: 0 0 312px;
 }
 
 .monza-logos span {
@@ -2957,7 +2957,7 @@ aside.sidebar {
 }
 
 .monza-section {
-  margin: 156px 0;
+  margin: 312px 0;
 }
 
 .monza-section-heading {
@@ -3032,7 +3032,7 @@ aside.sidebar {
   grid-template-columns: .82fr 1.18fr;
   gap: 48px;
   align-items: start;
-  margin: 156px 0;
+  margin: 312px 0;
 }
 
 .monza-layouts {
@@ -3050,7 +3050,7 @@ aside.sidebar {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  margin: 156px 0;
+  margin: 312px 0;
 }
 
 .monza-stats article {
@@ -3079,8 +3079,8 @@ aside.sidebar {
   display: grid;
   grid-template-columns: .58fr 1fr;
   gap: 56px;
-  margin: 156px 0;
-  padding: 96px 0;
+  margin: 312px 0;
+  padding: 192px 0;
   border-top: 1px solid rgba(255,255,255,.1);
   border-bottom: 1px solid rgba(255,255,255,.1);
 }
@@ -3163,7 +3163,7 @@ aside.sidebar {
   grid-template-columns: 1fr auto;
   gap: 40px;
   align-items: center;
-  margin: 156px 0;
+  margin: 312px 0;
   padding: 36px;
   border: 1px solid rgba(255,255,255,.1);
   border-radius: 20px;
@@ -3210,8 +3210,8 @@ aside.sidebar {
 .monza-final {
   display: grid;
   place-items: center;
-  margin: 156px 0 0;
-  padding: 104px 28px;
+  margin: 312px 0 0;
+  padding: 208px 28px;
   border: 1px solid rgba(255,255,255,.13);
   border-radius: 22px;
   background: #101012;
@@ -3531,7 +3531,7 @@ aside.sidebar {
   }
 
   .monza-preview-shell {
-    margin-bottom: 34px;
+    margin-bottom: 68px;
   }
 
   .monza-logos,
@@ -3540,19 +3540,19 @@ aside.sidebar {
   .monza-stats,
   .monza-split,
   .monza-free-plan {
-    margin-top: 92px;
-    margin-bottom: 92px;
+    margin-top: 184px;
+    margin-bottom: 184px;
   }
 
   .monza-split {
-    padding-top: 68px;
-    padding-bottom: 68px;
+    padding-top: 136px;
+    padding-bottom: 136px;
   }
 
   .monza-final {
-    margin-top: 92px;
-    padding-top: 76px;
-    padding-bottom: 76px;
+    margin-top: 184px;
+    padding-top: 152px;
+    padding-bottom: 152px;
   }
 
   .monza-hero h1,
