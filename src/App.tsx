@@ -223,7 +223,7 @@ function App() {
 
     const addZoomMoment = (moment: Omit<ZoomMoment, 'time'>) => {
       const time = Math.max(0, (performance.now() - recordingStartTimeRef.current) / 1000);
-      zoomMomentsRef.current = [...zoomMomentsRef.current, { strength: 'normal', duration: 'medium', ...moment, time }];
+      zoomMomentsRef.current = [...zoomMomentsRef.current, { ...moment, time }];
     };
 
     const updatePointer = (event: PointerEvent | MouseEvent) => {
@@ -474,16 +474,7 @@ function App() {
 
   const handleAddPreviewZoom = useCallback((moment: ZoomMoment) => {
     setZoomMoments((current) => {
-      const zoomMoment: ZoomMoment = { strength: 'normal', duration: 'medium', ...moment };
-      const next = [...current, zoomMoment].sort((a, b) => a.time - b.time);
-      zoomMomentsRef.current = next;
-      return next;
-    });
-  }, []);
-
-  const handleUpdateZoomMoment = useCallback((index: number, updates: Partial<ZoomMoment>) => {
-    setZoomMoments((current) => {
-      const next = current.map((moment, momentIndex) => momentIndex === index ? { ...moment, ...updates } : moment);
+      const next = [...current, moment].sort((a, b) => a.time - b.time);
       zoomMomentsRef.current = next;
       return next;
     });
@@ -772,7 +763,6 @@ function App() {
                 onChangeSettings={(updates) => setSettings((current) => ({ ...current, ...updates }))}
                 zoomMoments={zoomMoments}
                 onJumpToZoomMoment={handleSeek}
-                onUpdateZoomMoment={handleUpdateZoomMoment}
                 onDeleteZoomMoment={handleDeleteZoomMoment}
               />
             </aside>

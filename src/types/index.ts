@@ -32,6 +32,4 @@ export interface ZoomMoment {
   time: number;
   x: number;
   y: number;
-  strength?: 'soft' | 'normal' | 'strong';
-  duration?: 'short' | 'medium' | 'long';
 }

@@ -88,9 +88,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       type: 'click',
       time: Math.max(0, videoElement.currentTime - 0.22),
       x,
-      y,
-      strength: 'normal',
-      duration: 'medium'
+      y
     });
   }, [onAddZoomMoment, videoElement]);
 
@@ -143,26 +141,16 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         const currentTime = videoElement.currentTime;
         const activeMoment = [...zoomMoments].reverse().find((moment) => {
           const age = currentTime - moment.time;
-          const duration = moment.type === 'typing' ? 1.65 : 1.2;
+          const duration = 1;
           return age >= 0 && age <= duration;
         });
 
         if (!activeMoment) return { scale: 1, x: 0.5, y: 0.5 };
 
         const age = currentTime - activeMoment.time;
-        const durationMap = {
-          short: activeMoment.type === 'typing' ? 1.1 : 0.85,
-          medium: activeMoment.type === 'typing' ? 1.65 : 1.2,
-          long: activeMoment.type === 'typing' ? 2.35 : 1.8
-        };
-        const strengthMap = {
-          soft: activeMoment.type === 'typing' ? 1.16 : 1.2,
-          normal: activeMoment.type === 'typing' ? 1.28 : 1.34,
-          strong: activeMoment.type === 'typing' ? 1.42 : 1.52
-        };
-        const duration = durationMap[activeMoment.duration ?? 'medium'];
-        const fadeIn = 0.18;
-        const fadeOut = Math.min(duration * 0.42, activeMoment.type === 'typing' ? 0.75 : 0.5);
+        const duration = 1;
+        const fadeIn = 0.22;
+        const fadeOut = 0.45;
         const holdEnd = Math.max(fadeIn, duration - fadeOut);
         const smooth = (value: number) => value * value * (3 - 2 * value);
         let amount = 1;
@@ -173,7 +161,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           amount = 1 - smooth((age - holdEnd) / fadeOut);
         }
 
-        const peakScale = strengthMap[activeMoment.strength ?? 'normal'];
+        const peakScale = 1.18;
         return {
           scale: 1 + (peakScale - 1) * Math.max(0, Math.min(1, amount)),
           x: activeMoment.x,

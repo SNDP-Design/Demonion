@@ -8,11 +8,10 @@ interface SidebarControlsProps {
   onChangeSettings: (settings: Partial<EditorSettings>) => void;
   zoomMoments: ZoomMoment[];
   onJumpToZoomMoment: (time: number) => void;
-  onUpdateZoomMoment: (index: number, updates: Partial<ZoomMoment>) => void;
   onDeleteZoomMoment: (index: number) => void;
 }
 
-export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onChangeSettings, zoomMoments, onJumpToZoomMoment, onUpdateZoomMoment, onDeleteZoomMoment }) => {
+export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onChangeSettings, zoomMoments, onJumpToZoomMoment, onDeleteZoomMoment }) => {
   const update = <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) => onChangeSettings({ [key]: value });
   const flatColorInputRef = useRef<HTMLInputElement>(null);
   const sortedZoomMoments = zoomMoments.map((moment, index) => ({ moment, index })).sort((a, b) => a.moment.time - b.moment.time);
@@ -93,23 +92,6 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
                   </button>
                 </div>
 
-                <label className="zoom-point-field">
-                  <span>Strength</span>
-                  <select value={moment.strength ?? 'normal'} onChange={(event) => onUpdateZoomMoment(index, { strength: event.target.value as ZoomMoment['strength'] })}>
-                    <option value="soft">Soft</option>
-                    <option value="normal">Normal</option>
-                    <option value="strong">Strong</option>
-                  </select>
-                </label>
-
-                <label className="zoom-point-field">
-                  <span>Duration</span>
-                  <select value={moment.duration ?? 'medium'} onChange={(event) => onUpdateZoomMoment(index, { duration: event.target.value as ZoomMoment['duration'] })}>
-                    <option value="short">Short</option>
-                    <option value="medium">Medium</option>
-                    <option value="long">Long</option>
-                  </select>
-                </label>
               </article>
             ))}
           </div>
