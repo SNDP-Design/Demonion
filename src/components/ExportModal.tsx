@@ -123,7 +123,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       }
 
       const canvasStream = canvasElement.captureStream(60);
-      const outputStream = new MediaStream(canvasStream.getVideoTracks());
+      const canvasTracks = canvasStream.getVideoTracks();
+      const outputStream = new MediaStream(canvasTracks);
       if (mixedAudioTrack) outputStream.addTrack(mixedAudioTrack);
 
       let mimeType = 'video/mp4;codecs=h264,aac';
@@ -147,7 +148,25 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) chunksRef.current.push(event.data);
       };
+      let progressTimer: number | null = null;
+      let frameRequestTimer: number | null = null;
+      const stopTimers = () => {
+        if (progressTimer !== null) {
+          window.clearInterval(progressTimer);
+          progressTimer = null;
+        }
+        if (frameRequestTimer !== null) {
+          window.clearInterval(frameRequestTimer);
+          frameRequestTimer = null;
+        }
+      };
+      const stopRecording = () => {
+        if (recorder.state === 'recording') recorder.stop();
+      };
+
       recorder.onstop = () => {
+        stopTimers();
+        videoElement.removeEventListener('ended', stopRecording);
         const blob = new Blob(chunksRef.current, { type: mimeType || 'video/webm' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -174,14 +193,24 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       await videoElement.play();
       await cameraVideoElement?.play();
 
+      const requestCanvasFrame = () => {
+        canvasTracks.forEach((track) => {
+          const requestFrame = (track as MediaStreamTrack & { requestFrame?: () => void }).requestFrame;
+          requestFrame?.call(track);
+        });
+      };
+
       const checkProgress = () => {
         if (recorder.state !== 'recording') return;
         const progress = Math.round(Math.min(100, ((videoElement.currentTime - startSec) / exportDuration) * 100));
         onProgress(progress);
         if (videoElement.currentTime >= endSec || videoElement.ended) recorder.stop();
-        else requestAnimationFrame(checkProgress);
       };
-      requestAnimationFrame(checkProgress);
+
+      videoElement.addEventListener('ended', stopRecording, { once: true });
+      progressTimer = window.setInterval(checkProgress, 250);
+      frameRequestTimer = window.setInterval(requestCanvasFrame, 1000 / 30);
+      checkProgress();
     } catch (error) {
       restoreEditor();
       const message = error instanceof Error ? error.message : 'The video could not be exported. Please try again.';

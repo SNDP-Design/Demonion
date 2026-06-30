@@ -202,12 +202,11 @@ function App() {
     }
   }, [ensureWebcamStream, recordingState, showLandingPage, useWebcam]);
 
-  useEffect(() => {
-    if (!showLandingPage) {
-      setHideLandingNav(false);
-      lastLandingScrollTopRef.current = 0;
-    }
-  }, [showLandingPage]);
+  const openStudio = useCallback(() => {
+    setHideLandingNav(false);
+    lastLandingScrollTopRef.current = 0;
+    setShowLandingPage(false);
+  }, []);
 
   const handleLandingScroll = useCallback(() => {
     const scrollTop = landingScrollRef.current?.scrollTop ?? 0;
@@ -642,13 +641,13 @@ function App() {
                   <a href="/#ready">Ready</a>
                 </nav>
                 <div className="xg-nav-actions">
-                  <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary">
+                  <button onClick={openStudio} className="xg-button xg-button-primary">
                     Open studio <ArrowRight size={15} />
                   </button>
                 </div>
               </div>
             </header>
-            <LandingPage onOpenStudio={() => setShowLandingPage(false)} />
+            <LandingPage onOpenStudio={openStudio} />
           </>
         ) : <>
 

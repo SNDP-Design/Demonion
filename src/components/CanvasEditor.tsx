@@ -91,9 +91,20 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let animId: number;
+    let animId: number | null = null;
+    let timeoutId: number | null = null;
+
+    const scheduleRender = () => {
+      if (document.hidden) {
+        timeoutId = window.setTimeout(render, 1000 / 30);
+        return;
+      }
+      animId = requestAnimationFrame(render);
+    };
 
     const render = () => {
+      animId = null;
+      timeoutId = null;
       const cw = canvas.width;
       const ch = canvas.height;
 
@@ -331,7 +342,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           drawCamera(cameraX, cameraY, cameraW, cameraH, true, 0.08);
         }
 
-        animId = requestAnimationFrame(render);
+        scheduleRender();
         return;
       };
 
@@ -436,12 +447,15 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         drawCamera(cameraX, cameraY, sideCameraW, sideCameraH, true, 0.08);
       }
 
-      animId = requestAnimationFrame(render);
+      scheduleRender();
     };
 
-    animId = requestAnimationFrame(render);
+    scheduleRender();
 
-    return () => cancelAnimationFrame(animId);
+    return () => {
+      if (animId !== null) cancelAnimationFrame(animId);
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+    };
   }, [canvasRef, canvasDimensions]);
 
   return (
