@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Gauge, Pause, Play, RotateCcw, Scissors } from 'lucide-react';
+import type { ZoomMoment } from '../types';
 
 interface TimelineProps {
   duration: number;
@@ -12,9 +13,11 @@ interface TimelineProps {
   onTrimChange: (start: number, end: number) => void;
   playbackRate: number;
   onPlaybackRateChange: (rate: number) => void;
+  zoomMoments: ZoomMoment[];
+  onDeleteZoomMoment: (index: number) => void;
 }
 
-export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTimeUpdate, isPlaying, onTogglePlay, trimStart, trimEnd, onTrimChange, playbackRate, onPlaybackRateChange }) => {
+export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTimeUpdate, isPlaying, onTogglePlay, trimStart, trimEnd, onTrimChange, playbackRate, onPlaybackRateChange, zoomMoments, onDeleteZoomMoment }) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const [draggingItem, setDraggingItem] = useState<'playhead' | 'trim-start' | 'trim-end' | null>(null);
   const endTime = trimEnd > 0 ? trimEnd : duration;
@@ -65,14 +68,34 @@ export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTim
 
       <div className="video-editor-clip">
         <button onClick={onTogglePlay} className="video-editor-play" aria-label={isPlaying ? 'Pause video' : 'Play video'}>{isPlaying ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" />}</button>
-        <div ref={trackRef} onClick={(event) => updateFromPointer(event.clientX, 'playhead')} className="video-editor-track">
-          <div className="video-editor-frames" aria-hidden="true">{Array.from({ length: 22 }).map((_, index) => <i key={index} style={{ opacity: 0.42 + (index % 4) * 0.11 }} />)}</div>
-          <div className="video-editor-selected" style={{ left: `${trimStartPercent}%`, width: `${trimEndPercent - trimStartPercent}%` }} />
-          <div className="video-editor-cut video-editor-cut-start" style={{ width: `${trimStartPercent}%` }} />
-          <div className="video-editor-cut video-editor-cut-end" style={{ left: `${trimEndPercent}%`, width: `${100 - trimEndPercent}%` }} />
-          <button onMouseDown={(event) => { event.stopPropagation(); setDraggingItem('trim-start'); }} className="video-editor-handle" style={{ left: `calc(${trimStartPercent}% - 7px)` }} aria-label="Trim start" title="Drag to trim the beginning" />
-          <button onMouseDown={(event) => { event.stopPropagation(); setDraggingItem('trim-end'); }} className="video-editor-handle" style={{ left: `calc(${trimEndPercent}% - 7px)` }} aria-label="Trim end" title="Drag to trim the ending" />
-          <div className="video-editor-playhead" style={{ left: `${progressPercent}%` }}><i /></div>
+        <div className="video-editor-track-wrap">
+          <div ref={trackRef} onClick={(event) => updateFromPointer(event.clientX, 'playhead')} className="video-editor-track">
+            <div className="video-editor-frames" aria-hidden="true">{Array.from({ length: 22 }).map((_, index) => <i key={index} style={{ opacity: 0.42 + (index % 4) * 0.11 }} />)}</div>
+            <div className="video-editor-selected" style={{ left: `${trimStartPercent}%`, width: `${trimEndPercent - trimStartPercent}%` }} />
+            <div className="video-editor-cut video-editor-cut-start" style={{ width: `${trimStartPercent}%` }} />
+            <div className="video-editor-cut video-editor-cut-end" style={{ left: `${trimEndPercent}%`, width: `${100 - trimEndPercent}%` }} />
+            <button onMouseDown={(event) => { event.stopPropagation(); setDraggingItem('trim-start'); }} className="video-editor-handle" style={{ left: `calc(${trimStartPercent}% - 7px)` }} aria-label="Trim start" title="Drag to trim the beginning" />
+            <button onMouseDown={(event) => { event.stopPropagation(); setDraggingItem('trim-end'); }} className="video-editor-handle" style={{ left: `calc(${trimEndPercent}% - 7px)` }} aria-label="Trim end" title="Drag to trim the ending" />
+            <button onMouseDown={(event) => { event.stopPropagation(); setDraggingItem('playhead'); }} className="video-editor-playhead" style={{ left: `${progressPercent}%` }} aria-label="Drag playhead" title="Drag to scrub timeline"><i /></button>
+          </div>
+          {zoomMoments.length > 0 && (
+            <div className="video-editor-zoom-row" aria-label="Zoom points">
+              {zoomMoments.map((moment, index) => {
+                const zoomPercent = duration > 0 ? (moment.time / duration) * 100 : 0;
+                return (
+                  <button
+                    key={`${moment.time}-${index}`}
+                    type="button"
+                    onClick={() => onDeleteZoomMoment(index)}
+                    className="video-editor-zoom-dot"
+                    style={{ left: `${Math.max(0, Math.min(100, zoomPercent))}%` }}
+                    aria-label={`Delete zoom point ${index + 1}`}
+                    title="Delete zoom point"
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
