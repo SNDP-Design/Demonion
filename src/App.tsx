@@ -23,6 +23,7 @@ const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
 function App() {
   const [recordingState, setRecordingState] = useState<'idle' | 'recording' | 'editor'>('idle');
   const [showLandingPage, setShowLandingPage] = useState(true);
+  const [hideLandingNav, setHideLandingNav] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   
   // Streams
@@ -50,6 +51,8 @@ function App() {
   const editorVideoRef = useRef<HTMLVideoElement | null>(null);
   const webcamVideoRef = useRef<HTMLVideoElement | null>(null);
   const recordedCameraVideoRef = useRef<HTMLVideoElement | null>(null);
+  const landingScrollRef = useRef<HTMLDivElement | null>(null);
+  const lastLandingScrollTopRef = useRef(0);
   const webcamStreamRef = useRef<MediaStream | null>(null);
   const webcamRequestRef = useRef<Promise<boolean> | null>(null);
   const screenRecorderRef = useRef<MediaRecorder | null>(null);
@@ -198,6 +201,28 @@ function App() {
       });
     }
   }, [ensureWebcamStream, recordingState, showLandingPage, useWebcam]);
+
+  useEffect(() => {
+    if (!showLandingPage) {
+      setHideLandingNav(false);
+      lastLandingScrollTopRef.current = 0;
+    }
+  }, [showLandingPage]);
+
+  const handleLandingScroll = useCallback(() => {
+    const scrollTop = landingScrollRef.current?.scrollTop ?? 0;
+    const previousScrollTop = lastLandingScrollTopRef.current;
+
+    if (scrollTop < 24) {
+      setHideLandingNav(false);
+    } else if (scrollTop > previousScrollTop + 6) {
+      setHideLandingNav(true);
+    } else if (scrollTop < previousScrollTop - 6) {
+      setHideLandingNav(false);
+    }
+
+    lastLandingScrollTopRef.current = Math.max(scrollTop, 0);
+  }, []);
 
   // Handle countdown overlay before screen recording starts
   const handleStartScreenRecording = async () => {
@@ -594,11 +619,15 @@ function App() {
       <video ref={setRecordedCameraVideoRef} src={cameraSrc || undefined} style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0.001, pointerEvents: 'none', zIndex: -1000 }} muted playsInline />
 
       {/* Layout Content Body */}
-      <div className={showLandingPage ? 'landing-scroll-container flex-1' : 'flex-1 flex overflow-hidden'}>
+      <div
+        ref={showLandingPage ? landingScrollRef : undefined}
+        onScroll={showLandingPage ? handleLandingScroll : undefined}
+        className={showLandingPage ? 'landing-scroll-container flex-1' : 'flex-1 flex overflow-hidden'}
+      >
 
         {showLandingPage ? (
           <>
-            <header className="xg-nav landing-nav select-none">
+            <header className={`xg-nav landing-nav select-none ${hideLandingNav ? 'landing-nav-hidden' : ''}`}>
               <div className="xg-nav-inner">
                 <div className="xg-brand">
                   <div className="xg-brand-mark"><DemonierLogo /></div>

@@ -100,7 +100,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
           right layout for tutorials, demos, updates, and support videos.
         </p>
         <div className="monza-actions">
-          <button onClick={onOpenStudio} className="framer-primary">Open studio free <ArrowRight size={17} /></button>
+          <button onClick={onOpenStudio} className="framer-primary">Start Recording Now <ArrowRight size={17} /></button>
           <a href="#features" className="monza-secondary">Explore features</a>
         </div>
         <div className="monza-proof">

@@ -932,7 +932,7 @@ aside.sidebar {
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 6px;
+  gap: 18px;
   color: var(--text-muted);
   font-size: 14px;
   white-space: nowrap;
@@ -3228,7 +3228,7 @@ aside.sidebar {
 
 /* Evervault-inspired color system */
 .landing-scroll-container {
-  scroll-behavior: auto;
+  scroll-behavior: smooth;
   background:
     radial-gradient(circle at 50% 0%, rgba(102, 51, 238, .32), transparent 34%),
     radial-gradient(circle at 85% 18%, rgba(190, 167, 255, .18), transparent 28%),
@@ -3243,8 +3243,17 @@ aside.sidebar {
 }
 
 .landing-scroll-container .landing-nav {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 2;
+  transition: transform .28s ease, opacity .28s ease;
+  will-change: transform;
+}
+
+.landing-scroll-container .landing-nav-hidden {
+  opacity: 0;
+  transform: translateY(-100%);
+  pointer-events: none;
 }
 
 .landing-scroll-container .xg-brand-mark {
@@ -3271,6 +3280,8 @@ aside.sidebar {
   font-size: 13px;
   background: transparent;
 }
+
+.landing-scroll-container .xg-nav-links { gap: 24px; }
 
 .landing-scroll-container .xg-nav-links .active,
 .landing-scroll-container .xg-nav-links a:hover {
