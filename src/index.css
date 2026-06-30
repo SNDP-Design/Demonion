@@ -3218,12 +3218,15 @@ aside.sidebar {
 }
 
 .landing-scroll-container .xg-nav {
-  border-bottom-color: rgba(190, 167, 255, .16);
-  background:
-    linear-gradient(90deg, rgba(102, 51, 238, .18), rgba(1, 3, 20, .82) 34%, rgba(94, 56, 255, .2)),
-    rgba(1, 3, 20, .82);
-  box-shadow: 0 14px 44px rgba(1, 3, 20, .38), inset 0 -1px rgba(255,255,255,.04);
-  backdrop-filter: blur(18px) saturate(1.2);
+  border-bottom-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.landing-scroll-container .landing-nav {
+  position: relative;
+  z-index: 2;
 }
 
 .landing-scroll-container .xg-brand-mark {
@@ -3231,8 +3234,8 @@ aside.sidebar {
   height: 32px;
   border-color: rgba(238, 203, 255, .28);
   border-radius: 9px;
-  background: linear-gradient(135deg, #eecbff, #6633ee 48%, #010314);
-  box-shadow: 0 0 28px rgba(102, 51, 238, .34), inset 0 1px rgba(255,255,255,.28);
+  background: rgba(190, 167, 255, .1);
+  box-shadow: inset 0 1px rgba(255,255,255,.18);
 }
 
 .landing-scroll-container .xg-brand h1 {
@@ -3253,15 +3256,16 @@ aside.sidebar {
 .landing-scroll-container .xg-nav-links .active,
 .landing-scroll-container .xg-nav-links a:hover {
   color: #fff;
-  border-color: rgba(190, 167, 255, .16);
-  background: rgba(190, 167, 255, .1);
+  border-color: rgba(190, 167, 255, .2);
+  background: rgba(190, 167, 255, .08);
 }
 
 .landing-scroll-container .xg-nav-actions .xg-button {
   min-height: 34px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #6633ee, #5e38ff);
-  box-shadow: 0 12px 30px rgba(102, 51, 238, .28), inset 0 1px rgba(255,255,255,.22);
+  border-color: rgba(190, 167, 255, .26);
+  background: rgba(190, 167, 255, .1);
+  box-shadow: inset 0 1px rgba(255,255,255,.16);
 }
 
 .monza-landing {

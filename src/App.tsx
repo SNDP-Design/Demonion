@@ -492,30 +492,17 @@ function App() {
   return (
     <main className="xg-app h-screen w-screen flex flex-col text-white font-sans overflow-hidden">
       
-      {/* Header Bar */}
-      <header className={`xg-nav select-none ${showLandingPage ? '' : 'studio-nav'}`}>
-        <div className={`xg-nav-inner ${showLandingPage ? '' : 'studio-nav-inner'}`}>
+      {/* Studio Header Bar */}
+      {!showLandingPage && <header className="xg-nav select-none studio-nav">
+        <div className="xg-nav-inner studio-nav-inner">
           <div className="xg-brand">
             <div className="xg-brand-mark"><DemonierLogo /></div>
             <div>
               <h1>Demonier</h1>
             </div>
           </div>
-          {showLandingPage && (
-            <nav className="xg-nav-links" aria-label="Main sections">
-              <a href="#home" className="active">Home</a>
-              <a href="#how-it-works">How it works</a>
-              <a href="#features">Features</a>
-            </nav>
-          )}
 
-          {showLandingPage ? (
-            <div className="xg-nav-actions">
-              <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary">
-                Open studio <ArrowRight size={15} />
-              </button>
-            </div>
-          ) : recordingState === 'idle' ? (
+          {recordingState === 'idle' ? (
             <div className="xg-nav-actions studio-record-actions">
               <label className="studio-record-toggle">
                 <Mic size={14} />
@@ -574,7 +561,7 @@ function App() {
           </div>
         )}
         </div>
-      </header>
+      </header>}
 
       {/* Screen Elements for Feeds (Hidden in viewport) */}
       <video
@@ -610,7 +597,29 @@ function App() {
       <div className={showLandingPage ? 'landing-scroll-container flex-1' : 'flex-1 flex overflow-hidden'}>
 
         {showLandingPage ? (
-          <LandingPage onOpenStudio={() => setShowLandingPage(false)} />
+          <>
+            <header className="xg-nav landing-nav select-none">
+              <div className="xg-nav-inner">
+                <div className="xg-brand">
+                  <div className="xg-brand-mark"><DemonierLogo /></div>
+                  <div>
+                    <h1>Demonier</h1>
+                  </div>
+                </div>
+                <nav className="xg-nav-links" aria-label="Main sections">
+                  <a href="#home" className="active">Home</a>
+                  <a href="#how-it-works">How it works</a>
+                  <a href="#features">Features</a>
+                </nav>
+                <div className="xg-nav-actions">
+                  <button onClick={() => setShowLandingPage(false)} className="xg-button xg-button-primary">
+                    Open studio <ArrowRight size={15} />
+                  </button>
+                </div>
+              </div>
+            </header>
+            <LandingPage onOpenStudio={() => setShowLandingPage(false)} />
+          </>
         ) : <>
 
         {recordingState === 'idle' && <section className="studio-empty-space animate-fade-in" aria-label="Recording ready" />}
