@@ -1,16 +1,27 @@
 import React, { useRef } from 'react';
-import type { EditorSettings } from '../types';
+import type { EditorSettings, ZoomMoment } from '../types';
 import { GRADIENT_PRESETS } from '../constants/presets';
-import { Camera, CameraOff, Circle, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Monitor, PanelLeft, PanelRight, Paintbrush, Pencil, Square } from 'lucide-react';
+import { Camera, CameraOff, Circle, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Monitor, PanelLeft, PanelRight, Paintbrush, Pencil, Square, Trash2, ZoomIn } from 'lucide-react';
 
 interface SidebarControlsProps {
   settings: EditorSettings;
   onChangeSettings: (settings: Partial<EditorSettings>) => void;
+  zoomMoments: ZoomMoment[];
+  onJumpToZoomMoment: (time: number) => void;
+  onUpdateZoomMoment: (index: number, updates: Partial<ZoomMoment>) => void;
+  onDeleteZoomMoment: (index: number) => void;
 }
 
-export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onChangeSettings }) => {
+export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onChangeSettings, zoomMoments, onJumpToZoomMoment, onUpdateZoomMoment, onDeleteZoomMoment }) => {
   const update = <K extends keyof EditorSettings>(key: K, value: EditorSettings[K]) => onChangeSettings({ [key]: value });
   const flatColorInputRef = useRef<HTMLInputElement>(null);
+  const sortedZoomMoments = zoomMoments.map((moment, index) => ({ moment, index })).sort((a, b) => a.moment.time - b.moment.time);
+  const formatZoomTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    const tenths = Math.floor((time % 1) * 10);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}.${tenths}`;
+  };
 
   return (
     <aside className="glass-panel sidebar flex flex-col h-full w-[350px] border-r border-glass text-sm select-none rounded-none">
@@ -63,6 +74,45 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
               </span>
             </label>
           </div>}
+        </section>
+
+        <section className="sidebar-module border-t border-glass pt-5">
+          <h3 className="sidebar-module-title"><ZoomIn size={14} /> Zoom Points</h3>
+          <div className="zoom-point-list">
+            {sortedZoomMoments.length === 0 ? (
+              <p className="zoom-point-empty">Click the preview to add a zoom point.</p>
+            ) : sortedZoomMoments.map(({ moment, index }, displayIndex) => (
+              <article key={`${moment.time}-${index}`} className="zoom-point-item">
+                <div className="zoom-point-header">
+                  <button type="button" onClick={() => onJumpToZoomMoment(moment.time)} className="zoom-point-jump">
+                    <span>Point {displayIndex + 1}</span>
+                    <b>{formatZoomTime(moment.time)}</b>
+                  </button>
+                  <button type="button" onClick={() => onDeleteZoomMoment(index)} className="zoom-point-delete" aria-label="Delete zoom point" title="Delete zoom point">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+
+                <label className="zoom-point-field">
+                  <span>Strength</span>
+                  <select value={moment.strength ?? 'normal'} onChange={(event) => onUpdateZoomMoment(index, { strength: event.target.value as ZoomMoment['strength'] })}>
+                    <option value="soft">Soft</option>
+                    <option value="normal">Normal</option>
+                    <option value="strong">Strong</option>
+                  </select>
+                </label>
+
+                <label className="zoom-point-field">
+                  <span>Duration</span>
+                  <select value={moment.duration ?? 'medium'} onChange={(event) => onUpdateZoomMoment(index, { duration: event.target.value as ZoomMoment['duration'] })}>
+                    <option value="short">Short</option>
+                    <option value="medium">Medium</option>
+                    <option value="long">Long</option>
+                  </select>
+                </label>
+              </article>
+            ))}
+          </div>
         </section>
 
         {settings.layoutMode === 'framed' && <section className="sidebar-module browser-window-section border-t border-glass pt-5">
