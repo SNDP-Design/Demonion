@@ -141,16 +141,16 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         const currentTime = videoElement.currentTime;
         const activeMoment = [...zoomMoments].reverse().find((moment) => {
           const age = currentTime - moment.time;
-          const duration = 1;
+          const duration = 2;
           return age >= 0 && age <= duration;
         });
 
         if (!activeMoment) return { scale: 1, x: 0.5, y: 0.5 };
 
         const age = currentTime - activeMoment.time;
-        const duration = 1;
-        const fadeIn = 0.22;
-        const fadeOut = 0.45;
+        const duration = 2;
+        const fadeIn = 0.45;
+        const fadeOut = 0.9;
         const holdEnd = Math.max(fadeIn, duration - fadeOut);
         const smooth = (value: number) => value * value * (3 - 2 * value);
         let amount = 1;
@@ -161,7 +161,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           amount = 1 - smooth((age - holdEnd) / fadeOut);
         }
 
-        const peakScale = 1.18;
+        const peakScale = 1.16;
         return {
           scale: 1 + (peakScale - 1) * Math.max(0, Math.min(1, amount)),
           x: activeMoment.x,
