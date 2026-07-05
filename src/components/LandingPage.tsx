@@ -18,7 +18,7 @@ import {
   Video,
   WandSparkles,
 } from 'lucide-react';
-import { DemonierLogo } from './DemonierLogo';
+import { DemoDayLogo } from './DemoDayLogo';
 
 interface LandingPageProps {
   onOpenStudio: () => void;
@@ -95,30 +95,30 @@ const legalPages: Record<LegalPageKey, {
 }> = {
   terms: {
     eyebrow: 'Terms of Service',
-    title: 'Simple terms for using Demonier.',
-    intro: 'These terms explain the basic rules for using the Demonier browser recording studio.',
+    title: 'Simple terms for using DemoDay.',
+    intro: 'These terms explain the basic rules for using the DemoDay browser recording studio.',
     icon: FileText,
     sections: [
-      { title: 'Using Demonier', copy: 'You may use Demonier to record, style, trim, and export your own screen recordings. Please use the product only for content you are allowed to capture and share.' },
+      { title: 'Using DemoDay', copy: 'You may use DemoDay to record, style, trim, and export your own screen recordings. Please use the product only for content you are allowed to capture and share.' },
       { title: 'Your recordings', copy: 'You are responsible for the videos you create, including any people, apps, websites, files, or private information shown in them.' },
-      { title: 'Free browser studio', copy: 'Demonier is currently offered as a browser-based workflow. Features may change as the product improves.' },
-      { title: 'No misuse', copy: 'Do not use Demonier to break laws, record private content without permission, or create harmful, misleading, or abusive material.' },
-      { title: 'Availability', copy: 'We try to keep Demonier working well, but we cannot promise it will always be available, error-free, or compatible with every browser or device.' },
+      { title: 'Free browser studio', copy: 'DemoDay is currently offered as a browser-based workflow. Features may change as the product improves.' },
+      { title: 'No misuse', copy: 'Do not use DemoDay to break laws, record private content without permission, or create harmful, misleading, or abusive material.' },
+      { title: 'Availability', copy: 'We try to keep DemoDay working well, but we cannot promise it will always be available, error-free, or compatible with every browser or device.' },
       { title: 'Changes', copy: 'We may update these terms when the product changes. The latest version will live on this page.' },
     ],
   },
   privacy: {
     eyebrow: 'Privacy Policy',
-    title: 'How Demonier handles privacy.',
-    intro: 'This page explains the basic privacy approach for the Demonier browser recording studio.',
+    title: 'How DemoDay handles privacy.',
+    intro: 'This page explains the basic privacy approach for the DemoDay browser recording studio.',
     icon: ShieldCheck,
     sections: [
-      { title: 'Screen recording permission', copy: 'Your browser asks for permission before screen, camera, or microphone access. Demonier cannot record until you choose what to share.' },
+      { title: 'Screen recording permission', copy: 'Your browser asks for permission before screen, camera, or microphone access. DemoDay cannot record until you choose what to share.' },
       { title: 'Local recording workflow', copy: 'The recording and editing workflow runs in your browser. Your exported video is downloaded by your browser when you choose to export.' },
       { title: 'Camera and microphone', copy: 'Camera and microphone access is controlled by your browser. You can turn camera and microphone options on or off before recording.' },
       { title: 'What to avoid recording', copy: 'Please avoid capturing passwords, private messages, financial information, or anything you do not want included in your final video.' },
       { title: 'Website hosting', copy: 'Like most websites, the hosting provider may process basic technical information needed to load the site, such as device, browser, and request data.' },
-      { title: 'Updates', copy: 'We may update this privacy page as Demonier changes. The latest version will live on this page.' },
+      { title: 'Updates', copy: 'We may update this privacy page as DemoDay changes. The latest version will live on this page.' },
     ],
   },
 };
@@ -148,7 +148,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
           <span>polished product videos.</span>
         </h1>
         <p>
-          Demonier records your screen, camera, and voice, then helps you choose the
+          DemoDay records your screen, camera, and voice, then helps you choose the
           right layout for tutorials, demos, updates, and support videos.
         </p>
         <div className="monza-actions">
@@ -162,9 +162,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         </div>
       </section>
 
-      <section className="monza-preview-shell" aria-label="Interactive Demonier preview">
+      <section className="monza-preview-shell" aria-label="Interactive DemoDay preview">
         <div className="monza-preview-top">
-          <div><DemonierLogo /><b>Demonier Studio</b></div>
+          <div><DemoDayLogo /><b>DemoDay Studio</b></div>
           <span><i /> Ready to record</span>
         </div>
         <div className="monza-preview-grid">
@@ -195,7 +195,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         </div>
       </section>
 
-      <section className="monza-logos" aria-label="Demonier use cases">
+      <section className="monza-logos" aria-label="DemoDay use cases">
         <span>For founders</span>
         <span>For designers</span>
         <span>For educators</span>
@@ -282,7 +282,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         <div>
           <span className="framer-kicker">Free plan</span>
           <h3>Start with the browser studio.</h3>
-          <p>Use Demonier without a paid tool. Record, style, trim, and export from your browser.</p>
+          <p>Use DemoDay without a paid tool. Record, style, trim, and export from your browser.</p>
         </div>
         <ul>
           <li><Check size={15} /> Screen recording</li>
@@ -345,9 +345,9 @@ const LegalPage: React.FC<{ pageKey: LegalPageKey }> = ({ pageKey }) => {
 const Footer: React.FC = () => (
   <footer className="framer-footer">
     <div className="footer-brand">
-      <span className="framer-footer-logo"><DemonierLogo /></span>
+      <span className="framer-footer-logo"><DemoDayLogo /></span>
       <div>
-        <b>Demonier</b>
+        <b>DemoDay</b>
         <small>Browser studio for clear product videos.</small>
       </div>
     </div>
@@ -357,6 +357,6 @@ const Footer: React.FC = () => (
       <a href="/terms">Terms of Service</a>
       <a href="/privacy">Privacy Policy</a>
     </nav>
-    <span>© 2026 Demonier</span>
+    <span>© 2026 DemoDay</span>
   </footer>
 );

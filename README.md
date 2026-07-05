@@ -1,6 +1,6 @@
-# React + TypeScript + Vite
+# DemoDay
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A browser-based screen recording and editing studio for creating polished product walkthroughs and demos.
 
 Currently, two official plugins are available:
 

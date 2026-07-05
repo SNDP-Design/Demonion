@@ -891,7 +891,7 @@ aside.sidebar {
   background-color: rgba(9, 9, 11, 0.2) !important;
 }
 
-/* Xgrowth-inspired Demonier shell */
+/* Xgrowth-inspired DemoDay shell */
 .xg-app {
   background:
     radial-gradient(circle at 72% 10%, rgba(102, 51, 238, .22), transparent 30%),
@@ -1883,7 +1883,7 @@ aside.sidebar {
 }
 
 /* Landing page */
-.demonier-landing { width: min(1180px, 100%); margin: 0 auto; padding: 0 22px 88px; color: var(--text-primary); }
+.demoday-landing { width: min(1180px, 100%); margin: 0 auto; padding: 0 22px 88px; color: var(--text-primary); }
 .landing-hero { max-width: 790px; margin: 0 auto; padding: 110px 0 70px; text-align: center; }
 .landing-hero h2 { margin: 0 0 26px; font-size: clamp(46px, 7vw, 76px); line-height: 1.02; letter-spacing: -2.6px; font-weight: 800; }
 .landing-hero h2 span { color: #a3a3a3; }
