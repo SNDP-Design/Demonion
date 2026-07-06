@@ -342,21 +342,91 @@ const LegalPage: React.FC<{ pageKey: LegalPageKey }> = ({ pageKey }) => {
   );
 };
 
-const Footer: React.FC = () => (
-  <footer className="framer-footer">
-    <div className="footer-brand">
-      <span className="framer-footer-logo"><DemoDayLogo /></span>
-      <div>
-        <b>DemoDay</b>
-        <small>Browser studio for clear product videos.</small>
+const Footer: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      setSubscribed(true);
+      setEmail('');
+      setTimeout(() => setSubscribed(false), 3000);
+    }
+  };
+
+  return (
+    <footer className="demoday-footer">
+      <div className="footer-top-glow" />
+      <div className="footer-grid">
+        {/* Brand Column */}
+        <div className="footer-column brand-col">
+          <div className="footer-brand-info">
+            <span className="footer-logo-wrapper"><DemoDayLogo /></span>
+            <div>
+              <span className="footer-brand-name">DemoDay</span>
+              <span className="footer-brand-tagline">Browser recording studio</span>
+            </div>
+          </div>
+          <p className="footer-description">
+            Record your screen, camera, and audio, style with beautiful backgrounds, and export 4K walkthroughs directly from your browser.
+          </p>
+          <div className="footer-socials">
+            <a href="https://github.com/SNDP-Design/DemoDay" target="_blank" rel="noopener noreferrer" title="GitHub">
+              <svg className="social-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" /><path d="M9 18c-4.51 2-5-2-7-2" /></svg>
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" title="Twitter / X">
+              <svg className="social-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" /></svg>
+            </a>
+          </div>
+        </div>
+
+        {/* Product Column */}
+        <div className="footer-column">
+          <h4>Product</h4>
+          <nav aria-label="Product Links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">Workflow</a>
+            <a href="#use-cases">Use Cases</a>
+            <a href="#ready">Get Started</a>
+          </nav>
+        </div>
+
+        {/* Resources Column */}
+        <div className="footer-column">
+          <h4>Resources</h4>
+          <nav aria-label="Resource Links">
+            <a href="https://github.com/SNDP-Design/DemoDay" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
+            <a href="https://itsdemoday.vercel.app/" target="_blank" rel="noopener noreferrer">Live Site</a>
+            <a href="/terms">Terms of Service</a>
+            <a href="/privacy">Privacy Policy</a>
+          </nav>
+        </div>
+
+        {/* Newsletter Column */}
+        <div className="footer-column newsletter-col">
+          <h4>Stay Updated</h4>
+          <p className="newsletter-text">Subscribe to get notified about new styling presets and export features.</p>
+          <form onSubmit={handleSubscribe} className="newsletter-form">
+            <input 
+              type="email" 
+              placeholder="Enter your email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="newsletter-input"
+              required
+            />
+            <button type="submit" className="newsletter-submit" disabled={subscribed}>
+              {subscribed ? 'Subscribed!' : 'Subscribe'}
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
-    <nav className="footer-links" aria-label="Footer links">
-      <a href="/#features">Features</a>
-      <a href="/#how-it-works">Workflow</a>
-      <a href="/terms">Terms of Service</a>
-      <a href="/privacy">Privacy Policy</a>
-    </nav>
-    <span>© 2026 DemoDay</span>
-  </footer>
-);
+
+      <div className="footer-bottom">
+        <span>© {new Date().getFullYear()} DemoDay. All rights reserved.</span>
+        <span className="footer-attribution">Built for modern creators.</span>
+      </div>
+    </footer>
+  );
+};
