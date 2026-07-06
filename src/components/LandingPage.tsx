@@ -340,31 +340,33 @@ const LegalPage: React.FC<{ pageKey: LegalPageKey }> = ({ pageKey }) => {
 
   return (
     <section className="legal-page">
-      <a href="/" className="legal-back">Back to home</a>
-      <div className="legal-hero">
-        <div className="legal-icon"><PageIcon size={24} /></div>
-        <span className="framer-kicker">{page.eyebrow}</span>
-        <h1>{page.title}</h1>
-        <p>{page.intro}</p>
-        <small>Effective date: July 6, 2026 · Last updated: July 6, 2026</small>
-      </div>
-
-      <div className="legal-article">
-        <div className="legal-summary-card">
-          <span className="card-label">Quick summary</span>
-          <ul>
-            {page.summary.map((item, idx) => (
-              <li key={idx}>{item}</li>
-            ))}
-          </ul>
+      <div className="legal-container">
+        <a href="/" className="legal-back">Back to home</a>
+        <div className="legal-hero">
+          <div className="legal-icon"><PageIcon size={24} /></div>
+          <span className="framer-kicker">{page.eyebrow}</span>
+          <h1>{page.title}</h1>
+          <p>{page.intro}</p>
+          <small>Effective date: July 6, 2026 · Last updated: July 6, 2026</small>
         </div>
 
-        {page.sections.map((section) => (
-          <div key={section.title} className="legal-section">
-            <h2>{section.title}</h2>
-            <div dangerouslySetInnerHTML={{ __html: section.copy }} />
+        <div className="legal-article">
+          <div className="legal-summary-card">
+            <span className="card-label">Quick summary</span>
+            <ul>
+              {page.summary.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
           </div>
-        ))}
+
+          {page.sections.map((section) => (
+            <div key={section.title} className="legal-section">
+              <h2>{section.title}</h2>
+              <div dangerouslySetInnerHTML={{ __html: section.copy }} />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -3258,9 +3258,14 @@ aside.sidebar {
   color: #fff;
 }
 
+.legal-container {
+  max-width: 820px;
+  margin: 0 auto;
+}
+
 .legal-hero {
-  max-width: 780px;
   margin-bottom: 56px;
+  text-align: center;
 }
 
 .legal-icon {
@@ -3268,7 +3273,7 @@ aside.sidebar {
   height: 48px;
   display: grid;
   place-items: center;
-  margin-bottom: 22px;
+  margin: 0 auto 22px;
   border: 1px solid rgba(190, 167, 255, .24);
   border-radius: 14px;
   color: #eecbff;
@@ -3285,6 +3290,7 @@ aside.sidebar {
 }
 
 .legal-hero p {
+  margin: 0 auto;
   max-width: 640px;
   color: rgba(238, 203, 255, .72);
   font-size: 17px;
@@ -3300,8 +3306,6 @@ aside.sidebar {
 }
 
 .legal-article {
-  max-width: 820px;
-  margin: 0 auto;
   padding-bottom: 80px;
 }
 
