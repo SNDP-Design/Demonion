@@ -91,34 +91,52 @@ const legalPages: Record<LegalPageKey, {
   title: string;
   intro: string;
   icon: typeof FileText;
+  summary: string[];
   sections: Array<{ title: string; copy: string }>;
 }> = {
   terms: {
-    eyebrow: 'Terms of Service',
-    title: 'DemoDay Terms of Service',
-    intro: 'Please read these Terms of Service carefully before using DemoDay. By accessing or using our browser recording studio, you agree to be bound by these terms.',
+    eyebrow: 'Legal · terms',
+    title: 'Terms of Service',
+    intro: 'The terms that govern your use of DemoDay.',
     icon: FileText,
+    summary: [
+      'By using DemoDay, you agree to these terms.',
+      'All recording and video processing happens 100% locally in your browser.',
+      'You own your videos and you are responsible for the content you record.',
+      'We provide the Service "as is" without warranties of any kind.',
+      'We can update or modify the Service at any time.'
+    ],
     sections: [
-      { title: 'Acceptance of Terms', copy: 'By using DemoDay, you represent that you are at least 13 years of age and agree to these terms. If you do not agree to these terms, you must not use or access the service.' },
-      { title: 'Local Processing & Ownership', copy: 'All video processing, compositing, and rendering occurs 100% locally in your browser. DemoDay does not store, see, or claim ownership of any videos, audio, or metadata you record. You retain full copyright and ownership of your creations.' },
-      { title: 'Permitted Use & Content License', copy: 'You agree to use DemoDay only for lawful purposes. You represent that you have all necessary rights, licenses, and permissions to record the windows, screens, and audio inputs that you choose to capture.' },
-      { title: 'Prohibited Activities', copy: 'You agree not to use the service to record or share content that is defamatory, infringing on third-party intellectual property, violates any individual\'s privacy, or constitutes harassment, abuse, or illegal material.' },
-      { title: 'Disclaimer of Warranties', copy: 'DemoDay is provided on an "as is" and "as available" basis without warranties of any kind. We do not guarantee that the service will be error-free, uninterrupted, or fully compatible with every browser version or hardware setup.' },
-      { title: 'Limitation of Liability', copy: 'To the maximum extent permitted by law, DemoDay and its operators shall not be liable for any direct, indirect, incidental, or consequential damages resulting from your use of the studio or any loss of recorded footage.' },
+      { title: '1. Acceptance', copy: '<p>These Terms of Service ("Terms") form a binding agreement between you ("you", "your") and <strong>SNDP-Design</strong> ("we", "us", "our"), the operator of <a href="https://itsdemoday.vercel.app">https://itsdemoday.vercel.app</a> (the "Service"). By accessing or using the Service, you agree to these Terms and to our <a href="/privacy">Privacy Policy</a>. If you do not agree, do not use the Service.</p>' },
+      { title: '2. Eligibility', copy: '<p>You must be at least 13 years old to use the Service. If you are under 18, you represent that you have your parent or guardian\'s permission to use the Service. By using DemoDay, you represent that you meet these requirements.</p>' },
+      { title: '3. Local Processing & Ownership', copy: '<p>All video compositing, camera rendering, audio mixing, and export processing occur locally in your browser. We do not store or claim ownership of any videos, audio, or metadata you record. You retain full copyright and ownership of all content you create using the Service.</p>' },
+      { title: '4. Acceptable use', copy: '<p>You agree not to:</p><ul><li>Use the Service for any illegal purpose or in violation of any laws.</li><li>Record or distribute content that is defamatory, harassing, or infringes the intellectual property rights of any third party.</li><li>Record private information of individuals without their explicit consent.</li><li>Reverse engineer, decompile, or attempt to extract the source code of the recorder or compositing player.</li><li>Use automated bots or scripts to access the Service in a way that disrupts the platform.</li></ul>' },
+      { title: '5. Disclaimers', copy: '<p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. WE DO NOT WARRANT THAT:</p><ul><li>The Service will be uninterrupted, error-free, or fully compatible with every browser version or hardware configuration.</li><li>Use of the Service will result in specific marketing outcomes or video quality standards.</li><li>Any errors or rendering bugs will be corrected instantly.</li></ul>' },
+      { title: '6. Limitation of liability', copy: '<p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT WILL WE BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS, REVENUE, DATA, OR GOODWILL, ARISING OUT OF OR RELATED TO YOUR USE OF THE SERVICE, EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p><p>OUR TOTAL CUMULATIVE LIABILITY TO YOU FOR ALL CLAIMS WILL NOT EXCEED USD $50.</p>' },
+      { title: '7. Termination', copy: '<p>We may modify, suspend, or discontinue the Service (in whole or in part) at any time. We also reserve the right to block access to the Service for users who violate these Terms.</p>' },
+      { title: '8. Contact', copy: '<p>Questions about these Terms?</p><ul><li>Email: <a href="mailto:hello@demoday.uno">hello@demoday.uno</a></li><li>Site: <a href="https://itsdemoday.vercel.app">https://itsdemoday.vercel.app</a></li></ul>' }
     ],
   },
   privacy: {
-    eyebrow: 'Privacy Policy',
-    title: 'DemoDay Privacy Policy',
-    intro: 'At DemoDay, we believe your data should belong solely to you. This Privacy Policy details how we handle information in our local-first browser recording studio.',
+    eyebrow: 'Legal · privacy',
+    title: 'Privacy Policy',
+    intro: 'How DemoDay collects, uses, and protects your information.',
     icon: ShieldCheck,
+    summary: [
+      'DemoDay is a local-first application. Video recording, compositing, and rendering are performed 100% locally in your browser.',
+      'No screen capture frames, camera recordings, or microphone feeds are ever uploaded to our servers.',
+      'Any preference configurations are stored in your browser\'s local storage.',
+      'We do not sell your data, use trackers, or display third-party advertisements.'
+    ],
     sections: [
-      { title: 'Our Local-First Promise', copy: 'DemoDay is built on a local-first architecture. All video capture, background compositing, and export rendering run completely inside your browser. No video frames, audio inputs, or screen content are ever uploaded to our servers.' },
-      { title: 'Browser Permissions', copy: 'To perform recording services, DemoDay requests screen sharing, camera, and microphone permissions. These permissions are requested natively by your browser, and you can revoke them at any time through your browser settings.' },
-      { title: 'Hosting & Server Logs', copy: 'Like standard web applications, our hosting provider (Vercel) automatically logs basic technical information (such as your IP address, browser type, and request timestamps) to verify server health and prevent network abuse.' },
-      { title: 'Local Configuration Data', copy: 'We may use your browser\'s local storage (LocalStorage) to remember your workspace settings (such as camera shape, size, border radius, and active theme). This configuration stays local to your device.' },
-      { title: 'Third-Party Analytics', copy: 'We may use privacy-respecting, aggregated analytics to count site visits and help us improve DemoDay features. This analytics data contains no personal identifiers or recording details.' },
-      { title: 'Security of Recordings', copy: 'Because your recording files are processed and exported locally to your machine\'s downloads folder, you are solely responsible for securing your exported videos. We cannot recover lost recordings because we never have access to them.' },
+      { title: '1. Who we are', copy: '<p>DemoDay (the "Service") is operated by <strong>SNDP-Design</strong> ("we", "us", or "our"). This Privacy Policy describes how we handle information when you use the Service at <a href="https://itsdemoday.vercel.app">https://itsdemoday.vercel.app</a>.</p>' },
+      { title: '2. Information we collect', copy: '<h3>2.1 Device Permission Scopes</h3><p>To record video walkthroughs, DemoDay requires permission to access your screen (or specific windows), camera inputs, and microphone feeds. These permissions are managed entirely by your browser. DemoDay does not record any data until you explicitly grant access.</p><h3>2.2 Local Recording Files</h3><p>Your audio and video recordings are processed inside your browser\'s local sandbox environment using the MediaStream and MediaRecorder APIs. The completed video files are exported directly to your local computer\'s downloads folder. We never have access to, nor do we store, your video or audio files on our servers.</p><h3>2.3 Automatically Logged Information</h3><p>The Service is hosted on Vercel. Vercel may log standard server access information (IP address, browser type, request timestamp) for security and performance optimization. We do not have access to or store these logs ourselves. See the <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel Privacy Policy</a> for details.</p>' },
+      { title: '3. How we use information', copy: '<p>Since all media content is kept on your local machine, we only use standard web traffic data to:</p><ul><li>Ensure the technical operation of the recording studio.</li><li>Save user configuration data (such as layout presets, camera border designs, and themes) locally in your browser\'s <code>localStorage</code>.</li><li>Respond to support requests sent to our contact email.</li></ul><p>We do not use your information for advertising, profiling, or training machine-learning models.</p>' },
+      { title: '4. How we share information', copy: '<p>We do not sell or rent your personal information. We share information only in these limited cases:</p><ul><li><strong>Vercel</strong>: Hosts the application files. Their privacy practices are linked above.</li><li><strong>Legal requirements</strong>: We may disclose information if required by law, subpoena, or court order, or to protect the rights and safety of our users or the public.</li></ul>' },
+      { title: '5. Data retention & account deletion', copy: '<p>Because DemoDay operates locally, your recordings only exist on your own device. If you delete a recording locally, it is gone forever. We do not keep backups of your recordings on our servers because we never receive them in the first place.</p><p>Any UI preference configurations stored in your browser\'s local storage remain until you clear your browser data or cache.</p>' },
+      { title: '6. Your choices and rights', copy: '<p>You have full control over your data:</p><ul><li><strong>Revoke permissions</strong>: You can revoke screen, camera, and microphone permissions at any time through your browser settings.</li><li><strong>Delete local data</strong>: You can clear your browser storage (LocalStorage) to reset all UI layout preferences.</li><li><strong>GDPR / CCPA rights</strong>: If you reside in the EU, UK, or California, you have the right to request access, correction, or deletion of any technical metadata we may have. Contact us at the email below to exercise these rights.</li></ul>' },
+      { title: '7. Security', copy: '<p>We encrypt all data in transit using HTTPS (provided by Vercel via Let\'s Encrypt). While local browser storage is protected by standard browser sandboxing, you are responsible for securing the exported video files on your local drive.</p>' },
+      { title: '8. Contact', copy: '<p>Questions about this policy or your data rights?</p><ul><li>Email: <a href="mailto:hello@demoday.uno">hello@demoday.uno</a></li><li>Site: <a href="https://itsdemoday.vercel.app">https://itsdemoday.vercel.app</a></li></ul>' }
     ],
   },
 };
@@ -328,14 +346,24 @@ const LegalPage: React.FC<{ pageKey: LegalPageKey }> = ({ pageKey }) => {
         <span className="framer-kicker">{page.eyebrow}</span>
         <h1>{page.title}</h1>
         <p>{page.intro}</p>
-        <small>Last updated: June 30, 2026</small>
+        <small>Effective date: July 6, 2026 · Last updated: July 6, 2026</small>
       </div>
-      <div className="legal-grid">
+
+      <div className="legal-article">
+        <div className="legal-summary-card">
+          <span className="card-label">Quick summary</span>
+          <ul>
+            {page.summary.map((item, idx) => (
+              <li key={idx}>{item}</li>
+            ))}
+          </ul>
+        </div>
+
         {page.sections.map((section) => (
-          <article key={section.title}>
+          <div key={section.title} className="legal-section">
             <h2>{section.title}</h2>
-            <p>{section.copy}</p>
-          </article>
+            <div dangerouslySetInnerHTML={{ __html: section.copy }} />
+          </div>
         ))}
       </div>
     </section>
