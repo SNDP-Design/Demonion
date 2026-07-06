@@ -592,12 +592,12 @@ function App() {
       {/* Studio Header Bar */}
       {!showLandingPage && <header className="xg-nav select-none studio-nav">
         <div className="xg-nav-inner studio-nav-inner">
-          <div className="xg-brand">
+          <a href="/" className="xg-brand">
             <div className="xg-brand-mark"><DemoDayLogo /></div>
             <div>
               <h1>DemoDay</h1>
             </div>
-          </div>
+          </a>
 
           {recordingState === 'idle' ? (
             <div className="xg-nav-actions studio-record-actions">
@@ -703,12 +703,12 @@ function App() {
           <>
             <header className={`xg-nav landing-nav select-none ${hideLandingNav ? 'landing-nav-hidden' : ''}`}>
               <div className="xg-nav-inner">
-                <div className="xg-brand">
+                <a href="/" className="xg-brand">
                   <div className="xg-brand-mark"><DemoDayLogo /></div>
                   <div>
                     <h1>DemoDay</h1>
                   </div>
-                </div>
+                </a>
                 <nav className="xg-nav-links" aria-label="Main sections">
                   <a href="/#features">Features</a>
                   <a href="/#how-it-works">How it works</a>

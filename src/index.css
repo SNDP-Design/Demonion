@@ -919,7 +919,7 @@ aside.sidebar {
   position: relative;
 }
 
-.xg-brand { display: flex; align-items: center; gap: 10px; }
+.xg-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; cursor: pointer; }
 .xg-brand-mark {
   width: 36px;
   height: 36px;
@@ -3795,6 +3795,9 @@ aside.sidebar {
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
 }
 
 .footer-logo-wrapper {

@@ -361,13 +361,13 @@ const Footer: React.FC = () => {
       <div className="footer-grid">
         {/* Brand Column */}
         <div className="footer-column brand-col">
-          <div className="footer-brand-info">
+          <a href="/" className="footer-brand-info">
             <span className="footer-logo-wrapper"><DemoDayLogo /></span>
             <div>
               <span className="footer-brand-name">DemoDay</span>
               <span className="footer-brand-tagline">Browser recording studio</span>
             </div>
-          </div>
+          </a>
           <p className="footer-description">
             Record your screen, camera, and audio, style with beautiful backgrounds, and export 4K walkthroughs directly from your browser.
           </p>
