@@ -23,6 +23,7 @@ const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
 function App() {
   const [recordingState, setRecordingState] = useState<'idle' | 'recording' | 'editor'>('idle');
   const [showLandingPage, setShowLandingPage] = useState(true);
+  const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
   const [hideLandingNav, setHideLandingNav] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   
@@ -51,6 +52,7 @@ function App() {
   // Refs
   const editorVideoRef = useRef<HTMLVideoElement | null>(null);
   const webcamVideoRef = useRef<HTMLVideoElement | null>(null);
+  const modalWebcamVideoRef = useRef<HTMLVideoElement | null>(null);
   const recordedCameraVideoRef = useRef<HTMLVideoElement | null>(null);
   const landingScrollRef = useRef<HTMLDivElement | null>(null);
   const lastLandingScrollTopRef = useRef(0);
@@ -89,6 +91,18 @@ function App() {
     if (webcamVideoRef.current) webcamVideoRef.current.srcObject = null;
     webcamStreamRef.current?.getTracks().forEach((track) => track.stop());
     webcamStreamRef.current = null;
+  }, [exitCameraPictureInPicture]);
+
+  const handleStopRecording = useCallback(() => {
+    if (screenRecorderRef.current && screenRecorderRef.current.state === 'recording') {
+      screenRecorderRef.current.stop();
+      if (cameraRecorderRef.current?.state === 'recording') cameraRecorderRef.current.stop();
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      void exitCameraPictureInPicture();
+    }
   }, [exitCameraPictureInPicture]);
 
   const waitForVideoFrame = useCallback((video: HTMLVideoElement) => {
@@ -203,19 +217,35 @@ function App() {
     }
   }, [releaseWebcam, useWebcam]);
 
+  // Bind webcam stream to modal preview element when modal is active
   useEffect(() => {
-    if (!showLandingPage && recordingState === 'idle' && useWebcam) {
-      void ensureWebcamStream().catch((error) => {
-        console.warn('Camera preview could not start:', error);
-        setUseWebcam(false);
+    let active = true;
+    if (isRecordingModalOpen && useWebcam) {
+      void ensureWebcamStream().then((ready) => {
+        if (!active) return;
+        if (ready && modalWebcamVideoRef.current && webcamStreamRef.current) {
+          modalWebcamVideoRef.current.srcObject = webcamStreamRef.current;
+          void modalWebcamVideoRef.current.play().catch((err) => {
+            console.warn('Webcam stream play failed in modal preview:', err);
+          });
+        }
       });
+    } else {
+      if (modalWebcamVideoRef.current) {
+        modalWebcamVideoRef.current.pause();
+        modalWebcamVideoRef.current.srcObject = null;
+      }
+      if (!isRecordingModalOpen && recordingState !== 'recording') {
+        releaseWebcam();
+      }
     }
-  }, [ensureWebcamStream, recordingState, showLandingPage, useWebcam]);
+    return () => {
+      active = false;
+    };
+  }, [isRecordingModalOpen, useWebcam, ensureWebcamStream, releaseWebcam, recordingState]);
 
   const openStudio = useCallback(() => {
-    setHideLandingNav(false);
-    lastLandingScrollTopRef.current = 0;
-    setShowLandingPage(false);
+    setIsRecordingModalOpen(true);
   }, []);
 
   useEffect(() => {
@@ -239,6 +269,11 @@ function App() {
       addZoomMoment({ type: 'click', ...lastPointerRef.current });
     };
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' || (event.altKey && event.key.toLowerCase() === 's')) {
+        event.preventDefault();
+        handleStopRecording();
+        return;
+      }
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       addZoomMoment({ type: 'typing', ...lastPointerRef.current });
     };
@@ -252,7 +287,7 @@ function App() {
       window.removeEventListener('click', handleClick, true);
       window.removeEventListener('keydown', handleKeyDown, true);
     };
-  }, [recordingState]);
+  }, [recordingState, handleStopRecording]);
 
   const handleLandingScroll = useCallback(() => {
     const scrollTop = landingScrollRef.current?.scrollTop ?? 0;
@@ -403,20 +438,13 @@ function App() {
 
     } catch (err) {
       console.error('Recording initialization failed:', err);
+      setShowLandingPage(true);
+      setIsRecordingModalOpen(true);
+      setRecordingState('idle');
     }
   };
 
-  const handleStopRecording = () => {
-    if (screenRecorderRef.current && screenRecorderRef.current.state === 'recording') {
-      screenRecorderRef.current.stop();
-      if (cameraRecorderRef.current?.state === 'recording') cameraRecorderRef.current.stop();
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      void exitCameraPictureInPicture();
-    }
-  };
+
 
   // Video playback callbacks
   const handleTimeUpdate = () => {
@@ -641,6 +669,8 @@ function App() {
                   setZoomMoments([]);
                   setPlaybackRate(1);
                   setRecordingIncludesWebcam(false);
+                  setShowLandingPage(true);
+                  setIsRecordingModalOpen(true);
                 }
               }}
               className="xg-button xg-button-secondary"
@@ -820,6 +850,104 @@ function App() {
         onChangeSettings={(updates) => setSettings((current) => ({ ...current, ...updates }))}
         duration={duration}
       />
+
+      {/* Recording Configuration Modal */}
+      {isRecordingModalOpen && (
+        <div className="recording-modal-overlay">
+          <div className="recording-modal">
+            <h2>Ready to Record?</h2>
+            <p className="modal-desc">Configure your video and audio inputs before capturing your screen.</p>
+            
+            {/* Live Camera circular badge preview */}
+            <div className={`modal-camera-preview-container ${useWebcam ? 'active' : ''}`}>
+              {useWebcam ? (
+                <>
+                  <video 
+                    ref={modalWebcamVideoRef} 
+                    className="modal-camera-video"
+                    autoPlay 
+                    playsInline 
+                    muted 
+                  />
+                  <div className="modal-camera-active-dot" />
+                </>
+              ) : (
+                <div className="modal-camera-placeholder">
+                  <Camera size={32} />
+                  <span>Camera Off</span>
+                </div>
+              )}
+            </div>
+
+            {/* Input Selection Control Switches */}
+            <div className="modal-controls-list">
+              <div className="modal-control-row">
+                <div className="modal-control-info">
+                  <div className="modal-control-icon">
+                    <Mic size={18} />
+                  </div>
+                  <div className="modal-control-text">
+                    <h4>Microphone</h4>
+                    <p>Record voice narration</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={useMic} 
+                    onChange={(e) => setUseMic(e.target.checked)} 
+                    className="switch-input"
+                  />
+                  <span className="modal-toggle-track" />
+                </label>
+              </div>
+
+              <div className="modal-control-row">
+                <div className="modal-control-info">
+                  <div className="modal-control-icon">
+                    <Camera size={18} />
+                  </div>
+                  <div className="modal-control-text">
+                    <h4>Camera Overlay</h4>
+                    <p>Float camera bubble on screen</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={useWebcam} 
+                    onChange={(e) => setUseWebcam(e.target.checked)} 
+                    className="switch-input"
+                  />
+                  <span className="modal-toggle-track" />
+                </label>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="modal-actions">
+              <button 
+                onClick={() => setIsRecordingModalOpen(false)}
+                className="modal-btn secondary"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  setIsRecordingModalOpen(false);
+                  setShowLandingPage(false);
+                  setTimeout(() => {
+                    void handleStartScreenRecording();
+                  }, 100);
+                }}
+                className="modal-btn primary"
+              >
+                <Video size={16} /> Start Screen Capture
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </main>
   );
