@@ -891,7 +891,7 @@ function App() {
                     <p>Record voice narration</p>
                   </div>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="modal-toggle-label">
                   <input 
                     type="checkbox" 
                     checked={useMic} 
@@ -912,7 +912,7 @@ function App() {
                     <p>Float camera bubble on screen</p>
                   </div>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label className="modal-toggle-label">
                   <input 
                     type="checkbox" 
                     checked={useWebcam} 
