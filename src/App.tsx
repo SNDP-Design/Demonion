@@ -269,8 +269,9 @@ function App() {
       addZoomMoment({ type: 'click', ...lastPointerRef.current });
     };
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' || (event.altKey && event.key.toLowerCase() === 's')) {
+      if (event.key === 'Escape' || event.code === 'Escape' || (event.altKey && event.code === 'KeyS')) {
         event.preventDefault();
+        event.stopPropagation();
         handleStopRecording();
         return;
       }
