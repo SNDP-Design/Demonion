@@ -942,7 +942,7 @@ function App() {
                 }}
                 className="modal-btn primary"
               >
-                <Video size={16} /> Start Screen Capture
+                <Video size={16} /> Start Recording
               </button>
             </div>
           </div>
