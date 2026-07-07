@@ -419,7 +419,8 @@ function App() {
         timerRef.current = setInterval(() => setRecTime((time) => time + 1), 1000);
       };
 
-      // Start countdown
+      // Hide landing page and start countdown
+      setShowLandingPage(false);
       setCountdown(3);
       const counter = setInterval(() => {
         setCountdown((prev) => {
@@ -935,10 +936,7 @@ function App() {
               <button 
                 onClick={() => {
                   setIsRecordingModalOpen(false);
-                  setShowLandingPage(false);
-                  setTimeout(() => {
-                    void handleStartScreenRecording();
-                  }, 100);
+                  void handleStartScreenRecording();
                 }}
                 className="modal-btn primary"
               >
