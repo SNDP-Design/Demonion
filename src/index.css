@@ -4076,7 +4076,7 @@ aside.sidebar {
 }
 
 .recording-modal {
-  width: min(440px, 92vw);
+  width: min(540px, 92vw);
   background: #090516;
   border: 1px solid rgba(190, 167, 255, 0.3);
   border-radius: 24px;
