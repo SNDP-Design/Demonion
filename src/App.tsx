@@ -319,6 +319,11 @@ function App() {
         audio: false
       });
       const screenTrack = screenStream.getVideoTracks()[0];
+      if (screenTrack) {
+        screenTrack.onended = () => {
+          handleStopRecording();
+        };
+      }
       const displaySurface = (screenTrack?.getSettings() as MediaTrackSettings & { displaySurface?: string }).displaySurface;
       const isBrowserTabRecording = displaySurface === 'browser';
 
@@ -782,6 +787,9 @@ function App() {
             <div className="text-center space-y-1">
               <h3 className="text-lg font-bold text-white">Recording Your Screen...</h3>
               <p className="text-xs text-gray-400">Everything is being captured. Switch to your desired app now.</p>
+              <p className="text-[11px] text-violet-400/80 max-w-sm mx-auto leading-relaxed pt-1">
+                Tip: Click the browser's native <strong>"Stop sharing"</strong> button at the top/bottom of your screen to instantly stop and edit.
+              </p>
               <p className="text-sm font-mono text-red-400 font-semibold pt-1">Timer: {formatSecs(recTime)}</p>
             </div>
 
