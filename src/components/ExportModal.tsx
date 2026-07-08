@@ -364,7 +364,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           <div className="export-warning-content">
             <h4>Keep this tab active</h4>
             <p>
-              Please <strong>do not switch tabs, minimize this window, or navigate away</strong>. Keep this screen active until the export completes, otherwise the export will fail.
+              Please <strong>do not switch tabs, minimize this window, or navigate away</strong>.
+              <br /><br />
+              Keep this screen active until the export completes, otherwise the export will fail.
             </p>
           </div>
         </div>
