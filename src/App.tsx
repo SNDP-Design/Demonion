@@ -11,11 +11,9 @@ import {
   Video, 
   Mic, 
   Camera, 
-  Disc, 
   Download,
   ArrowRight,
-  RotateCcw,
-  FileVideo
+  RotateCcw
 } from 'lucide-react';
 
 const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
@@ -416,6 +414,7 @@ function App() {
           setPlaybackRate(1);
           setVideoSrc(URL.createObjectURL(blob));
           setRecordingState('editor');
+          setShowLandingPage(false); // Hide landing page to show editor
           screenStream.getTracks().forEach((track) => track.stop());
         };
         recorder.start();
@@ -425,8 +424,7 @@ function App() {
         timerRef.current = setInterval(() => setRecTime((time) => time + 1), 1000);
       };
 
-      // Hide landing page and start countdown
-      setShowLandingPage(false);
+      // Start countdown inside modal overlay
       setCountdown(3);
       const counter = setInterval(() => {
         setCountdown((prev) => {
@@ -434,9 +432,8 @@ function App() {
           if (prev <= 1) {
             clearInterval(counter);
             setCountdown(null);
-            
+            setIsRecordingModalOpen(false); // Close modal when countdown completes
             startSeparateRecording();
-
             return null;
           }
           return prev - 1;
@@ -616,7 +613,7 @@ function App() {
     return `${m}:${sec.toString().padStart(2, '0')}`;
   };
 
-  const showRecordingCameraPreview = !showLandingPage && (recordingState === 'idle' || recordingState === 'recording') && useWebcam && settings.cameraPosition !== 'none';
+  const showRecordingCameraPreview = (recordingState === 'recording') && useWebcam && settings.cameraPosition !== 'none';
   const isLiveSideCamera = settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right';
   const liveCameraPreviewWidth = Math.min(220, Math.max(110, settings.cameraSize));
   const liveCameraPreviewHeight = isLiveSideCamera ? liveCameraPreviewWidth * SIDE_CAMERA_HEIGHT_TO_WIDTH : liveCameraPreviewWidth;
@@ -760,50 +757,25 @@ function App() {
               </div>
             </header>
             <LandingPage onOpenStudio={openStudio} />
-          </>
-        ) : <>
 
-        {recordingState === 'idle' && <section className="studio-empty-space animate-fade-in" aria-label="Recording ready" />}
-
-        {/* Countdown overlay screen */}
-        {countdown !== null && (
-          <div className="flex-1 flex-center bg-black-90 z-40">
-            <div className="text-center space-y-3">
-              <p className="text-xs text-gray-500 uppercase tracking-widest font-bold">Recording starts in</p>
-              <div className="text-8xl font-black text-violet-500 animate-ping font-mono">
-                {countdown}
+            {/* Floating Recording Bar */}
+            {recordingState === 'recording' && (
+              <div className="floating-recording-bar">
+                <div className="floating-recording-info">
+                  <span className="floating-recording-dot" />
+                  <span className="floating-recording-text">Recording active... {formatSecs(recTime)}</span>
+                </div>
+                <button 
+                  onClick={handleStopRecording}
+                  className="floating-recording-stop-btn"
+                >
+                  Stop Recording & Edit
+                </button>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* State 2: Active Recording Control view */}
-        {recordingState === 'recording' && (
-          <section className="flex-1 flex flex-col justify-center items-center gap-6 animate-fade-in bg-zinc-950">
-            <div className="w-24 h-24 rounded-full bg-red-600/10 border-2 border-red-500 flex-center animate-pulse">
-              <Disc size={40} className="text-red-500" />
-            </div>
-            
-            <div className="text-center space-y-1">
-              <h3 className="text-lg font-bold text-white">Recording Your Screen...</h3>
-              <p className="text-xs text-gray-400">Everything is being captured. Switch to your desired app now.</p>
-              <p className="text-[11px] text-violet-400/80 max-w-sm mx-auto leading-relaxed pt-1">
-                Tip: Click the browser's native <strong>"Stop sharing"</strong> button at the top/bottom of your screen to instantly stop and edit.
-              </p>
-              <p className="text-sm font-mono text-red-400 font-semibold pt-1">Timer: {formatSecs(recTime)}</p>
-            </div>
-
-            <button 
-              onClick={handleStopRecording}
-              className="glass-button danger px-8 py-3 rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-transform"
-            >
-              <FileVideo size={16} /> Stop Recording & Edit
-            </button>
-          </section>
-        )}
-
-        {/* State 3: Editor Layout */}
-        {recordingState === 'editor' && (
+            )}
+          </>
+        ) : (
+          /* Editor Layout */
           <div className="flex-1 flex overflow-hidden animate-fade-in">
             <aside className="h-full shrink-0">
               <SidebarControls
@@ -839,8 +811,6 @@ function App() {
             </div>
           </div>
         )}
-
-        </>}
       </div>
 
       {/* Export Modal */}
@@ -865,93 +835,104 @@ function App() {
       {isRecordingModalOpen && (
         <div className="recording-modal-overlay">
           <div className="recording-modal">
-            <h2>Ready to Record?</h2>
-            <p className="modal-desc">Configure your video and audio inputs before capturing your screen.</p>
-            
-            {/* Live Camera circular badge preview */}
-            <div className={`modal-camera-preview-container ${useWebcam ? 'active' : ''}`}>
-              {useWebcam ? (
-                <>
-                  <video 
-                    ref={modalWebcamVideoRef} 
-                    className="modal-camera-video"
-                    autoPlay 
-                    playsInline 
-                    muted 
-                  />
-                  <div className="modal-camera-active-dot" />
-                </>
-              ) : (
-                <div className="modal-camera-placeholder">
-                  <Camera size={32} />
-                  <span>Camera Off</span>
+            {countdown !== null ? (
+              <div className="modal-countdown-container animate-fade-in">
+                <div className="modal-countdown-text">Recording starts in</div>
+                <div className="modal-countdown-number animate-ping">{countdown}</div>
+                <div className="modal-countdown-sub">
+                  Prepare your screen. Switching to your desired app now.
                 </div>
-              )}
-            </div>
-
-            {/* Input Selection Control Switches */}
-            <div className="modal-controls-list">
-              <div className="modal-control-row">
-                <div className="modal-control-info">
-                  <div className="modal-control-icon">
-                    <Mic size={18} />
-                  </div>
-                  <div className="modal-control-text">
-                    <h4>Microphone</h4>
-                    <p>Record voice narration</p>
-                  </div>
-                </div>
-                <label className="modal-toggle-label">
-                  <input 
-                    type="checkbox" 
-                    checked={useMic} 
-                    onChange={(e) => setUseMic(e.target.checked)} 
-                    className="switch-input"
-                  />
-                  <span className="modal-toggle-track" />
-                </label>
               </div>
+            ) : (
+              <>
+                <h2>Ready to Record?</h2>
+                <p className="modal-desc">Configure your video and audio inputs before capturing your screen.</p>
+                
+                {/* Live Camera circular badge preview */}
+                <div className={`modal-camera-preview-container ${useWebcam ? 'active' : ''}`}>
+                  {useWebcam ? (
+                    <>
+                      <video 
+                        ref={modalWebcamVideoRef} 
+                        className="modal-camera-video"
+                        autoPlay 
+                        playsInline 
+                        muted 
+                      />
+                      <div className="modal-camera-active-dot" />
+                    </>
+                  ) : (
+                    <div className="modal-camera-placeholder">
+                      <Camera size={32} />
+                      <span>Camera Off</span>
+                    </div>
+                  )}
+                </div>
 
-              <div className="modal-control-row">
-                <div className="modal-control-info">
-                  <div className="modal-control-icon">
-                    <Camera size={18} />
+                {/* Input Selection Control Switches */}
+                <div className="modal-controls-list">
+                  <div className="modal-control-row">
+                    <div className="modal-control-info">
+                      <div className="modal-control-icon">
+                        <Mic size={18} />
+                      </div>
+                      <div className="modal-control-text">
+                        <h4>Microphone</h4>
+                        <p>Record voice narration</p>
+                      </div>
+                    </div>
+                    <label className="modal-toggle-label">
+                      <input 
+                        type="checkbox" 
+                        checked={useMic} 
+                        onChange={(e) => setUseMic(e.target.checked)} 
+                        className="switch-input"
+                      />
+                      <span className="modal-toggle-track" />
+                    </label>
                   </div>
-                  <div className="modal-control-text">
-                    <h4>Camera Overlay</h4>
-                    <p>Float camera bubble on screen</p>
+
+                  <div className="modal-control-row">
+                    <div className="modal-control-info">
+                      <div className="modal-control-icon">
+                        <Camera size={18} />
+                      </div>
+                      <div className="modal-control-text">
+                        <h4>Camera Overlay</h4>
+                        <p>Float camera bubble on screen</p>
+                      </div>
+                    </div>
+                    <label className="modal-toggle-label">
+                      <input 
+                        type="checkbox" 
+                        checked={useWebcam} 
+                        onChange={(e) => setUseWebcam(e.target.checked)} 
+                        className="switch-input"
+                      />
+                      <span className="modal-toggle-track" />
+                    </label>
                   </div>
                 </div>
-                <label className="modal-toggle-label">
-                  <input 
-                    type="checkbox" 
-                    checked={useWebcam} 
-                    onChange={(e) => setUseWebcam(e.target.checked)} 
-                    className="switch-input"
-                  />
-                  <span className="modal-toggle-track" />
-                </label>
-              </div>
-            </div>
 
-            {/* Modal Actions */}
-            <div className="modal-actions">
-              <button 
-                onClick={() => setIsRecordingModalOpen(false)}
-                className="modal-btn secondary"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={() => {
-                  setIsRecordingModalOpen(false);
-                  void handleStartScreenRecording();
-                }}
-                className="modal-btn primary"
-              >
-                <Video size={16} /> Start Recording
-              </button>
-            </div>
+                {/* Modal Actions */}
+                <div className="modal-actions">
+                  <button 
+                    onClick={() => setIsRecordingModalOpen(false)}
+                    className="modal-btn secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={() => {
+                      void handleStartScreenRecording();
+                    }}
+                    className="modal-btn primary"
+                  >
+                    <Video size={16} /> Start Recording
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

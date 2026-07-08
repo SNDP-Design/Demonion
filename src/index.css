@@ -4346,3 +4346,104 @@ aside.sidebar {
   box-shadow: 0 4px 18px rgba(255, 255, 255, 0.18);
 }
 
+/* Modal Countdown styles */
+.modal-countdown-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.modal-countdown-text {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(238, 203, 255, 0.52);
+  margin-bottom: 24px;
+}
+
+.modal-countdown-number {
+  font-size: 96px;
+  font-weight: 900;
+  color: #c084fc;
+  font-family: monospace;
+  text-shadow: 0 0 32px rgba(192, 132, 252, 0.5);
+  line-height: 1;
+}
+
+.modal-countdown-sub {
+  font-size: 12px;
+  color: rgba(238, 203, 255, 0.4);
+  margin-top: 28px;
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+/* Floating Recording Bar styles */
+.floating-recording-bar {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 20px;
+  background: rgba(16, 12, 38, 0.94);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 99px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(239, 68, 68, 0.15);
+  animation: bar-slide-down 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes bar-slide-down {
+  from { transform: translate(-50%, -20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.floating-recording-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.floating-recording-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: camera-dot-pulse 1.5s infinite;
+}
+
+.floating-recording-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  font-family: monospace;
+}
+
+.floating-recording-stop-btn {
+  padding: 6px 14px;
+  background: #ef4444;
+  border: none;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.floating-recording-stop-btn:hover {
+  background: #dc2626;
+  transform: scale(1.04);
+}
+
+.floating-recording-stop-btn:active {
+  transform: scale(0.98);
+}
+
