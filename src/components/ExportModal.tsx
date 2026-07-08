@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { EditorSettings } from '../types';
 
 interface ExportModalProps {
@@ -36,6 +36,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   const originalPlayRateRef = useRef(1);
   const originalTimeRef = useRef(0);
   const hasStartedRef = useRef(false);
+  const [localProgress, setLocalProgress] = useState(0);
 
   const restoreEditor = useCallback(() => {
     onChangeSettings({ exportResolution: '1080p' });
@@ -54,6 +55,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
     try {
       onProgress(0);
+      setLocalProgress(0);
       onChangeSettings({ exportResolution: '4k' });
 
       const expectedSize = (() => {
@@ -218,6 +220,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         }
         restoreEditor();
         onProgress(100);
+        setLocalProgress(100);
         recorderRef.current = null;
         hasStartedRef.current = false;
         onClose();
@@ -239,6 +242,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         if (recorder.state !== 'recording') return;
         const progress = Math.round(Math.min(100, ((videoElement.currentTime - startSec) / exportDuration) * 100));
         onProgress(progress);
+        setLocalProgress(progress);
         if (videoElement.currentTime >= endSec || videoElement.ended) recorder.stop();
       };
 
@@ -282,5 +286,50 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     }
   }, [isOpen, startExport]);
 
-  return null;
+  if (!isOpen) return null;
+
+  return (
+    <div className="export-modal-overlay">
+      <div className="export-modal">
+        <div className="export-modal-header">
+          <h3>Exporting Video</h3>
+          <span className="export-progress-text">{localProgress}%</span>
+        </div>
+
+        {/* Progress Bar Track */}
+        <div className="export-progress-track">
+          <div 
+            className="export-progress-bar" 
+            style={{ width: `${localProgress}%` }}
+          />
+        </div>
+
+        {/* Warning card */}
+        <div className="export-warning-card">
+          <div className="export-warning-icon">⚠️</div>
+          <div className="export-warning-content">
+            <h4>Keep this tab active</h4>
+            <p>
+              Please <strong>do not switch tabs, minimize this window, or navigate away</strong>. Keep this screen active until the export completes, otherwise the export will fail.
+            </p>
+          </div>
+        </div>
+
+        {/* Action Button */}
+        <div className="export-actions">
+          <button 
+            onClick={() => {
+              if (recorderRef.current && recorderRef.current.state !== 'inactive') {
+                recorderRef.current.stop();
+              }
+              onClose();
+            }}
+            className="export-cancel-btn"
+          >
+            Cancel Export
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
