@@ -163,7 +163,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         <div className="monza-badge"><Sparkles size={14} /> Screen recording studio for clear demos</div>
         <h1>
           <span>Turn screen recordings into</span>
-          <span>polished product demos.</span>
+          <span>polished product demos</span>
         </h1>
         <p>
           DemoDay records your screen, camera, and voice, then helps you choose the
