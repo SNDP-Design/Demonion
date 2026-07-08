@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { EditorSettings } from '../types';
 
+let persistentAudioCtx: AudioContext | null = null;
+let persistentVideoSourceNode: MediaElementAudioSourceNode | null = null;
+
 interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -32,18 +35,37 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 }) => {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const audioCtxRef = useRef<AudioContext | null>(null);
   const originalPlayRateRef = useRef(1);
   const originalTimeRef = useRef(0);
   const hasStartedRef = useRef(false);
   const [localProgress, setLocalProgress] = useState(0);
+  const activeMicSourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const activeExportDestinationRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const isCancelledRef = useRef(false);
 
   const restoreEditor = useCallback(() => {
     onChangeSettings({ exportResolution: '1080p' });
-    if (audioCtxRef.current) {
-      void audioCtxRef.current.close();
-      audioCtxRef.current = null;
+    if (persistentVideoSourceNode && persistentAudioCtx) {
+      try {
+        persistentVideoSourceNode.disconnect();
+      } catch {
+        // Safe
+      }
+      try {
+        persistentVideoSourceNode.connect(persistentAudioCtx.destination);
+      } catch (err) {
+        console.warn('Failed to reconnect video audio to speakers:', err);
+      }
     }
+    if (activeMicSourceNodeRef.current) {
+      try {
+        activeMicSourceNodeRef.current.disconnect();
+      } catch {
+        // Safe
+      }
+      activeMicSourceNodeRef.current = null;
+    }
+    activeExportDestinationRef.current = null;
   }, [onChangeSettings]);
 
   const startExport = useCallback(async () => {
@@ -54,6 +76,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     }
 
     try {
+      isCancelledRef.current = false;
       onProgress(0);
       setLocalProgress(0);
       onChangeSettings({ exportResolution: '4k' });
@@ -111,27 +134,54 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       const includeExportAudio = settings.cameraPosition !== 'none';
       const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (includeExportAudio && AudioContextClass) {
-        const audioCtx = new AudioContextClass();
-        audioCtxRef.current = audioCtx;
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
-        const destination = audioCtx.createMediaStreamDestination();
+        if (!persistentAudioCtx) {
+          persistentAudioCtx = new AudioContextClass();
+        }
+        if (persistentAudioCtx.state === 'suspended') {
+          await persistentAudioCtx.resume();
+        }
+        const destination = persistentAudioCtx.createMediaStreamDestination();
         let hasAudioInput = false;
 
-        try {
-          const videoAudio = audioCtx.createMediaElementSource(videoElement);
-          videoAudio.connect(destination);
-          hasAudioInput = true;
-        } catch {
-          // Some browser recordings have no audio source. Microphone audio can still be mixed below.
+        if (!persistentVideoSourceNode) {
+          try {
+            persistentVideoSourceNode = persistentAudioCtx.createMediaElementSource(videoElement);
+          } catch (err) {
+            console.warn('Failed to create media element source node:', err);
+          }
         }
 
+        if (persistentVideoSourceNode) {
+          try {
+            persistentVideoSourceNode.disconnect();
+          } catch {
+            // Safe
+          }
+          try {
+            persistentVideoSourceNode.connect(destination);
+            hasAudioInput = true;
+          } catch (err) {
+            console.warn('Failed to connect video source node to export destination:', err);
+          }
+        }
+
+        let micSourceNode: MediaStreamAudioSourceNode | null = null;
         if (micStream?.getAudioTracks().length) {
-          const microphone = audioCtx.createMediaStreamSource(micStream);
-          microphone.connect(destination);
-          hasAudioInput = true;
+          try {
+            micSourceNode = persistentAudioCtx.createMediaStreamSource(micStream);
+            micSourceNode.connect(destination);
+            hasAudioInput = true;
+          } catch (err) {
+            console.warn('Failed to connect mic stream to export destination:', err);
+          }
         }
 
-        if (hasAudioInput) mixedAudioTrack = destination.stream.getAudioTracks()[0] ?? null;
+        if (hasAudioInput) {
+          mixedAudioTrack = destination.stream.getAudioTracks()[0] ?? null;
+        }
+
+        activeMicSourceNodeRef.current = micSourceNode;
+        activeExportDestinationRef.current = destination;
       }
 
       const canvasStream = canvasElement.captureStream(60);
@@ -201,15 +251,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         stopTimers();
         videoElement.removeEventListener('ended', stopRecording);
         document.removeEventListener('visibilitychange', handleVisibilityChange);
-        const blob = new Blob(chunksRef.current, { type: mimeType || 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `demoday-${Date.now()}.${extension}`;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 
         videoElement.playbackRate = originalPlayRateRef.current;
         videoElement.currentTime = originalTimeRef.current;
@@ -219,8 +260,21 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           cameraVideoElement.pause();
         }
         restoreEditor();
-        onProgress(100);
-        setLocalProgress(100);
+
+        if (!isCancelledRef.current) {
+          const blob = new Blob(chunksRef.current, { type: mimeType || 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `demoday-${Date.now()}.${extension}`;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+          onProgress(100);
+          setLocalProgress(100);
+        }
+
         recorderRef.current = null;
         hasStartedRef.current = false;
         onClose();
@@ -319,10 +373,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         <div className="export-actions">
           <button 
             onClick={() => {
+              isCancelledRef.current = true;
               if (recorderRef.current && recorderRef.current.state !== 'inactive') {
                 recorderRef.current.stop();
+              } else {
+                restoreEditor();
+                onClose();
               }
-              onClose();
             }}
             className="export-cancel-btn"
           >
