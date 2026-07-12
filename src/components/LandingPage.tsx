@@ -58,7 +58,7 @@ const featureRows = [
 ];
 
 const stats = [
-  ['16:10', 'MacBook Air friendly output'],
+  ['16:9', 'Standard widescreen output'],
   ['5:4', 'Side facecam ratio'],
   ['4K', 'High quality export'],
   ['Free', 'Browser based workflow'],
@@ -175,7 +175,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         </div>
         <div className="monza-proof">
           <span><Check size={13} /> No install</span>
-          <span><Check size={13} /> 16:10 output</span>
+          <span><Check size={13} /> 16:9 output</span>
           <span><Check size={13} /> Screen + camera</span>
         </div>
       </section>
@@ -305,7 +305,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         <ul>
           <li><Check size={15} /> Screen recording</li>
           <li><Check size={15} /> Camera overlay</li>
-          <li><Check size={15} /> 16:10 canvas</li>
+          <li><Check size={15} /> 16:9 canvas</li>
           <li><Check size={15} /> Video export</li>
         </ul>
       </section>
