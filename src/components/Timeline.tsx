@@ -62,7 +62,7 @@ export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTim
         <div className="video-editor-actions">
           <button onClick={() => onTrimChange(0, duration)} className="video-editor-reset"><RotateCcw size={13} /> Reset trim</button>
           <div className="video-editor-speed"><Gauge size={14} /><span>Speed</span>{[0.5, 1, 1.5, 2].map((rate) => <button key={rate} onClick={() => onPlaybackRateChange(rate)} className={playbackRate === rate ? 'active' : ''}>{rate}x</button>)}</div>
-          <div className="video-editor-timecodes"><b>Start</b> {formatTime(trimStart)} <b>End</b> {formatTime(endTime)} <b>Length</b> {formatTime(endTime - trimStart)}</div>
+          <div className="video-editor-timecodes"><b>Length</b> {formatTime(endTime - trimStart)}</div>
         </div>
       </div>
 
