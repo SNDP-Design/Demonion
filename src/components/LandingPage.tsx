@@ -402,10 +402,10 @@ const Footer: React.FC = () => (
       <div className="footer-column">
         <h4>Product</h4>
         <nav aria-label="Product Links">
-          <a href="#features">Features</a>
-          <a href="#how-it-works">Workflow</a>
-          <a href="#use-cases">Use Cases</a>
-          <a href="#ready">Get Started</a>
+          <a href="/#features">Features</a>
+          <a href="/#how-it-works">Workflow</a>
+          <a href="/#use-cases">Use Cases</a>
+          <a href="/#ready">Get Started</a>
         </nav>
       </div>
 
