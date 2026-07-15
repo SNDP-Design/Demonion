@@ -266,7 +266,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = `demoday-${Date.now()}.${extension}`;
+          link.download = `demonion-${Date.now()}.${extension}`;
           document.body.appendChild(link);
           link.click();
           link.remove();

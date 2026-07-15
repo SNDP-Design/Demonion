@@ -18,7 +18,7 @@ import {
   Video,
   WandSparkles,
 } from 'lucide-react';
-import { DemoDayLogo } from './DemoDayLogo';
+import { DemonionLogo } from './DemonionLogo';
 
 interface LandingPageProps {
   onOpenStudio: () => void;
@@ -97,46 +97,46 @@ const legalPages: Record<LegalPageKey, {
   terms: {
     eyebrow: 'Legal · terms',
     title: 'Terms of Service',
-    intro: 'The terms that govern your use of DemoDay.',
+    intro: 'The terms that govern your use of Demonion.',
     icon: FileText,
     summary: [
-      'By using DemoDay, you agree to these terms.',
+      'By using Demonion, you agree to these terms.',
       'All recording and video processing happens 100% locally in your browser.',
       'You own your videos and you are responsible for the content you record.',
       'We provide the Service "as is" without warranties of any kind.',
       'We can update or modify the Service at any time.'
     ],
     sections: [
-      { title: '1. Acceptance', copy: '<p>These Terms of Service ("Terms") form a binding agreement between you ("you", "your") and <strong>SNDP-Design</strong> ("we", "us", "our"), the operator of <a href="https://itsdemoday.vercel.app">https://itsdemoday.vercel.app</a> (the "Service"). By accessing or using the Service, you agree to these Terms and to our <a href="/privacy">Privacy Policy</a>. If you do not agree, do not use the Service.</p>' },
-      { title: '2. Eligibility', copy: '<p>You must be at least 13 years old to use the Service. If you are under 18, you represent that you have your parent or guardian\'s permission to use the Service. By using DemoDay, you represent that you meet these requirements.</p>' },
+      { title: '1. Acceptance', copy: '<p>These Terms of Service ("Terms") form a binding agreement between you ("you", "your") and <strong>SNDP-Design</strong> ("we", "us", "our"), the operator of <a href="https://itsdemonion.vercel.app">https://itsdemonion.vercel.app</a> (the "Service"). By accessing or using the Service, you agree to these Terms and to our <a href="/privacy">Privacy Policy</a>. If you do not agree, do not use the Service.</p>' },
+      { title: '2. Eligibility', copy: '<p>You must be at least 13 years old to use the Service. If you are under 18, you represent that you have your parent or guardian\'s permission to use the Service. By using Demonion, you represent that you meet these requirements.</p>' },
       { title: '3. Local Processing & Ownership', copy: '<p>All video compositing, camera rendering, audio mixing, and export processing occur locally in your browser. We do not store or claim ownership of any videos, audio, or metadata you record. You retain full copyright and ownership of all content you create using the Service.</p>' },
       { title: '4. Acceptable use', copy: '<p>You agree not to:</p><ul><li>Use the Service for any illegal purpose or in violation of any laws.</li><li>Record or distribute content that is defamatory, harassing, or infringes the intellectual property rights of any third party.</li><li>Record private information of individuals without their explicit consent.</li><li>Reverse engineer, decompile, or attempt to extract the source code of the recorder or compositing player.</li><li>Use automated bots or scripts to access the Service in a way that disrupts the platform.</li></ul>' },
       { title: '5. Disclaimers', copy: '<p>The Service is provided "as is" and "as available" without warranties of any kind, express or implied, including but not limited to merchantability, fitness for a particular purpose, or non-infringement. We do not warrant that:</p><ul><li>The Service will be uninterrupted, error-free, or fully compatible with every browser version or hardware configuration.</li><li>Use of the Service will result in specific marketing outcomes or video quality standards.</li><li>Any errors or rendering bugs will be corrected instantly.</li></ul>' },
       { title: '6. Limitation of liability', copy: '<p>To the maximum extent permitted by law, in no event will we be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits, revenue, data, or goodwill, arising out of or related to your use of the Service, even if we have been advised of the possibility of such damages.</p><p>Our total cumulative liability to you for all claims will not exceed USD $50.</p>' },
       { title: '7. Termination', copy: '<p>We may modify, suspend, or discontinue the Service (in whole or in part) at any time. We also reserve the right to block access to the Service for users who violate these Terms.</p>' },
-      { title: '8. Contact', copy: '<p>Questions about these Terms?</p><ul><li>Email: <a href="mailto:hello@demoday.uno">hello@demoday.uno</a></li><li>Site: <a href="https://itsdemoday.vercel.app">https://itsdemoday.vercel.app</a></li></ul>' }
+      { title: '8. Contact', copy: '<p>Questions about these Terms?</p><ul><li>Email: <a href="mailto:hello@demonion.uno">hello@demonion.uno</a></li><li>Site: <a href="https://itsdemonion.vercel.app">https://itsdemonion.vercel.app</a></li></ul>' }
     ],
   },
   privacy: {
     eyebrow: 'Legal · privacy',
     title: 'Privacy Policy',
-    intro: 'How DemoDay collects, uses, and protects your information.',
+    intro: 'How Demonion collects, uses, and protects your information.',
     icon: ShieldCheck,
     summary: [
-      'DemoDay is a local-first application. Video recording, compositing, and rendering are performed 100% locally in your browser.',
+      'Demonion is a local-first application. Video recording, compositing, and rendering are performed 100% locally in your browser.',
       'No screen capture frames, camera recordings, or microphone feeds are ever uploaded to our servers.',
       'Any preference configurations are stored in your browser\'s local storage.',
       'We do not sell your data, use trackers, or display third-party advertisements.'
     ],
     sections: [
-      { title: '1. Who we are', copy: '<p>DemoDay (the "Service") is operated by <strong>SNDP-Design</strong> ("we", "us", or "our"). This Privacy Policy describes how we handle information when you use the Service at <a href="https://itsdemoday.vercel.app">https://itsdemoday.vercel.app</a>.</p>' },
-      { title: '2. Information we collect', copy: '<h3>2.1 Device Permission Scopes</h3><p>To record video walkthroughs, DemoDay requires permission to access your screen (or specific windows), camera inputs, and microphone feeds. These permissions are managed entirely by your browser. DemoDay does not record any data until you explicitly grant access.</p><h3>2.2 Local Recording Files</h3><p>Your audio and video recordings are processed inside your browser\'s local sandbox environment using the MediaStream and MediaRecorder APIs. The completed video files are exported directly to your local computer\'s downloads folder. We never have access to, nor do we store, your video or audio files on our servers.</p><h3>2.3 Automatically Logged Information</h3><p>The Service is hosted on Vercel. Vercel may log standard server access information (IP address, browser type, request timestamp) for security and performance optimization. We do not have access to or store these logs ourselves. See the <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel Privacy Policy</a> for details.</p>' },
+      { title: '1. Who we are', copy: '<p>Demonion (the "Service") is operated by <strong>SNDP-Design</strong> ("we", "us", or "our"). This Privacy Policy describes how we handle information when you use the Service at <a href="https://itsdemonion.vercel.app">https://itsdemonion.vercel.app</a>.</p>' },
+      { title: '2. Information we collect', copy: '<h3>2.1 Device Permission Scopes</h3><p>To record video walkthroughs, Demonion requires permission to access your screen (or specific windows), camera inputs, and microphone feeds. These permissions are managed entirely by your browser. Demonion does not record any data until you explicitly grant access.</p><h3>2.2 Local Recording Files</h3><p>Your audio and video recordings are processed inside your browser\'s local sandbox environment using the MediaStream and MediaRecorder APIs. The completed video files are exported directly to your local computer\'s downloads folder. We never have access to, nor do we store, your video or audio files on our servers.</p><h3>2.3 Automatically Logged Information</h3><p>The Service is hosted on Vercel. Vercel may log standard server access information (IP address, browser type, request timestamp) for security and performance optimization. We do not have access to or store these logs ourselves. See the <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">Vercel Privacy Policy</a> for details.</p>' },
       { title: '3. How we use information', copy: '<p>Since all media content is kept on your local machine, we only use standard web traffic data to:</p><ul><li>Ensure the technical operation of the recording studio.</li><li>Save user configuration data (such as layout presets, camera border designs, and themes) locally in your browser\'s <code>localStorage</code>.</li><li>Respond to support requests sent to our contact email.</li></ul><p>We do not use your information for advertising, profiling, or training machine-learning models.</p>' },
       { title: '4. How we share information', copy: '<p>We do not sell or rent your personal information. We share information only in these limited cases:</p><ul><li><strong>Vercel</strong>: Hosts the application files. Their privacy practices are linked above.</li><li><strong>Legal requirements</strong>: We may disclose information if required by law, subpoena, or court order, or to protect the rights and safety of our users or the public.</li></ul>' },
-      { title: '5. Data retention & account deletion', copy: '<p>Because DemoDay operates locally, your recordings only exist on your own device. If you delete a recording locally, it is gone forever. We do not keep backups of your recordings on our servers because we never receive them in the first place.</p><p>Any UI preference configurations stored in your browser\'s local storage remain until you clear your browser data or cache.</p>' },
+      { title: '5. Data retention & account deletion', copy: '<p>Because Demonion operates locally, your recordings only exist on your own device. If you delete a recording locally, it is gone forever. We do not keep backups of your recordings on our servers because we never receive them in the first place.</p><p>Any UI preference configurations stored in your browser\'s local storage remain until you clear your browser data or cache.</p>' },
       { title: '6. Your choices and rights', copy: '<p>You have full control over your data:</p><ul><li><strong>Revoke permissions</strong>: You can revoke screen, camera, and microphone permissions at any time through your browser settings.</li><li><strong>Delete local data</strong>: You can clear your browser storage (LocalStorage) to reset all UI layout preferences.</li><li><strong>GDPR / CCPA rights</strong>: If you reside in the EU, UK, or California, you have the right to request access, correction, or deletion of any technical metadata we may have. Contact us at the email below to exercise these rights.</li></ul>' },
       { title: '7. Security', copy: '<p>We encrypt all data in transit using HTTPS (provided by Vercel via Let\'s Encrypt). While local browser storage is protected by standard browser sandboxing, you are responsible for securing the exported video files on your local drive.</p>' },
-      { title: '8. Contact', copy: '<p>Questions about this policy or your data rights?</p><ul><li>Email: <a href="mailto:hello@demoday.uno">hello@demoday.uno</a></li><li>Site: <a href="https://itsdemoday.vercel.app">https://itsdemoday.vercel.app</a></li></ul>' }
+      { title: '8. Contact', copy: '<p>Questions about this policy or your data rights?</p><ul><li>Email: <a href="mailto:hello@demonion.uno">hello@demonion.uno</a></li><li>Site: <a href="https://itsdemonion.vercel.app">https://itsdemonion.vercel.app</a></li></ul>' }
     ],
   },
 };
@@ -166,7 +166,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
           <span>polished product demos</span>
         </h1>
         <p>
-          DemoDay records your screen, camera, and voice, then helps you choose the
+          Demonion records your screen, camera, and voice, then helps you choose the
           right layout for tutorials, demos, updates, and support videos.
         </p>
         <div className="monza-actions">
@@ -180,9 +180,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         </div>
       </section>
 
-      <section className="monza-preview-shell" aria-label="Interactive DemoDay preview">
+      <section className="monza-preview-shell" aria-label="Interactive Demonion preview">
         <div className="monza-preview-top">
-          <div><DemoDayLogo /><b>DemoDay Studio</b></div>
+          <div><DemonionLogo /><b>Demonion Studio</b></div>
           <span><i /> Ready to record</span>
         </div>
         <div className="monza-preview-grid">
@@ -213,7 +213,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         </div>
       </section>
 
-      <section className="monza-logos" aria-label="DemoDay use cases">
+      <section className="monza-logos" aria-label="Demonion use cases">
         <span>For founders</span>
         <span>For designers</span>
         <span>For educators</span>
@@ -300,7 +300,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         <div>
           <span className="framer-kicker">Free plan</span>
           <h3>Start with the browser studio.</h3>
-          <p>Use DemoDay without a paid tool. Record, style, trim, and export from your browser.</p>
+          <p>Use Demonion without a paid tool. Record, style, trim, and export from your browser.</p>
         </div>
         <ul>
           <li><Check size={15} /> Screen recording</li>
@@ -373,15 +373,15 @@ const LegalPage: React.FC<{ pageKey: LegalPageKey }> = ({ pageKey }) => {
 };
 
 const Footer: React.FC = () => (
-  <footer className="demoday-footer">
+  <footer className="demonion-footer">
     <div className="footer-top-glow" />
     <div className="footer-grid">
       {/* Brand Column */}
       <div className="footer-column brand-col">
         <a href="/" className="footer-brand-info">
-          <span className="footer-logo-wrapper"><DemoDayLogo /></span>
+          <span className="footer-logo-wrapper"><DemonionLogo /></span>
           <div>
-            <span className="footer-brand-name">DemoDay</span>
+            <span className="footer-brand-name">Demonion</span>
             <span className="footer-brand-tagline">Browser recording studio</span>
           </div>
         </a>
@@ -389,7 +389,7 @@ const Footer: React.FC = () => (
           Record your screen, camera, and audio, style with beautiful backgrounds, and export 4K walkthroughs directly from your browser.
         </p>
         <div className="footer-socials">
-          <a href="https://github.com/SNDP-Design/DemoDay" target="_blank" rel="noopener noreferrer" title="GitHub">
+          <a href="https://github.com/SNDP-Design/Demonion" target="_blank" rel="noopener noreferrer" title="GitHub">
             <svg className="social-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" /><path d="M9 18c-4.51 2-5-2-7-2" /></svg>
           </a>
           <a href="https://x.com/sndpdesign" target="_blank" rel="noopener noreferrer" title="Twitter / X">
@@ -413,8 +413,8 @@ const Footer: React.FC = () => (
       <div className="footer-column">
         <h4>Resources</h4>
         <nav aria-label="Resource Links">
-          <a href="https://github.com/SNDP-Design/DemoDay" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
-          <a href="https://itsdemoday.vercel.app/" target="_blank" rel="noopener noreferrer">Live Site</a>
+          <a href="https://github.com/SNDP-Design/Demonion" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
+          <a href="https://itsdemonion.vercel.app/" target="_blank" rel="noopener noreferrer">Live Site</a>
           <a href="/terms">Terms of Service</a>
           <a href="/privacy">Privacy Policy</a>
         </nav>
@@ -422,7 +422,7 @@ const Footer: React.FC = () => (
     </div>
 
     <div className="footer-bottom">
-      <span>© {new Date().getFullYear()} DemoDay. All rights reserved.</span>
+      <span>© {new Date().getFullYear()} Demonion. All rights reserved.</span>
       <span className="footer-attribution">Built for modern creators.</span>
     </div>
   </footer>

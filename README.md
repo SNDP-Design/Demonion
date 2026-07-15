@@ -1,4 +1,4 @@
-# DemoDay
+# Demonion
 
 A browser-based screen recording and editing studio for creating polished product walkthroughs and demos.
 

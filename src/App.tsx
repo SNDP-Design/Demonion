@@ -6,7 +6,7 @@ import { CanvasEditor } from './components/CanvasEditor';
 import { Timeline } from './components/Timeline';
 import { ExportModal } from './components/ExportModal';
 import { LandingPage } from './components/LandingPage';
-import { DemoDayLogo } from './components/DemoDayLogo';
+import { DemonionLogo } from './components/DemonionLogo';
 import { 
   Video, 
   Mic, 
@@ -625,9 +625,9 @@ function App() {
       {!showLandingPage && <header className="xg-nav select-none studio-nav">
         <div className="xg-nav-inner studio-nav-inner">
           <a href="/" className="xg-brand">
-            <div className="xg-brand-mark"><DemoDayLogo /></div>
+            <div className="xg-brand-mark"><DemonionLogo /></div>
             <div>
-              <h1>DemoDay</h1>
+              <h1>Demonion</h1>
             </div>
           </a>
 
@@ -738,9 +738,9 @@ function App() {
             <header className={`xg-nav landing-nav select-none ${hideLandingNav ? 'landing-nav-hidden' : ''}`}>
               <div className="xg-nav-inner">
                 <a href="/" className="xg-brand">
-                  <div className="xg-brand-mark"><DemoDayLogo /></div>
+                  <div className="xg-brand-mark"><DemonionLogo /></div>
                   <div>
-                    <h1>DemoDay</h1>
+                    <h1>Demonion</h1>
                   </div>
                 </a>
                 <nav className="xg-nav-links" aria-label="Main sections">
