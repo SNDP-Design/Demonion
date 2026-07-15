@@ -5,24 +5,21 @@ interface DemonionLogoProps {
 }
 
 export const DemonionLogo: React.FC<DemonionLogoProps> = ({ className }) => (
-  <svg className={className} width="18" height="18" viewBox="0 0 48 48" fill="none" aria-hidden="true" focusable="false">
-    <rect width="48" height="48" rx="12" fill="#050505" />
-    {/* Corner Brackets */}
-    <path d="M12 18v-6h6" stroke="url(#demonion-logo-fill)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M30 12h6v6" stroke="url(#demonion-logo-fill)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M12 30v6h6" stroke="url(#demonion-logo-fill)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M30 36h6v-6" stroke="url(#demonion-logo-fill)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-    {/* Camera Lens */}
-    <circle cx="24" cy="24" r="6" stroke="url(#demonion-logo-fill)" strokeWidth="3.5" />
-    {/* Record Dot */}
-    <circle cx="24" cy="24" r="2" fill="#EF4444" />
+  <svg className={className} width="18" height="18" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
     <defs>
-      <linearGradient id="demonion-logo-fill" x1="12" y1="12" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-        <stop stopColor="#F8FAFC" />
-        <stop offset=".44" stopColor="#6EE7F9" />
-        <stop offset="1" stopColor="#A78BFA" />
-      </linearGradient>
+      <mask id="demonion-logo-mask">
+        <rect width="100" height="100" fill="white" />
+        <circle cx="32" cy="43" r="4.5" fill="black" />
+        <circle cx="50" cy="43" r="4.5" fill="black" />
+        <path d="M 32 53 A 9 9 0 0 0 50 53" stroke="black" strokeWidth="5.5" strokeLinecap="round" fill="none" />
+      </mask>
     </defs>
+    <rect width="100" height="100" rx="24" fill="#784DFE" />
+    <path 
+      d="M 30 27 h 22 c 6.6 0 12 5.4 12 12 v 1.5 l 12.3 -7.4 c 2.5 -1.5 5.7 0.3 5.7 3.2 v 27.4 c 0 2.9 -3.2 4.7 -5.7 3.2 l -12.3 -7.4 v 1.5 c 0 6.6 -5.4 12 -12 12 H 30 c -6.6 0 -12 -5.4 -12 -12 V 39 c 0 -6.6 5.4 -12 12 -12 Z" 
+      fill="white" 
+      mask="url(#demonion-logo-mask)" 
+    />
   </svg>
 );
 
