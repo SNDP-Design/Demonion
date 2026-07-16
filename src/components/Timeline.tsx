@@ -1,6 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Gauge, Pause, Play, RotateCcw, Scissors, MousePointerClick, Keyboard } from 'lucide-react';
-import type { ZoomMoment } from '../types';
+import { Gauge, Pause, Play, RotateCcw, Scissors } from 'lucide-react';
 
 interface TimelineProps {
   duration: number;
@@ -13,11 +11,11 @@ interface TimelineProps {
   onTrimChange: (start: number, end: number) => void;
   playbackRate: number;
   onPlaybackRateChange: (rate: number) => void;
-  zoomMoments: ZoomMoment[];
-  onDeleteZoomMoment: (index: number) => void;
 }
 
-export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTimeUpdate, isPlaying, onTogglePlay, trimStart, trimEnd, onTrimChange, playbackRate, onPlaybackRateChange, zoomMoments, onDeleteZoomMoment }) => {
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+
+export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTimeUpdate, isPlaying, onTogglePlay, trimStart, trimEnd, onTrimChange, playbackRate, onPlaybackRateChange }) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const [draggingItem, setDraggingItem] = useState<'playhead' | 'trim-start' | 'trim-end' | null>(null);
   const endTime = trimEnd > 0 ? trimEnd : duration;
@@ -78,49 +76,7 @@ export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTim
             <button onMouseDown={(event) => { event.stopPropagation(); setDraggingItem('trim-end'); }} className="video-editor-handle" style={{ left: `calc(${trimEndPercent}% - 7px)` }} aria-label="Trim end" title="Drag to trim the ending" />
             <button onMouseDown={(event) => { event.stopPropagation(); setDraggingItem('playhead'); }} className="video-editor-playhead" style={{ left: `${progressPercent}%` }} aria-label="Drag playhead" title="Drag to scrub timeline"><i /></button>
           </div>
-          {zoomMoments.length > 0 && (
-            <div className="video-editor-zoom-row" aria-label="Zoom points">
-              {zoomMoments.map((moment, index) => {
-                const zoomDuration = 2.0; // zoom active duration
-                const zoomPercent = duration > 0 ? (moment.time / duration) * 100 : 0;
-                const widthPercent = duration > 0 ? (zoomDuration / duration) * 100 : 0;
-                const clampedWidth = Math.min(widthPercent, 100 - zoomPercent);
-                return (
-                  <div
-                    key={`${moment.time}-${index}`}
-                    className="video-editor-zoom-pill"
-                    style={{
-                      left: `${Math.max(0, Math.min(100, zoomPercent))}%`,
-                      width: `${Math.max(1, clampedWidth)}%`
-                    }}
-                    onClick={() => onTimeUpdate(moment.time)}
-                    title={`Seek to zoom moment (${moment.time.toFixed(1)}s)`}
-                  >
-                    <span className="zoom-pill-label">
-                      {moment.type === 'click' ? (
-                        <MousePointerClick size={10} />
-                      ) : (
-                        <Keyboard size={10} />
-                      )}
-                      <span className="zoom-pill-text">Zoom</span>
-                    </span>
-                    <button
-                      type="button"
-                      className="zoom-pill-delete"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteZoomMoment(index);
-                      }}
-                      aria-label="Delete zoom point"
-                      title="Delete zoom moment"
-                    >
-                      ×
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+
         </div>
       </div>
 

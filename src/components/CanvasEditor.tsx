@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useMemo, useCallback } from 'react';
-import type { EditorSettings, ZoomMoment } from '../types';
+import type { EditorSettings, ClickMoment } from '../types';
 
 interface CanvasEditorProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -8,8 +8,8 @@ interface CanvasEditorProps {
   webcamElement: HTMLVideoElement | null;
   showWebcamOverlay: boolean;
   settings: EditorSettings;
-  zoomMoments?: ZoomMoment[];
-  onAddZoomMoment?: (moment: ZoomMoment) => void;
+  clickMoments?: ClickMoment[];
+  onAddClickMoment?: (moment: ClickMoment) => void;
 }
 
 const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
@@ -21,8 +21,8 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   webcamElement,
   showWebcamOverlay,
   settings,
-  zoomMoments = [],
-  onAddZoomMoment
+  clickMoments = [],
+  onAddClickMoment
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -31,14 +31,14 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   const videoElementRef = useRef(videoElement);
   const webcamElementRef = useRef(webcamElement);
   const showWebcamOverlayRef = useRef(showWebcamOverlay);
-  const zoomMomentsRef = useRef(zoomMoments);
+  const clickMomentsRef = useRef(clickMoments);
 
   useEffect(() => {
     settingsRef.current = settings;
     videoElementRef.current = videoElement;
     webcamElementRef.current = webcamElement;
     showWebcamOverlayRef.current = showWebcamOverlay;
-    zoomMomentsRef.current = zoomMoments;
+    clickMomentsRef.current = clickMoments;
   });
 
   const canvasDimensions = useMemo(() => {
@@ -78,19 +78,18 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   }, [canvasRef, onCanvasElementChange]);
 
   const handleCanvasClick = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!videoElement || !onAddZoomMoment) return;
+    if (!videoElement || !onAddClickMoment) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
     const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / Math.max(rect.width, 1)));
     const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / Math.max(rect.height, 1)));
 
-    onAddZoomMoment({
-      type: 'click',
+    onAddClickMoment({
       time: Math.max(0, videoElement.currentTime - 0.22),
       x,
       y
     });
-  }, [onAddZoomMoment, videoElement]);
+  }, [onAddClickMoment, videoElement]);
 
   const getContainRect = (sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number) => {
     const sourceRatio = sourceWidth / sourceHeight;
@@ -135,43 +134,47 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const videoElement = videoElementRef.current;
       const webcamElement = webcamElementRef.current;
       const showWebcamOverlay = showWebcamOverlayRef.current;
-      const zoomMoments = zoomMomentsRef.current;
+      const clickMoments = clickMomentsRef.current;
       const renderScale = settings.exportResolution === '4k' ? 2 : 1;
+
+      let displayTime = 0;
+      if (videoElement) {
+        const vTime = videoElement.currentTime;
+        const now = performance.now();
+
+        if (videoElement.paused) {
+          displayTime = vTime;
+          lastVideoTime = vTime;
+          lastUpdateTime = now;
+        } else {
+          if (vTime !== lastVideoTime) {
+            lastVideoTime = vTime;
+            lastUpdateTime = now;
+            displayTime = vTime;
+          } else {
+            const elapsed = (now - lastUpdateTime) / 1000;
+            const playbackRate = videoElement.playbackRate || 1.0;
+            const extrapolated = vTime + Math.min(0.15, elapsed) * playbackRate;
+            displayTime = Math.min(videoElement.duration || Infinity, extrapolated);
+          }
+        }
+      }
 
       const drawClickRipples = (
         targetX: number,
         targetY: number,
         targetWidth: number,
-        targetHeight: number,
-        sourceWidth: number,
-        sourceHeight: number
+        targetHeight: number
       ) => {
-        const activeZoom = getActiveZoom(displayTime);
         const rippleDuration = 0.8;
         const maxRadius = 40 * renderScale;
 
-        zoomMoments.forEach((moment) => {
-          if (moment.type !== 'click') return;
-
+        clickMoments.forEach((moment) => {
           const age = displayTime - moment.time;
           if (age < 0 || age > rippleDuration) return;
 
-          const cropWidth = sourceWidth / activeZoom.scale;
-          const cropHeight = sourceHeight / activeZoom.scale;
-          const cropX = Math.min(sourceWidth - cropWidth, Math.max(0, activeZoom.x * sourceWidth - cropWidth / 2));
-          const cropY = Math.min(sourceHeight - cropHeight, Math.max(0, activeZoom.y * sourceHeight - cropHeight / 2));
-
-          const srcX = moment.x * sourceWidth;
-          const srcY = moment.y * sourceHeight;
-
-          const relX = (srcX - cropX) / cropWidth;
-          const relY = (srcY - cropY) / cropHeight;
-
-          // If the click point is outside the current zoom crop, don't draw it
-          if (relX < 0 || relX > 1 || relY < 0 || relY > 1) return;
-
-          const screenX = targetX + relX * targetWidth;
-          const screenY = targetY + relY * targetHeight;
+          const screenX = targetX + moment.x * targetWidth;
+          const screenY = targetY + moment.y * targetHeight;
 
           // Draw concentric rings
           for (let j = 0; j < 3; j++) {
@@ -199,92 +202,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         });
       };
 
-      let displayTime = 0;
-      if (videoElement) {
-        const vTime = videoElement.currentTime;
-        const now = performance.now();
-
-        if (videoElement.paused) {
-          displayTime = vTime;
-          lastVideoTime = vTime;
-          lastUpdateTime = now;
-        } else {
-          if (vTime !== lastVideoTime) {
-            lastVideoTime = vTime;
-            lastUpdateTime = now;
-            displayTime = vTime;
-          } else {
-            const elapsed = (now - lastUpdateTime) / 1000;
-            const playbackRate = videoElement.playbackRate || 1.0;
-            const extrapolated = vTime + Math.min(0.15, elapsed) * playbackRate;
-            displayTime = Math.min(videoElement.duration || Infinity, extrapolated);
-          }
-        }
-      }
-
-      // Easing function: easeInOutCubic
-      const easeInOutCubic = (x: number): number => {
-        return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-      };
-
-      const getActiveZoom = (currentTime: number) => {
-        if (!videoElement || zoomMoments.length === 0) return { scale: 1, x: 0.5, y: 0.5 };
-        const duration = 2.0; // Zoom active duration in seconds
-        const fadeIn = 0.45;  // Fade-in duration
-        const fadeOut = 0.9;  // Fade-out duration
-        const holdEnd = duration - fadeOut;
-
-        let weightedX = 0;
-        let weightedY = 0;
-
-        // Calculate raw weights for all active zoom moments at the current time
-        const activeMomentsWithWeights = zoomMoments.map((moment) => {
-          const age = currentTime - moment.time;
-          if (age < 0 || age > duration) return { moment, w: 0 };
-
-          let w = 1.0;
-          if (age < fadeIn) {
-            w = easeInOutCubic(age / fadeIn);
-          } else if (age > holdEnd) {
-            w = easeInOutCubic(1.0 - (age - holdEnd) / fadeOut);
-          }
-          return { moment, w };
-        });
-
-        // Compute total active weight sum
-        const activeWeightsSum = activeMomentsWithWeights.reduce((acc, m) => acc + m.w, 0);
-
-        if (activeWeightsSum <= 0.0001) {
-          return { scale: 1, x: 0.5, y: 0.5 };
-        }
-
-        // Cap total zoom scale weight at 1.0 (so max zoom scale is peakScale)
-        const totalZoomWeight = Math.min(1.0, activeWeightsSum);
-
-        // Normalize weights and sum up the focal points
-        activeMomentsWithWeights.forEach(({ moment, w }) => {
-          if (w > 0) {
-            const normalizedW = (w / activeWeightsSum) * totalZoomWeight;
-            weightedX += normalizedW * moment.x;
-            weightedY += normalizedW * moment.y;
-          }
-        });
-
-        // Blend with default center (0.5, 0.5) based on the zoom ratio
-        const finalX = (1.0 - totalZoomWeight) * 0.5 + weightedX;
-        const finalY = (1.0 - totalZoomWeight) * 0.5 + weightedY;
-
-        const peakScale = 1.16;
-        const finalScale = 1.0 + (peakScale - 1.0) * totalZoomWeight;
-
-        return {
-          scale: finalScale,
-          x: finalX,
-          y: finalY
-        };
-      };
-
-      const drawZoomedVideo = (
+      const drawVideo = (
         sourceVideo: HTMLVideoElement,
         sourceWidth: number,
         sourceHeight: number,
@@ -293,18 +211,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         targetWidth: number,
         targetHeight: number
       ) => {
-        const activeZoom = getActiveZoom(displayTime);
-        if (activeZoom.scale <= 1.001) {
-          ctx.drawImage(sourceVideo, 0, 0, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight);
-          return;
-        }
-
-        const cropWidth = sourceWidth / activeZoom.scale;
-        const cropHeight = sourceHeight / activeZoom.scale;
-        const cropX = Math.min(sourceWidth - cropWidth, Math.max(0, activeZoom.x * sourceWidth - cropWidth / 2));
-        const cropY = Math.min(sourceHeight - cropHeight, Math.max(0, activeZoom.y * sourceHeight - cropHeight / 2));
-
-        ctx.drawImage(sourceVideo, cropX, cropY, cropWidth, cropHeight, targetX, targetY, targetWidth, targetHeight);
+        ctx.drawImage(sourceVideo, 0, 0, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight);
       };
 
       // Enable high-quality image smoothing
@@ -499,8 +406,8 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           const vHeight = videoElement.videoHeight || 1080;
           const target = getContainRect(vWidth, vHeight, cw, ch);
 
-          drawZoomedVideo(videoElement, vWidth, vHeight, target.dx, target.dy, target.dw, target.dh);
-          drawClickRipples(target.dx, target.dy, target.dw, target.dh, vWidth, vHeight);
+          drawVideo(videoElement, vWidth, vHeight, target.dx, target.dy, target.dw, target.dh);
+          drawClickRipples(target.dx, target.dy, target.dw, target.dh);
         } else {
           ctx.fillStyle = '#0a0d14';
           ctx.fillRect(0, 0, cw, ch);
@@ -587,8 +494,8 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillStyle = '#050505';
         ctx.fillRect(x0, y0 + headerH, finalW, finalH);
 
-        drawZoomedVideo(videoElement, vWidth, vHeight, x0, y0 + headerH, finalW, finalH);
-        drawClickRipples(x0, y0 + headerH, finalW, finalH, vWidth, vHeight);
+        drawVideo(videoElement, vWidth, vHeight, x0, y0 + headerH, finalW, finalH);
+        drawClickRipples(x0, y0 + headerH, finalW, finalH);
       } else {
         ctx.fillStyle = '#0a0d14';
         ctx.fillRect(x0, y0 + headerH, finalW, finalH);
@@ -666,7 +573,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           height: 'auto',
           maxWidth: '100%',
           maxHeight: '100%',
-          cursor: onAddZoomMoment ? 'crosshair' : 'default',
+          cursor: onAddClickMoment ? 'crosshair' : 'default',
           aspectRatio: settings.aspectRatio.replace('-', '/')
         }}
       />

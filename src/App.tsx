@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import type { EditorSettings, ZoomMoment } from './types';
+import type { EditorSettings, ClickMoment } from './types';
 import { DEFAULT_SETTINGS } from './constants/presets';
 import { SidebarControls } from './components/SidebarControls';
 import { CanvasEditor } from './components/CanvasEditor';
@@ -41,7 +41,7 @@ function App() {
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportProgress, setExportProgress] = useState<number | null>(null);
   const [recordingIncludesWebcam, setRecordingIncludesWebcam] = useState(false);
-  const [zoomMoments, setZoomMoments] = useState<ZoomMoment[]>([]);
+  const [clickMoments, setClickMoments] = useState<ClickMoment[]>([]);
 
   // Recorder flags
   const [useMic, setUseMic] = useState(true);
@@ -62,7 +62,7 @@ function App() {
   const recordedChunksRef = useRef<Blob[]>([]);
   const recordedCameraChunksRef = useRef<Blob[]>([]);
   const recordingStartTimeRef = useRef(0);
-  const zoomMomentsRef = useRef<ZoomMoment[]>([]);
+  const clickMomentsRef = useRef<ClickMoment[]>([]);
   const lastPointerRef = useRef({ x: 0.5, y: 0.5 });
   const timerRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
   const [recTime, setRecTime] = useState(0);
@@ -250,9 +250,9 @@ function App() {
   useEffect(() => {
     if (recordingState !== 'recording') return;
 
-    const addZoomMoment = (moment: Omit<ZoomMoment, 'time'>) => {
+    const addClickMoment = (moment: Omit<ClickMoment, 'time'>) => {
       const time = Math.max(0, (performance.now() - recordingStartTimeRef.current) / 1000);
-      zoomMomentsRef.current = [...zoomMomentsRef.current, { ...moment, time }];
+      clickMomentsRef.current = [...clickMomentsRef.current, { ...moment, time }];
     };
 
     const updatePointer = (event: PointerEvent | MouseEvent) => {
@@ -265,17 +265,14 @@ function App() {
     const handlePointerMove = (event: PointerEvent) => updatePointer(event);
     const handleClick = (event: MouseEvent) => {
       updatePointer(event);
-      addZoomMoment({ type: 'click', ...lastPointerRef.current });
+      addClickMoment(lastPointerRef.current);
     };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' || event.code === 'Escape' || (event.altKey && event.code === 'KeyS')) {
         event.preventDefault();
         event.stopPropagation();
         handleStopRecording();
-        return;
       }
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
-      addZoomMoment({ type: 'typing', ...lastPointerRef.current });
     };
 
     window.addEventListener('pointermove', handlePointerMove, true);
@@ -397,8 +394,8 @@ function App() {
       const startSeparateRecording = () => {
         recordedChunksRef.current = [];
         recordedCameraChunksRef.current = [];
-        zoomMomentsRef.current = [];
-        setZoomMoments([]);
+        clickMomentsRef.current = [];
+        setClickMoments([]);
         let recordMimeType = 'video/webm;codecs=vp9';
         if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = 'video/webm;codecs=vp8';
         if (!MediaRecorder.isTypeSupported(recordMimeType)) recordMimeType = 'video/webm';
@@ -462,7 +459,7 @@ function App() {
           activeMicStream?.getTracks().forEach((track) => track.stop());
           setMicStream(null);
           setRecordingIncludesWebcam(false);
-          setZoomMoments(zoomMomentsRef.current);
+          setClickMoments(clickMomentsRef.current);
           setPlaybackRate(1);
           setVideoSrc(URL.createObjectURL(blob));
           setRecordingState('editor');
@@ -558,18 +555,10 @@ function App() {
     }
   };
 
-  const handleAddPreviewZoom = useCallback((moment: ZoomMoment) => {
-    setZoomMoments((current) => {
+  const handleAddPreviewClick = useCallback((moment: ClickMoment) => {
+    setClickMoments((current) => {
       const next = [...current, moment].sort((a, b) => a.time - b.time);
-      zoomMomentsRef.current = next;
-      return next;
-    });
-  }, []);
-
-  const handleDeleteZoomMoment = useCallback((index: number) => {
-    setZoomMoments((current) => {
-      const next = current.filter((_, momentIndex) => momentIndex !== index);
-      zoomMomentsRef.current = next;
+      clickMomentsRef.current = next;
       return next;
     });
   }, []);
@@ -722,7 +711,7 @@ function App() {
                   setRecordingState('idle');
                   setVideoSrc('');
                   setCameraSrc('');
-                  setZoomMoments([]);
+                  setClickMoments([]);
                   setPlaybackRate(1);
                   setRecordingIncludesWebcam(false);
                   setShowLandingPage(true);
@@ -843,8 +832,8 @@ function App() {
                 webcamElement={useWebcam && !recordingIncludesWebcam ? recordedCameraVideoEl : null}
                 showWebcamOverlay={useWebcam && !recordingIncludesWebcam && Boolean(cameraSrc)}
                 settings={settings}
-                zoomMoments={zoomMoments}
-                onAddZoomMoment={handleAddPreviewZoom}
+                clickMoments={clickMoments}
+                onAddClickMoment={handleAddPreviewClick}
               />
               <Timeline
                 duration={duration}
@@ -857,8 +846,6 @@ function App() {
                 onTrimChange={handleTrimChange}
                 playbackRate={playbackRate}
                 onPlaybackRateChange={handlePlaybackRate}
-                zoomMoments={zoomMoments}
-                onDeleteZoomMoment={handleDeleteZoomMoment}
               />
             </div>
           </div>

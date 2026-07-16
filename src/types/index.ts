@@ -27,8 +27,7 @@ export interface EditorSettings {
   exportResolution?: '1080p' | '4k';
 }
 
-export interface ZoomMoment {
-  type: 'click' | 'typing';
+export interface ClickMoment {
   time: number;
   x: number;
   y: number;
