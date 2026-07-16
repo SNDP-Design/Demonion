@@ -4663,7 +4663,7 @@ aside.sidebar {
 }
 
 .modal-tip-desc {
-  font-size: 12px;
+  font-size: 14px;
   color: rgba(238, 203, 255, 0.65);
   line-height: 1.6;
   margin: 0;
@@ -4676,6 +4676,6 @@ aside.sidebar {
   border-radius: 4px;
   color: #fff;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 13px;
 }
 
