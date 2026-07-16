@@ -951,10 +951,10 @@ function App() {
                 {/* Pro Tip Note */}
                 <div className="modal-tip-box">
                   <div className="modal-tip-title">
-                    💡 Pro-Tip for High-Definition Captures
+                    💡 Pro-Tip
                   </div>
                   <p className="modal-tip-desc">
-                    For the absolute best results, we highly recommend zooming your browser or application window to <strong>125%</strong> (simply press <code>Cmd +</code> on macOS or <code>Ctrl +</code> on Windows/Linux) before starting. This makes UI elements, text, and details look incredibly sharp and prominent!
+                    Zoom your target window/browser to <strong>125%</strong> (press <code>Cmd +</code> or <code>Ctrl +</code>) before recording to make text and details look crisp and high-definition!
                   </p>
                 </div>
 
