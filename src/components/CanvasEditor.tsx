@@ -136,6 +136,68 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const webcamElement = webcamElementRef.current;
       const showWebcamOverlay = showWebcamOverlayRef.current;
       const zoomMoments = zoomMomentsRef.current;
+      const renderScale = settings.exportResolution === '4k' ? 2 : 1;
+
+      const drawClickRipples = (
+        targetX: number,
+        targetY: number,
+        targetWidth: number,
+        targetHeight: number,
+        sourceWidth: number,
+        sourceHeight: number
+      ) => {
+        const activeZoom = getActiveZoom(displayTime);
+        const rippleDuration = 0.8;
+        const maxRadius = 40 * renderScale;
+
+        zoomMoments.forEach((moment) => {
+          if (moment.type !== 'click') return;
+
+          const age = displayTime - moment.time;
+          if (age < 0 || age > rippleDuration) return;
+
+          const cropWidth = sourceWidth / activeZoom.scale;
+          const cropHeight = sourceHeight / activeZoom.scale;
+          const cropX = Math.min(sourceWidth - cropWidth, Math.max(0, activeZoom.x * sourceWidth - cropWidth / 2));
+          const cropY = Math.min(sourceHeight - cropHeight, Math.max(0, activeZoom.y * sourceHeight - cropHeight / 2));
+
+          const srcX = moment.x * sourceWidth;
+          const srcY = moment.y * sourceHeight;
+
+          const relX = (srcX - cropX) / cropWidth;
+          const relY = (srcY - cropY) / cropHeight;
+
+          // If the click point is outside the current zoom crop, don't draw it
+          if (relX < 0 || relX > 1 || relY < 0 || relY > 1) return;
+
+          const screenX = targetX + relX * targetWidth;
+          const screenY = targetY + relY * targetHeight;
+
+          // Draw concentric rings
+          for (let j = 0; j < 3; j++) {
+            const delay = j * 0.15;
+            const ringAge = age - delay;
+            if (ringAge < 0) continue;
+
+            const ringProgress = ringAge / (rippleDuration - delay);
+            const radius = maxRadius * ringProgress;
+            const opacity = 0.8 * (1.0 - ringProgress);
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+            ctx.lineWidth = 2 * renderScale;
+            ctx.strokeStyle = `rgba(190, 167, 255, ${opacity})`;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(190, 167, 255, ${opacity * 0.15})`;
+            ctx.fill();
+            ctx.restore();
+          }
+        });
+      };
 
       let displayTime = 0;
       if (videoElement) {
@@ -346,7 +408,6 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ? videoElement.videoHeight / videoElement.videoWidth
         : defaultFrameRatio;
 
-      const renderScale = settings.exportResolution === '4k' ? 2 : 1;
       const isSideCamera = showWebcamOverlay && (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right');
       const baseCardW = cw * 0.8;
       const defaultCardW = baseCardW * settings.scale;
@@ -439,6 +500,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           const target = getContainRect(vWidth, vHeight, cw, ch);
 
           drawZoomedVideo(videoElement, vWidth, vHeight, target.dx, target.dy, target.dw, target.dh);
+          drawClickRipples(target.dx, target.dy, target.dw, target.dh, vWidth, vHeight);
         } else {
           ctx.fillStyle = '#0a0d14';
           ctx.fillRect(0, 0, cw, ch);
@@ -526,6 +588,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillRect(x0, y0 + headerH, finalW, finalH);
 
         drawZoomedVideo(videoElement, vWidth, vHeight, x0, y0 + headerH, finalW, finalH);
+        drawClickRipples(x0, y0 + headerH, finalW, finalH, vWidth, vHeight);
       } else {
         ctx.fillStyle = '#0a0d14';
         ctx.fillRect(x0, y0 + headerH, finalW, finalH);
