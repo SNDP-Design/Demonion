@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import type { EditorSettings } from '../types';
 import { GRADIENT_PRESETS } from '../constants/presets';
-import { Camera, CameraOff, Circle, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, Layout, Monitor, PanelLeft, PanelRight, Paintbrush, Pencil, Square } from 'lucide-react';
+import { CameraOff, Circle, CornerDownLeft, CornerDownRight, CornerUpLeft, CornerUpRight, PanelLeft, PanelRight, Pencil, Square } from 'lucide-react';
 
 interface SidebarControlsProps {
   settings: EditorSettings;
@@ -16,7 +16,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
     <aside className="glass-panel sidebar flex flex-col h-full w-[350px] border-r border-glass text-sm select-none rounded-none">
       <div className="sidebar-content space-y-6">
         <section className="sidebar-module">
-          <h3 className="sidebar-module-title"><Monitor size={14} /> Video Layout</h3>
+
           <div className="video-layout-options">
             <button type="button" onClick={() => update('layoutMode', 'screen-only')} className={`video-layout-option ${settings.layoutMode === 'screen-only' ? 'sidebar-control-active' : 'border-glass hover-bg-glass text-gray-400'}`}>
               <strong>Screen + Camera</strong>
@@ -28,7 +28,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
         </section>
 
         <section className="sidebar-module">
-          <h3 className="sidebar-module-title"><Camera size={14} /> Facecam Overlay</h3>
+
           <div className="facecam-position-row">
             {[
               { id: 'top-left', name: 'Top left', icon: CornerUpLeft },
@@ -66,7 +66,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
         </section>
 
         {settings.layoutMode === 'framed' && <section className="sidebar-module browser-window-section border-t border-glass pt-5">
-          <h3 className="sidebar-module-title"><Layout size={14} /> Browser Window</h3>
+
           <div className="browser-window-controls">
             <Slider label="Window Padding" value={`${Math.round(settings.scale * 100)}%`} min="0.5" max="1.2" step="0.01" current={settings.scale} onChange={(value) => update('scale', value)} />
             <Slider label="Shadow Blur" value={`${settings.shadowIntensity}px`} min="0" max="100" current={settings.shadowIntensity} onChange={(value) => update('shadowIntensity', value)} />
@@ -75,7 +75,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
         </section>}
 
         {settings.layoutMode === 'framed' && <section className="sidebar-module border-t border-glass pt-5">
-          <h3 className="sidebar-module-title"><Paintbrush size={14} /> Background</h3>
+
           <div className="gradient-thumbnail-grid">{GRADIENT_PRESETS.map((preset) => <button key={preset.id} onClick={() => onChangeSettings({ gradientPresetId: preset.id, backgroundType: 'gradient' })} title={preset.name} aria-label={preset.name} className={`gradient-thumbnail ${settings.gradientPresetId === preset.id && settings.backgroundType === 'gradient' ? 'active-pink' : 'border-glass hover:border-white/10'}`}><span style={{ background: preset.css }} /></button>)}
             <button type="button" onClick={() => flatColorInputRef.current?.click()} title="Choose a flat color" aria-label="Choose a flat color" className={`flat-color-thumbnail ${settings.backgroundType === 'solid' ? 'active-pink' : 'border-glass hover:border-white/10'}`}><span style={{ background: settings.solidColor }} /><i><Pencil size={12} /></i></button>
             <input ref={flatColorInputRef} type="color" value={settings.solidColor} onChange={(event) => onChangeSettings({ solidColor: event.target.value, backgroundType: 'solid' })} className="flat-color-picker-input" />
