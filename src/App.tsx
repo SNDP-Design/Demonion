@@ -954,7 +954,7 @@ function App() {
                     💡 Pro-Tip for High-Definition Captures
                   </div>
                   <p className="modal-tip-desc">
-                    For the absolute best results and ultra-crisp zoom-ins, we highly recommend zooming your browser or application window to <strong>125%</strong> (simply press <code>Cmd +</code> on macOS or <code>Ctrl +</code> on Windows/Linux) before starting. This makes UI elements, text, and details look incredibly sharp and prominent!
+                    For the absolute best results, we highly recommend zooming your browser or application window to <strong>125%</strong> (simply press <code>Cmd +</code> on macOS or <code>Ctrl +</code> on Windows/Linux) before starting. This makes UI elements, text, and details look incredibly sharp and prominent!
                   </p>
                 </div>
 
