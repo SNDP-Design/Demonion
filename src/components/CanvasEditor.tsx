@@ -114,6 +114,8 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
 
     let animId: number | null = null;
     let timeoutId: number | null = null;
+    let lastVideoTime = 0;
+    let lastUpdateTime = 0;
 
     const scheduleRender = () => {
       if (document.hidden) {
@@ -135,15 +137,36 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const showWebcamOverlay = showWebcamOverlayRef.current;
       const zoomMoments = zoomMomentsRef.current;
 
+      let displayTime = 0;
+      if (videoElement) {
+        const vTime = videoElement.currentTime;
+        const now = performance.now();
+
+        if (videoElement.paused) {
+          displayTime = vTime;
+          lastVideoTime = vTime;
+          lastUpdateTime = now;
+        } else {
+          if (vTime !== lastVideoTime) {
+            lastVideoTime = vTime;
+            lastUpdateTime = now;
+            displayTime = vTime;
+          } else {
+            const elapsed = (now - lastUpdateTime) / 1000;
+            const playbackRate = videoElement.playbackRate || 1.0;
+            const extrapolated = vTime + Math.min(0.15, elapsed) * playbackRate;
+            displayTime = Math.min(videoElement.duration || Infinity, extrapolated);
+          }
+        }
+      }
+
       // Easing function: easeInOutCubic
       const easeInOutCubic = (x: number): number => {
         return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
       };
 
-      const getActiveZoom = () => {
+      const getActiveZoom = (currentTime: number) => {
         if (!videoElement || zoomMoments.length === 0) return { scale: 1, x: 0.5, y: 0.5 };
-
-        const currentTime = videoElement.currentTime;
         const duration = 2.0; // Zoom active duration in seconds
         const fadeIn = 0.45;  // Fade-in duration
         const fadeOut = 0.9;  // Fade-out duration
@@ -208,7 +231,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         targetWidth: number,
         targetHeight: number
       ) => {
-        const activeZoom = getActiveZoom();
+        const activeZoom = getActiveZoom(displayTime);
         if (activeZoom.scale <= 1.001) {
           ctx.drawImage(sourceVideo, 0, 0, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight);
           return;
