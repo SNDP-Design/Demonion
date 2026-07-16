@@ -13,7 +13,8 @@ import {
   Camera, 
   Download,
   ArrowRight,
-  RotateCcw
+  RotateCcw,
+  Volume2
 } from 'lucide-react';
 
 const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
@@ -46,6 +47,7 @@ function App() {
   // Recorder flags
   const [useMic, setUseMic] = useState(true);
   const [useWebcam, setUseWebcam] = useState(true); // Default to camera overlay active!
+  const [useSystemAudio, setUseSystemAudio] = useState(true);
 
   // Refs
   const editorVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -314,7 +316,7 @@ function App() {
           height: { ideal: 2400, max: 2400 },
           frameRate: { ideal: 60, max: 60 }
         },
-        audio: false
+        audio: useSystemAudio
       });
       const screenTrack = screenStream.getVideoTracks()[0];
       if (screenTrack) {
@@ -376,10 +378,21 @@ function App() {
             audioContext.createMediaStreamSource(activeMicStream).connect(audioDestination);
             hasAudio = true;
           }
-          if (hasAudio) audioDestination.stream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+          if (useSystemAudio && screenStream.getAudioTracks().length) {
+            audioContext.createMediaStreamSource(screenStream).connect(audioDestination);
+            hasAudio = true;
+          }
+          if (hasAudio) {
+            audioDestination.stream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+          } else if (screenStream.getAudioTracks().length) {
+            screenStream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+          }
         } catch (error) {
           console.warn('Could not mix audio sources:', error);
           activeMicStream?.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+          if (useSystemAudio) {
+            screenStream.getAudioTracks().forEach((track) => recordingStream.addTrack(track));
+          }
         }
 
         const recorder = new MediaRecorder(recordingStream, {
@@ -912,6 +925,37 @@ function App() {
                       <span className="modal-toggle-track" />
                     </label>
                   </div>
+
+                  <div className="modal-control-row">
+                    <div className="modal-control-info">
+                      <div className="modal-control-icon">
+                        <Volume2 size={18} />
+                      </div>
+                      <div className="modal-control-text">
+                        <h4>System Audio</h4>
+                        <p>Capture computer sound</p>
+                      </div>
+                    </div>
+                    <label className="modal-toggle-label">
+                      <input 
+                        type="checkbox" 
+                        checked={useSystemAudio} 
+                        onChange={(e) => setUseSystemAudio(e.target.checked)} 
+                        className="switch-input"
+                      />
+                      <span className="modal-toggle-track" />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Pro Tip Note */}
+                <div className="modal-tip-box">
+                  <div className="modal-tip-title">
+                    💡 Pro-Tip for High-Definition Captures
+                  </div>
+                  <p className="modal-tip-desc">
+                    For the absolute best results and ultra-crisp zoom-ins, we highly recommend zooming your browser or application window to <strong>125%</strong> (simply press <code>Cmd +</code> on macOS or <code>Ctrl +</code> on Windows/Linux) before starting. This makes UI elements, text, and details look incredibly sharp and prominent!
+                  </p>
                 </div>
 
                 {/* Modal Actions */}
