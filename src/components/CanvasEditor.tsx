@@ -135,37 +135,67 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       const showWebcamOverlay = showWebcamOverlayRef.current;
       const zoomMoments = zoomMomentsRef.current;
 
+      // Easing function: easeInOutCubic
+      const easeInOutCubic = (x: number): number => {
+        return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      };
+
       const getActiveZoom = () => {
         if (!videoElement || zoomMoments.length === 0) return { scale: 1, x: 0.5, y: 0.5 };
 
         const currentTime = videoElement.currentTime;
-        const activeMoment = [...zoomMoments].reverse().find((moment) => {
+        const duration = 2.0; // Zoom active duration in seconds
+        const fadeIn = 0.45;  // Fade-in duration
+        const fadeOut = 0.9;  // Fade-out duration
+        const holdEnd = duration - fadeOut;
+
+        let weightedX = 0;
+        let weightedY = 0;
+
+        // Calculate raw weights for all active zoom moments at the current time
+        const activeMomentsWithWeights = zoomMoments.map((moment) => {
           const age = currentTime - moment.time;
-          const duration = 2;
-          return age >= 0 && age <= duration;
+          if (age < 0 || age > duration) return { moment, w: 0 };
+
+          let w = 1.0;
+          if (age < fadeIn) {
+            w = easeInOutCubic(age / fadeIn);
+          } else if (age > holdEnd) {
+            w = easeInOutCubic(1.0 - (age - holdEnd) / fadeOut);
+          }
+          return { moment, w };
         });
 
-        if (!activeMoment) return { scale: 1, x: 0.5, y: 0.5 };
+        // Compute total active weight sum
+        const activeWeightsSum = activeMomentsWithWeights.reduce((acc, m) => acc + m.w, 0);
 
-        const age = currentTime - activeMoment.time;
-        const duration = 2;
-        const fadeIn = 0.45;
-        const fadeOut = 0.9;
-        const holdEnd = Math.max(fadeIn, duration - fadeOut);
-        const smooth = (value: number) => value * value * (3 - 2 * value);
-        let amount = 1;
-
-        if (age < fadeIn) {
-          amount = smooth(age / fadeIn);
-        } else if (age > holdEnd) {
-          amount = 1 - smooth((age - holdEnd) / fadeOut);
+        if (activeWeightsSum <= 0.0001) {
+          return { scale: 1, x: 0.5, y: 0.5 };
         }
 
+        // Cap total zoom scale weight at 1.0 (so max zoom scale is peakScale)
+        const totalZoomWeight = Math.min(1.0, activeWeightsSum);
+
+        // Normalize weights and sum up the focal points
+        activeMomentsWithWeights.forEach(({ moment, w }) => {
+          if (w > 0) {
+            const normalizedW = (w / activeWeightsSum) * totalZoomWeight;
+            weightedX += normalizedW * moment.x;
+            weightedY += normalizedW * moment.y;
+          }
+        });
+
+        // Blend with default center (0.5, 0.5) based on the zoom ratio
+        const finalX = (1.0 - totalZoomWeight) * 0.5 + weightedX;
+        const finalY = (1.0 - totalZoomWeight) * 0.5 + weightedY;
+
         const peakScale = 1.16;
+        const finalScale = 1.0 + (peakScale - 1.0) * totalZoomWeight;
+
         return {
-          scale: 1 + (peakScale - 1) * Math.max(0, Math.min(1, amount)),
-          x: activeMoment.x,
-          y: activeMoment.y
+          scale: finalScale,
+          x: finalX,
+          y: finalY
         };
       };
 

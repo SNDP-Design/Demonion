@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Gauge, Pause, Play, RotateCcw, Scissors } from 'lucide-react';
+import { Gauge, Pause, Play, RotateCcw, Scissors, MousePointerClick, Keyboard } from 'lucide-react';
 import type { ZoomMoment } from '../types';
 
 interface TimelineProps {
@@ -81,17 +81,42 @@ export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTim
           {zoomMoments.length > 0 && (
             <div className="video-editor-zoom-row" aria-label="Zoom points">
               {zoomMoments.map((moment, index) => {
+                const zoomDuration = 2.0; // zoom active duration
                 const zoomPercent = duration > 0 ? (moment.time / duration) * 100 : 0;
+                const widthPercent = duration > 0 ? (zoomDuration / duration) * 100 : 0;
+                const clampedWidth = Math.min(widthPercent, 100 - zoomPercent);
                 return (
-                  <button
+                  <div
                     key={`${moment.time}-${index}`}
-                    type="button"
-                    onClick={() => onDeleteZoomMoment(index)}
-                    className="video-editor-zoom-dot"
-                    style={{ left: `${Math.max(0, Math.min(100, zoomPercent))}%` }}
-                    aria-label={`Delete zoom point ${index + 1}`}
-                    title="Delete zoom point"
-                  />
+                    className="video-editor-zoom-pill"
+                    style={{
+                      left: `${Math.max(0, Math.min(100, zoomPercent))}%`,
+                      width: `${Math.max(1, clampedWidth)}%`
+                    }}
+                    onClick={() => onTimeUpdate(moment.time)}
+                    title={`Seek to zoom moment (${moment.time.toFixed(1)}s)`}
+                  >
+                    <span className="zoom-pill-label">
+                      {moment.type === 'click' ? (
+                        <MousePointerClick size={10} />
+                      ) : (
+                        <Keyboard size={10} />
+                      )}
+                      <span className="zoom-pill-text">Zoom</span>
+                    </span>
+                    <button
+                      type="button"
+                      className="zoom-pill-delete"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteZoomMoment(index);
+                      }}
+                      aria-label="Delete zoom point"
+                      title="Delete zoom moment"
+                    >
+                      ×
+                    </button>
+                  </div>
                 );
               })}
             </div>
