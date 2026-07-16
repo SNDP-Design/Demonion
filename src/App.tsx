@@ -289,6 +289,46 @@ function App() {
     };
   }, [recordingState, handleStopRecording]);
 
+  // Global click wave ripple effect for links, buttons, and editor controls
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const clickable = target.closest('a') || 
+                        target.closest('button') || 
+                        target.closest('.video-editor-zoom-pill') || 
+                        target.closest('.video-editor-handle') ||
+                        target.closest('.flat-color-thumbnail') ||
+                        target.closest('.gradient-thumbnail');
+      if (!clickable) return;
+
+      // Create wave ripple container
+      const wave = document.createElement('div');
+      wave.className = 'click-wave-container';
+      wave.style.left = `${e.clientX}px`;
+      wave.style.top = `${e.clientY}px`;
+
+      // Create concentric rings
+      for (let i = 0; i < 3; i++) {
+        const ring = document.createElement('div');
+        ring.className = 'click-wave-ring';
+        ring.style.animationDelay = `${i * 0.12}s`;
+        wave.appendChild(ring);
+      }
+
+      document.body.appendChild(wave);
+
+      // Clean up wave elements after animation completes
+      setTimeout(() => {
+        wave.remove();
+      }, 1200);
+    };
+
+    window.addEventListener('click', handleGlobalClick, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener('click', handleGlobalClick, { capture: true });
+    };
+  }, []);
+
   const handleLandingScroll = useCallback(() => {
     const scrollTop = landingScrollRef.current?.scrollTop ?? 0;
     const previousScrollTop = lastLandingScrollTopRef.current;
