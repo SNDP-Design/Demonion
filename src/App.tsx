@@ -13,8 +13,7 @@ import {
   Camera, 
   Download,
   ArrowRight,
-  RotateCcw,
-  Volume2
+  RotateCcw
 } from 'lucide-react';
 
 const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
@@ -47,7 +46,7 @@ function App() {
   // Recorder flags
   const [useMic, setUseMic] = useState(true);
   const [useWebcam, setUseWebcam] = useState(true); // Default to camera overlay active!
-  const [useSystemAudio, setUseSystemAudio] = useState(true);
+  const useSystemAudio = true;
 
   // Refs
   const editorVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -926,26 +925,6 @@ function App() {
                     </label>
                   </div>
 
-                  <div className="modal-control-row">
-                    <div className="modal-control-info">
-                      <div className="modal-control-icon">
-                        <Volume2 size={18} />
-                      </div>
-                      <div className="modal-control-text">
-                        <h4>System Audio</h4>
-                        <p>Capture computer sound</p>
-                      </div>
-                    </div>
-                    <label className="modal-toggle-label">
-                      <input 
-                        type="checkbox" 
-                        checked={useSystemAudio} 
-                        onChange={(e) => setUseSystemAudio(e.target.checked)} 
-                        className="switch-input"
-                      />
-                      <span className="modal-toggle-track" />
-                    </label>
-                  </div>
                 </div>
 
                 {/* Pro Tip Note */}
