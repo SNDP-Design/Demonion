@@ -209,6 +209,21 @@ function App() {
     };
   }, [cameraSrc]);
 
+  // Prevent accidental page reloads/navigating away when a recording/edit is in progress
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (recordingState !== 'idle') {
+        e.preventDefault();
+        e.returnValue = 'You have an active recording session. Discard and leave?';
+        return e.returnValue;
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [recordingState]);
+
   // Release the camera when the user turns the camera option off.
   useEffect(() => {
     if (!useWebcam) {
@@ -716,6 +731,11 @@ function App() {
                   setRecordingIncludesWebcam(false);
                   setShowLandingPage(true);
                   setIsRecordingModalOpen(true);
+                  setCurrentTime(0);
+                  setDuration(0);
+                  setTrimStart(0);
+                  setTrimEnd(0);
+                  setIsPlaying(false);
                 }
               }}
               className="xg-button xg-button-secondary"

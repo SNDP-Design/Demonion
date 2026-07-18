@@ -131,7 +131,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       });
 
       let mixedAudioTrack: MediaStreamTrack | null = null;
-      const includeExportAudio = settings.cameraPosition !== 'none';
+      const includeExportAudio = true;
       const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (includeExportAudio && AudioContextClass) {
         if (!persistentAudioCtx) {
@@ -323,7 +323,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     onProgress,
     restoreEditor,
     settings.aspectRatio,
-    settings.cameraPosition,
     settings.trimEnd,
     settings.trimStart,
     videoElement

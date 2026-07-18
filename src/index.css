@@ -1102,7 +1102,7 @@ aside.sidebar {
 .flat-color-thumbnail > span { display: block; width: 100%; height: 100%; border-radius: 5px; }
 .flat-color-thumbnail i { position: absolute; right: 4px; bottom: 4px; display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; color: #fff; background: rgba(0,0,0,.55); }
 .flat-color-picker-input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-.recording-camera-preview { position: fixed; right: 32px; bottom: 32px; z-index: 50; display: block; object-fit: cover; pointer-events: none; border: 3px solid #eecbff; background: #0b0624; box-shadow: 0 16px 38px rgba(0,0,0,.5); }
+.recording-camera-preview { position: fixed; right: 32px; bottom: 32px; z-index: 50; display: block; object-fit: cover; pointer-events: none; border: 3px solid #eecbff; background: #0b0624; box-shadow: 0 16px 38px rgba(0,0,0,.5); transform: scaleX(-1); }
 .video-editor { flex: 0 0 auto; width: 100%; padding: 16px 20px; border-top: 1px solid var(--border-glass); background: rgba(8,3,29,.94); color: var(--text-primary); }
 .video-editor-toolbar, .video-editor-actions, .video-editor-speed, .video-editor-timecodes, .video-editor-clip { display: flex; align-items: center; }
 .video-editor-toolbar { justify-content: space-between; gap: 16px; margin-bottom: 14px; }

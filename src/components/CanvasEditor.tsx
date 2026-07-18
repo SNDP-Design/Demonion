@@ -14,6 +14,67 @@ interface CanvasEditorProps {
 
 const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
 
+const calculateLayout = (
+  settings: EditorSettings,
+  videoWidth: number,
+  videoHeight: number,
+  cw: number,
+  ch: number,
+  showWebcamOverlay: boolean
+) => {
+  const renderScale = settings.exportResolution === '4k' ? 2 : 1;
+  const defaultFrameRatio = (() => {
+    switch (settings.aspectRatio) {
+      case '16-10':
+        return 10 / 16;
+      case '16-9':
+        return 9 / 16;
+      case '9-16':
+        return 16 / 9;
+      case '1-1':
+        return 1;
+      case '4-3':
+        return 3 / 4;
+    }
+  })();
+  const frameRatio = videoWidth && videoHeight
+    ? videoHeight / videoWidth
+    : defaultFrameRatio;
+
+  const isSideCamera = showWebcamOverlay && (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right');
+  const baseCardW = cw * 0.8;
+  const defaultCardW = baseCardW * settings.scale;
+  const sideOuterMargin = isSideCamera ? 16 * renderScale : 0;
+  const sideGap = isSideCamera ? 16 * renderScale : 0;
+  const sideCameraH = isSideCamera ? Math.min(settings.cameraSize * 2.5 * renderScale, ch * 0.56) : 0;
+  const sideCameraW = isSideCamera ? sideCameraH / SIDE_CAMERA_HEIGHT_TO_WIDTH : 0;
+  const sideCardW = Math.max(cw * 0.48, cw - sideOuterMargin * 2 - sideCameraW - sideGap);
+  const finalW = isSideCamera ? sideCardW : defaultCardW;
+  const finalH = finalW * frameRatio;
+  const headerH = settings.macOSHeader ? 32 : 0;
+  const totalH = finalH + headerH;
+
+  const groupW = isSideCamera ? finalW + sideGap + sideCameraW : finalW;
+  const groupX = isSideCamera ? sideOuterMargin : (cw - groupW) / 2;
+  const x0 = isSideCamera && settings.cameraPosition === 'side-left' ? groupX + sideCameraW + sideGap : groupX;
+  const y0 = (ch - totalH) / 2;
+
+  return { x0, y0, finalW, finalH, headerH, totalH, isSideCamera, sideCameraW, sideCameraH, sideGap, groupX, renderScale };
+};
+
+const getContainRect = (sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number) => {
+  const sourceRatio = sourceWidth / sourceHeight;
+  const targetRatio = targetWidth / targetHeight;
+
+  if (sourceRatio > targetRatio) {
+    const height = targetWidth / sourceRatio;
+    return { dx: 0, dy: (targetHeight - height) / 2, dw: targetWidth, dh: height };
+  }
+
+  const width = targetHeight * sourceRatio;
+  return { dx: (targetWidth - width) / 2, dy: 0, dw: width, dh: targetHeight };
+};
+
 export const CanvasEditor: React.FC<CanvasEditorProps> = ({
   canvasRef,
   onCanvasElementChange,
@@ -81,28 +142,42 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
     if (!videoElement || !onAddClickMoment) return;
 
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / Math.max(rect.width, 1)));
-    const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / Math.max(rect.height, 1)));
+    const canvasX = ((event.clientX - rect.left) / rect.width) * event.currentTarget.width;
+    const canvasY = ((event.clientY - rect.top) / rect.height) * event.currentTarget.height;
+
+    const cw = event.currentTarget.width;
+    const ch = event.currentTarget.height;
+    const vWidth = videoElement.videoWidth || 1920;
+    const vHeight = videoElement.videoHeight || 1080;
+
+    let targetX: number;
+    let targetY: number;
+    let targetWidth: number;
+    let targetHeight: number;
+
+    if (settings.layoutMode === 'screen-only') {
+      const target = getContainRect(vWidth, vHeight, cw, ch);
+      targetX = target.dx;
+      targetY = target.dy;
+      targetWidth = target.dw;
+      targetHeight = target.dh;
+    } else {
+      const layout = calculateLayout(settings, vWidth, vHeight, cw, ch, showWebcamOverlay);
+      targetX = layout.x0;
+      targetY = layout.y0 + layout.headerH;
+      targetWidth = layout.finalW;
+      targetHeight = layout.finalH;
+    }
+
+    const x = Math.min(1, Math.max(0, (canvasX - targetX) / Math.max(targetWidth, 1)));
+    const y = Math.min(1, Math.max(0, (canvasY - targetY) / Math.max(targetHeight, 1)));
 
     onAddClickMoment({
       time: Math.max(0, videoElement.currentTime - 0.22),
       x,
       y
     });
-  }, [onAddClickMoment, videoElement]);
-
-  const getContainRect = (sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number) => {
-    const sourceRatio = sourceWidth / sourceHeight;
-    const targetRatio = targetWidth / targetHeight;
-
-    if (sourceRatio > targetRatio) {
-      const height = targetWidth / sourceRatio;
-      return { dx: 0, dy: (targetHeight - height) / 2, dw: targetWidth, dh: height };
-    }
-
-    const width = targetHeight * sourceRatio;
-    return { dx: (targetWidth - width) / 2, dy: 0, dw: width, dh: targetHeight };
-  };
+  }, [onAddClickMoment, videoElement, settings, showWebcamOverlay]);
 
   // Canvas drawing loop
   useEffect(() => {
@@ -297,41 +372,26 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillRect(Math.random() * cw, Math.random() * ch, 2, 2);
       }
 
-      const defaultFrameRatio = (() => {
-        switch (settings.aspectRatio) {
-          case '16-10':
-            return 10 / 16;
-          case '16-9':
-            return 9 / 16;
-          case '9-16':
-            return 16 / 9;
-          case '1-1':
-            return 1;
-          case '4-3':
-            return 3 / 4;
-        }
-      })();
-      const frameRatio = videoElement?.videoWidth && videoElement.videoHeight
-        ? videoElement.videoHeight / videoElement.videoWidth
-        : defaultFrameRatio;
-
-      const isSideCamera = showWebcamOverlay && (settings.cameraPosition === 'side-left' || settings.cameraPosition === 'side-right');
-      const baseCardW = cw * 0.8;
-      const defaultCardW = baseCardW * settings.scale;
-      const sideOuterMargin = isSideCamera ? 16 * renderScale : 0;
-      const sideGap = isSideCamera ? 16 * renderScale : 0;
-      const sideCameraH = isSideCamera ? Math.min(settings.cameraSize * 2.5 * renderScale, ch * 0.56) : 0;
-      const sideCameraW = isSideCamera ? sideCameraH / SIDE_CAMERA_HEIGHT_TO_WIDTH : 0;
-      const sideCardW = Math.max(cw * 0.48, cw - sideOuterMargin * 2 - sideCameraW - sideGap);
-      const finalW = isSideCamera ? sideCardW : defaultCardW;
-      const finalH = finalW * frameRatio;
-      const headerH = settings.macOSHeader ? 32 : 0;
-      const totalH = finalH + headerH;
-
-      const groupW = isSideCamera ? finalW + sideGap + sideCameraW : finalW;
-      const groupX = isSideCamera ? sideOuterMargin : (cw - groupW) / 2;
-      const x0 = isSideCamera && settings.cameraPosition === 'side-left' ? groupX + sideCameraW + sideGap : groupX;
-      const y0 = (ch - totalH) / 2;
+      const {
+        x0,
+        y0,
+        finalW,
+        finalH,
+        headerH,
+        totalH,
+        isSideCamera,
+        sideCameraW,
+        sideCameraH,
+        sideGap,
+        groupX
+      } = calculateLayout(
+        settings,
+        videoElement?.videoWidth || 0,
+        videoElement?.videoHeight || 0,
+        cw,
+        ch,
+        showWebcamOverlay
+      );
 
       const drawCamera = (cameraX: number, cameraY: number, cameraW: number, cameraH: number, shadow = false, cornerRoundness = 0.2) => {
         const r = Math.min(cameraW, cameraH) / 2;
