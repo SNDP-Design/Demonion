@@ -143,18 +143,25 @@ const legalPages: Record<LegalPageKey, {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
   const [activeMode, setActiveMode] = useState(0);
+  const [activeBgPreset, setActiveBgPreset] = useState('nebula');
+  const [activeCamShape, setActiveCamShape] = useState<'circle' | 'rounded'>('rounded');
+  const [activeCamPos, setActiveCamPos] = useState<'bottom-right' | 'top-right' | 'side-right'>('bottom-right');
+
   const active = previewModes[activeMode];
   const ActiveIcon = active.icon;
   const path = window.location.pathname;
   const legalPageKey = path === '/terms' ? 'terms' : path === '/privacy' ? 'privacy' : null;
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handlePointerMove = (e: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>) => {
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
     card.style.setProperty('--mouse-x', `${x}px`);
     card.style.setProperty('--mouse-y', `${y}px`);
+    card.setAttribute('data-active', 'true');
   };
 
   if (legalPageKey) {
@@ -165,6 +172,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
       </main>
     );
   }
+
+  const bgGradientMap: Record<string, string> = {
+    sunset: 'linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%)',
+    cyberpunk: 'linear-gradient(135deg, #a855f7 0%, #06b6d4 100%)',
+    aurora: 'linear-gradient(135deg, #10b981 0%, #06b6d4 50%, #3b82f6 100%)',
+    nebula: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #db2777 100%)',
+  };
 
   return (
     <main className="monza-landing" id="home">
@@ -214,19 +228,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         </div>
       </section>
 
+      {/* Interactive Framer Studio Preview Shell */}
       <section 
         className="monza-preview-shell" 
         aria-label="Interactive Demonion preview"
-        onMouseMove={handleMouseMove}
+        onMouseMove={handlePointerMove}
+        onTouchStart={handlePointerMove}
+        onTouchMove={handlePointerMove}
       >
         <div className="monza-preview-top">
-          <div><DemonionLogo /><b>Demonion Studio</b></div>
-          <span><i /> Ready to record</span>
+          <div><DemonionLogo /><b>Demonion Studio Interactive Demo</b></div>
+          <div className="monza-interactive-badge">
+            <span className="live-pulse-dot" /> Try changing controls below
+          </div>
         </div>
         <div className="monza-preview-grid">
-          <div className={`monza-stage ${active.className}`}>
+          <div 
+            className={`monza-stage ${active.className}`}
+            style={activeMode === 1 ? { background: bgGradientMap[activeBgPreset] } : undefined}
+          >
             <div className="monza-screen">
-              <div className="monza-browser"><i /><i /><i /><span>demo-recording</span></div>
+              <div className="monza-browser"><i /><i /><i /><span>demo-recording.mp4</span></div>
               <div className="monza-screen-content">
                 <aside><i /><i /><i /><i /></aside>
                 <div>
@@ -237,17 +259,105 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
                 </div>
               </div>
             </div>
-            <div className="monza-camera">CAM</div>
+            
+            {/* Interactive Camera Bubble */}
+            {activeMode !== 0 && (
+              <div 
+                className={`monza-camera ${activeCamShape} pos-${activeCamPos}`}
+              >
+                CAM
+              </div>
+            )}
+
             <div className="monza-timeline"><i /><i /><i /><i /><b /></div>
           </div>
+
           <div className="monza-mode-list">
+            <div className="monza-control-group-title">Layout Mode</div>
             {previewModes.map((mode, index) => (
               <button key={mode.label} onClick={() => setActiveMode(index)} className={activeMode === index ? 'active' : ''}>
                 <mode.icon size={17} />
                 <span>{mode.label}</span>
               </button>
             ))}
+
+            {activeMode === 1 && (
+              <>
+                <div className="monza-control-group-title" style={{ marginTop: '16px' }}>Canvas Preset</div>
+                <div className="monza-preset-chips">
+                  {Object.keys(bgGradientMap).map((presetKey) => (
+                    <button
+                      key={presetKey}
+                      onClick={() => setActiveBgPreset(presetKey)}
+                      className={`preset-chip ${activeBgPreset === presetKey ? 'active' : ''}`}
+                      style={{ background: bgGradientMap[presetKey] }}
+                      title={presetKey}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+
+            <div className="monza-control-group-title" style={{ marginTop: '16px' }}>Camera Style & Position</div>
+            <div className="monza-cam-style-row">
+              <button
+                onClick={() => setActiveCamShape('circle')}
+                className={`cam-style-btn ${activeCamShape === 'circle' ? 'active' : ''}`}
+              >
+                Circle
+              </button>
+              <button
+                onClick={() => setActiveCamShape('rounded')}
+                className={`cam-style-btn ${activeCamShape === 'rounded' ? 'active' : ''}`}
+              >
+                Rounded
+              </button>
+            </div>
+            <div className="monza-cam-style-row" style={{ marginTop: '8px' }}>
+              <button
+                onClick={() => setActiveCamPos('bottom-right')}
+                className={`cam-style-btn ${activeCamPos === 'bottom-right' ? 'active' : ''}`}
+              >
+                Bottom Right
+              </button>
+              <button
+                onClick={() => setActiveCamPos('top-right')}
+                className={`cam-style-btn ${activeCamPos === 'top-right' ? 'active' : ''}`}
+              >
+                Top Right
+              </button>
+              <button
+                onClick={() => setActiveCamPos('side-right')}
+                className={`cam-style-btn ${activeCamPos === 'side-right' ? 'active' : ''}`}
+              >
+                Side 5:4
+              </button>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Infinite Framer Ticker Marquee Band */}
+      <section className="framer-marquee-ribbon" aria-label="Feature highlights">
+        <div className="framer-marquee-track">
+          {[
+            '⚡ 4K Ultra HD Export',
+            '🎥 Screen & Camera Overlay',
+            '🎨 Framed & Styled Backgrounds',
+            '✂️ Precise Video Trimming',
+            '🔒 100% Local & Private Processing',
+            '🚀 Zero Installation Needed',
+            '⚡ 4K Ultra HD Export',
+            '🎥 Screen & Camera Overlay',
+            '🎨 Framed & Styled Backgrounds',
+            '✂️ Precise Video Trimming',
+            '🔒 100% Local & Private Processing',
+            '🚀 Zero Installation Needed',
+          ].map((item, i) => (
+            <div key={i} className="framer-marquee-badge">
+              {item}
+            </div>
+          ))}
         </div>
       </section>
 
@@ -267,7 +377,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         </div>
         <div className="monza-feature-grid">
           {featureRows.map((feature) => (
-            <article key={feature.title}>
+            <article 
+              key={feature.title}
+              onMouseMove={handlePointerMove}
+              onTouchStart={handlePointerMove}
+              onTouchMove={handlePointerMove}
+            >
               <feature.icon size={22} />
               <h4>{feature.title}</h4>
               <p>{feature.copy}</p>

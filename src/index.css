@@ -4896,4 +4896,189 @@ aside.sidebar {
   transform: scale(1.15) rotate(6deg) !important;
 }
 
+/* Framer Touch & Interactive Landing Extensions */
+.monza-hero h1 {
+  font-size: clamp(32px, 7vw, 76px) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.03em !important;
+}
+
+.monza-hero h1 span {
+  white-space: normal !important;
+}
+
+.monza-interactive-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #c084fc;
+  background: rgba(192, 132, 252, 0.12);
+  border: 1px solid rgba(192, 132, 252, 0.25);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #c084fc;
+  box-shadow: 0 0 10px #c084fc;
+  animation: pulse-glow 1.8s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.monza-control-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(238, 203, 255, 0.6);
+  margin-bottom: 8px;
+}
+
+.monza-preset-chips {
+  display: flex;
+  gap: 8px;
+}
+
+.preset-chip {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.preset-chip:hover,
+.preset-chip.active {
+  transform: scale(1.18);
+  border-color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+}
+
+.monza-cam-style-row {
+  display: flex;
+  gap: 8px;
+}
+
+.cam-style-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(238, 203, 255, 0.8);
+  background: rgba(238, 203, 255, 0.06);
+  border: 1px solid rgba(190, 167, 255, 0.16);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cam-style-btn.active,
+.cam-style-btn:hover {
+  color: #ffffff;
+  background: rgba(102, 51, 238, 0.35);
+  border-color: rgba(190, 167, 255, 0.4);
+}
+
+/* Framer Marquee Ticker Ribbon */
+.framer-marquee-ribbon {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  margin-top: 60px;
+  margin-bottom: 60px;
+  overflow: hidden;
+  border-top: 1px solid rgba(190, 167, 255, 0.12);
+  border-bottom: 1px solid rgba(190, 167, 255, 0.12);
+  background: rgba(8, 4, 28, 0.5);
+  padding: 18px 0;
+  backdrop-filter: blur(8px);
+}
+
+.framer-marquee-track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+  animation: framer-ticker 32s linear infinite;
+}
+
+.framer-marquee-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #eecbff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+@keyframes framer-ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Touch-active spotlight enhancement */
+.monza-preview-shell[data-active="true"]::before,
+.monza-feature-grid article[data-active="true"]::before {
+  opacity: 1 !important;
+}
+
+/* Mobile Responsive Layout Refinements */
+@media (max-width: 640px) {
+  .monza-landing {
+    padding: 0 16px !important;
+  }
+
+  .monza-hero {
+    padding: 48px 0 32px !important;
+    min-height: auto !important;
+  }
+
+  .monza-hero h1 {
+    font-size: clamp(26px, 8vw, 42px) !important;
+    line-height: 1.15 !important;
+  }
+
+  .monza-hero p {
+    font-size: 15px !important;
+  }
+
+  .monza-preview-shell {
+    margin-bottom: 40px !important;
+  }
+
+  .monza-logos,
+  .monza-section,
+  .monza-band,
+  .monza-stats,
+  .monza-split,
+  .monza-free-plan {
+    margin-top: 54px !important;
+    margin-bottom: 54px !important;
+  }
+
+  .monza-split {
+    padding-top: 36px !important;
+    padding-bottom: 36px !important;
+  }
+}
+
+
 
