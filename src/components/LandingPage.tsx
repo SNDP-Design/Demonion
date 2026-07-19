@@ -22,6 +22,7 @@ import { DemonionLogo } from './DemonionLogo';
 
 interface LandingPageProps {
   onOpenStudio: () => void;
+  onOpenAIDemo?: () => void;
 }
 
 const previewModes = [
@@ -141,7 +142,7 @@ const legalPages: Record<LegalPageKey, {
   },
 };
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, onOpenAIDemo }) => {
   const [activeMode, setActiveMode] = useState(0);
   const [activeBgPreset, setActiveBgPreset] = useState('nebula');
   const [activeCamShape, setActiveCamShape] = useState<'circle' | 'rounded'>('rounded');
@@ -218,8 +219,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
           right layout for tutorials, demos, updates, and support videos.
         </p>
         <div className="monza-actions">
-          <button onClick={onOpenStudio} className="framer-primary">Start Recording Now <ArrowRight size={17} /></button>
-          <a href="#features" className="monza-secondary">Explore features</a>
+          {onOpenAIDemo && (
+            <button onClick={onOpenAIDemo} className="framer-primary ai-hero-cta">
+              <Sparkles size={17} /> Create Demo (AI)
+            </button>
+          )}
+          <button onClick={onOpenStudio} className="monza-secondary">
+            Screen Recorder <ArrowRight size={15} />
+          </button>
         </div>
         <div className="monza-proof">
           <span><Check size={13} /> No install</span>

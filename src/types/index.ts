@@ -32,3 +32,54 @@ export interface ClickMoment {
   x: number;
   y: number;
 }
+
+export type AIDemoSceneType = 'hero' | 'feature_highlight' | 'workflow_demo' | 'analytics_spotlight' | 'cta_closing';
+
+export interface SubtitleCue {
+  id: string;
+  startTime: number;
+  endTime: number;
+  text: string;
+  activeWordIndex?: number;
+}
+
+export interface AIDemoScene {
+  id: string;
+  type: AIDemoSceneType;
+  startTime: number; // in seconds
+  duration: number; // in seconds (total 120s across scenes)
+  title: string;
+  subtitleText: string;
+  narrationScript: string;
+  highlights: string[];
+  gradientPresetId: string;
+  visualMockup: {
+    badgeText: string;
+    headline: string;
+    subheadline: string;
+    primaryBtnText: string;
+    secondaryBtnText: string;
+    metrics?: Array<{ label: string; value: string }>;
+    features?: Array<{ title: string; desc: string }>;
+  };
+}
+
+export interface AIDemoScript {
+  productName: string;
+  productTagline: string;
+  url: string;
+  domain: string;
+  scenes: AIDemoScene[];
+  totalDuration: number; // 120 seconds (2 mins)
+  subtitles: SubtitleCue[];
+}
+
+export interface AIDemoConfig {
+  showSubtitles: boolean;
+  subtitleStyle: 'glass-pill' | 'bold-yellow' | 'minimal-dark';
+  enableVoiceover: boolean;
+  voicePitch: number;
+  voiceRate: number;
+  voiceGender: 'female' | 'male';
+}
+

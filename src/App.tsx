@@ -6,6 +6,7 @@ import { CanvasEditor } from './components/CanvasEditor';
 import { Timeline } from './components/Timeline';
 import { ExportModal } from './components/ExportModal';
 import { LandingPage } from './components/LandingPage';
+import { AIDemoStudio } from './components/AIDemoStudio';
 import { DemonionLogo } from './components/DemonionLogo';
 import { 
   Video, 
@@ -13,7 +14,8 @@ import {
   Camera, 
   Download,
   ArrowRight,
-  RotateCcw
+  RotateCcw,
+  Sparkles
 } from 'lucide-react';
 
 const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
@@ -22,6 +24,7 @@ function App() {
   const [recordingState, setRecordingState] = useState<'idle' | 'recording' | 'editor'>('idle');
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
+  const [isAIDemoStudioOpen, setIsAIDemoStudioOpen] = useState(false);
   const [hideLandingNav, setHideLandingNav] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   
@@ -260,6 +263,10 @@ function App() {
 
   const openStudio = useCallback(() => {
     setIsRecordingModalOpen(true);
+  }, []);
+
+  const openAIDemoStudio = useCallback(() => {
+    setIsAIDemoStudioOpen(true);
   }, []);
 
   useEffect(() => {
@@ -712,6 +719,12 @@ function App() {
                 <span className="studio-toggle-track" />
               </label>
               <button 
+                onClick={openAIDemoStudio}
+                className="xg-button ai-create-demo-cta"
+              >
+                <Sparkles size={14} /> Create Demo
+              </button>
+              <button 
                 onClick={handleStartScreenRecording}
                 className="xg-button xg-button-primary"
               >
@@ -720,6 +733,12 @@ function App() {
             </div>
           ) : recordingState === 'editor' && (
           <div className="xg-nav-actions">
+            <button 
+              onClick={openAIDemoStudio}
+              className="xg-button ai-create-demo-cta"
+            >
+              <Sparkles size={14} /> Create Demo
+            </button>
             <button 
               onClick={() => {
                 if (window.confirm('Discard current video and start over?')) {
@@ -811,13 +830,16 @@ function App() {
                   <a href="/#ready">Ready</a>
                 </nav>
                 <div className="xg-nav-actions">
+                  <button onClick={openAIDemoStudio} className="xg-button ai-create-demo-cta">
+                    <Sparkles size={14} /> Create Demo
+                  </button>
                   <button onClick={openStudio} className="xg-button xg-button-primary">
                     Open studio <ArrowRight size={15} />
                   </button>
                 </div>
               </div>
             </header>
-            <LandingPage onOpenStudio={openStudio} />
+            <LandingPage onOpenStudio={openStudio} onOpenAIDemo={openAIDemoStudio} />
 
             {/* Floating Recording Bar */}
             {recordingState === 'recording' && (
@@ -1006,6 +1028,12 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* AI Demo Studio Modal */}
+      <AIDemoStudio 
+        isOpen={isAIDemoStudioOpen}
+        onClose={() => setIsAIDemoStudioOpen(false)}
+      />
 
     </main>
   );
