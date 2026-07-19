@@ -17,7 +17,9 @@ import {
   ArrowRight,
   Sliders,
   CheckCircle2,
-  Film
+  Film,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 
 interface AIDemoStudioProps {
@@ -57,6 +59,7 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
     geminiApiKey: ''
   });
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [canvasEl, setCanvasEl] = useState<HTMLCanvasElement | null>(null);
@@ -66,15 +69,45 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
 
   useEffect(() => {
     narratorRef.current = new AIVoiceoverNarrator();
+    
+    const handleFSChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFSChange);
+
     return () => {
       narratorRef.current?.stop();
+      document.removeEventListener('fullscreenchange', handleFSChange);
     };
+  }, []);
+
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      }).catch((err) => console.warn('Fullscreen failed:', err));
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().then(() => {
+          setIsFullscreen(false);
+        }).catch((err) => console.warn('Exit Fullscreen failed:', err));
+      }
+    }
   }, []);
 
   const handleGenerate = useCallback((targetUrl: string) => {
     if (!targetUrl.trim()) return;
     setStep('generating');
     setGenProgressStep(0);
+
+    // Auto trigger full screen mode when user submits website URL
+    if (document.documentElement && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      }).catch((err) => {
+        console.warn('Fullscreen auto-request deferred by browser:', err);
+      });
+    }
 
     const generated = generateAIDemoScript(targetUrl);
     setScript(generated);
@@ -263,8 +296,8 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
   };
 
   return (
-    <div className="ai-studio-overlay animate-fade-in">
-      <div className="ai-studio-window">
+    <div className={`ai-studio-overlay animate-fade-in ${isFullscreen || step === 'studio' ? 'is-fullscreen' : ''}`}>
+      <div className={`ai-studio-window ${isFullscreen || step === 'studio' ? 'is-fullscreen' : ''}`}>
         {/* Studio Top Navigation Header */}
         <header className="ai-studio-nav">
           <div className="ai-studio-brand">
@@ -276,6 +309,15 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
           </div>
 
           <div className="ai-studio-header-actions">
+            <button
+              onClick={toggleFullscreen}
+              className={`ai-header-btn ${isFullscreen ? 'active' : ''}`}
+              title="Toggle Full Screen View"
+            >
+              {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+              {isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
+            </button>
+
             {step === 'studio' && script && (
               <>
                 <button

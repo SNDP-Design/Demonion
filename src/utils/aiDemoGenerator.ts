@@ -214,7 +214,7 @@ export class AIVoiceoverNarrator {
 
   /**
    * Fetch audio binary from Google Gemini API using prebuilt voice (e.g. Kore)
-   * Automatically falls back across Gemini models in specified order if quota or API error occurs
+   * Calls secure backend API /api/gemini-tts first, falling back across models if needed.
    */
   public async fetchGeminiAudio(
     text: string, 
@@ -222,21 +222,55 @@ export class AIVoiceoverNarrator {
     apiKey?: string, 
     preferredModel: GeminiModelId = 'gemini-3.5-flash'
   ): Promise<string | null> {
+    const cacheKey = `${preferredModel}:${voiceName}:${text}`;
+    if (this.audioCache.has(cacheKey)) {
+      return this.audioCache.get(cacheKey)!;
+    }
+
+    // 1. Primary: Call secure backend serverless function (/api/gemini-tts) which holds GEMINI_API_KEY
+    try {
+      const backendRes = await fetch('/api/gemini-tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          voiceName,
+          preferredModel,
+          clientApiKey: apiKey
+        })
+      });
+
+      if (backendRes.ok) {
+        const result = await backendRes.json();
+        if (result.audioBase64) {
+          const mimeType = result.mimeType || 'audio/wav';
+          const byteCharacters = atob(result.audioBase64);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: mimeType });
+          const blobUrl = URL.createObjectURL(blob);
+
+          this.audioCache.set(cacheKey, blobUrl);
+          return blobUrl;
+        }
+      }
+    } catch (e) {
+      console.warn('Backend /api/gemini-tts call unavailable, attempting direct client fallback:', e);
+    }
+
+    // 2. Client-side fallback if client API key is provided
     const key = apiKey || import.meta.env.VITE_GEMINI_API_KEY;
     if (!key) return null;
 
-    // Construct model priority list starting from preferredModel, then falling back in order
     const startIdx = GEMINI_MODEL_FALLBACK_ORDER.indexOf(preferredModel);
     const modelsToTry = startIdx >= 0 
       ? [...GEMINI_MODEL_FALLBACK_ORDER.slice(startIdx), ...GEMINI_MODEL_FALLBACK_ORDER.slice(0, startIdx)]
       : GEMINI_MODEL_FALLBACK_ORDER;
 
     for (const model of modelsToTry) {
-      const cacheKey = `${model}:${voiceName}:${text}`;
-      if (this.audioCache.has(cacheKey)) {
-        return this.audioCache.get(cacheKey)!;
-      }
-
       try {
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
         const response = await fetch(endpoint, {
@@ -288,7 +322,6 @@ export class AIVoiceoverNarrator {
       }
     }
 
-    console.warn('All Gemini API models in fallback sequence were exhausted.');
     return null;
   }
 
