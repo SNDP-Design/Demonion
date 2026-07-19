@@ -5700,6 +5700,127 @@ aside.sidebar {
   box-shadow: 0 2px 8px rgba(168, 85, 247, 0.2);
 }
 
+.ai-voice-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #c084fc;
+  margin-right: 2px;
+}
+
+.ai-voice-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 4px;
+}
+
+.ai-key-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(238, 203, 255, 0.8);
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(192, 132, 252, 0.25);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 6px;
+}
+
+.ai-key-btn.active,
+.ai-key-btn:hover {
+  color: #ffffff;
+  background: rgba(168, 85, 247, 0.3);
+  border-color: rgba(192, 132, 252, 0.5);
+  box-shadow: 0 2px 10px rgba(168, 85, 247, 0.25);
+}
+
+.ai-apikey-drawer {
+  background: rgba(15, 10, 36, 0.96);
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-top: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.ai-apikey-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.ai-apikey-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.ai-close-mini {
+  background: transparent;
+  border: 0;
+  color: rgba(238, 203, 255, 0.6);
+  cursor: pointer;
+}
+
+.ai-close-mini:hover {
+  color: #ffffff;
+}
+
+.ai-apikey-desc {
+  font-size: 12px;
+  color: rgba(238, 203, 255, 0.7);
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.ai-apikey-desc code {
+  color: #c084fc;
+  background: rgba(192, 132, 252, 0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.ai-apikey-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.ai-apikey-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(192, 132, 252, 0.25);
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: #ffffff;
+  font-size: 12px;
+  font-family: monospace;
+  outline: none;
+}
+
+.ai-apikey-input:focus {
+  border-color: #c084fc;
+}
+
+.ai-apikey-save {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   .ai-studio-window {
     height: 98vh;
@@ -5714,6 +5835,7 @@ aside.sidebar {
     grid-template-columns: 1fr;
   }
 }
+
 
 
 

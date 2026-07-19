@@ -180,10 +180,12 @@ export function generateAIDemoScript(rawUrl: string): AIDemoScript {
   };
 }
 
-// Web Speech Synthesis Narrator Manager
+// Google Gemini API + Web Speech Synthesis Narrator Manager
 export class AIVoiceoverNarrator {
   private synth: SpeechSynthesis | null = null;
   private currentUtterance: SpeechSynthesisUtterance | null = null;
+  private currentAudioElement: HTMLAudioElement | null = null;
+  private audioCache: Map<string, string> = new Map(); // key -> blobUrl
   private isSpeaking = false;
 
   constructor() {
@@ -196,9 +198,125 @@ export class AIVoiceoverNarrator {
     return this.currentUtterance;
   }
 
-  public speakSceneScript(text: string, pitch = 1.0, rate = 1.0) {
-    if (!this.synth) return;
+  /**
+   * Fetch audio binary from Google Gemini API using prebuilt voice (e.g. Kore)
+   */
+  public async fetchGeminiAudio(
+    text: string, 
+    voiceName = 'Kore', 
+    apiKey?: string, 
+    model = 'gemini-2.5-flash'
+  ): Promise<string | null> {
+    const key = apiKey || import.meta.env.VITE_GEMINI_API_KEY;
+    if (!key) return null;
+
+    const cacheKey = `${model}:${voiceName}:${text}`;
+    if (this.audioCache.has(cacheKey)) {
+      return this.audioCache.get(cacheKey)!;
+    }
+
+    try {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: `Narrate the following text clearly: ${text}` }]
+            }
+          ],
+          generationConfig: {
+            responseModalities: ['AUDIO'],
+            speechConfig: {
+              voiceConfig: {
+                prebuiltVoiceConfig: {
+                  voiceName: voiceName
+                }
+              }
+            }
+          }
+        })
+      });
+
+      if (!response.ok) {
+        console.warn('Gemini Audio API error:', response.statusText);
+        return null;
+      }
+
+      const data = await response.json();
+      const inlineData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+
+      if (inlineData && inlineData.data) {
+        const mimeType = inlineData.mimeType || 'audio/wav';
+        const byteCharacters = atob(inlineData.data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: mimeType });
+        const blobUrl = URL.createObjectURL(blob);
+
+        this.audioCache.set(cacheKey, blobUrl);
+        return blobUrl;
+      }
+    } catch (err) {
+      console.warn('Failed to generate Gemini AI audio:', err);
+    }
+
+    return null;
+  }
+
+  /**
+   * Speak scene narration using Google Gemini AI Voice (Kore) with Web Speech fallback
+   */
+  public async speakSceneScript(
+    text: string, 
+    pitch = 1.0, 
+    rate = 1.0, 
+    voiceName = 'Kore', 
+    apiKey?: string,
+    model = 'gemini-2.5-flash'
+  ) {
     this.stop();
+
+    const key = apiKey || import.meta.env.VITE_GEMINI_API_KEY;
+
+    // Try Google Gemini API Audio synthesis if key is present
+    if (key) {
+      const audioUrl = await this.fetchGeminiAudio(text, voiceName, key, model);
+      if (audioUrl) {
+        try {
+          const audio = new Audio(audioUrl);
+          audio.playbackRate = rate;
+          this.currentAudioElement = audio;
+          this.isSpeaking = true;
+
+          audio.onended = () => {
+            this.isSpeaking = false;
+            this.currentAudioElement = null;
+          };
+          audio.onerror = () => {
+            this.isSpeaking = false;
+            this.currentAudioElement = null;
+            this.speakWebSpeechFallback(text, pitch, rate);
+          };
+
+          await audio.play();
+          return;
+        } catch (e) {
+          console.warn('Gemini Audio playback failed, resorting to fallback:', e);
+        }
+      }
+    }
+
+    // Fallback to browser Web Speech API
+    this.speakWebSpeechFallback(text, pitch, rate);
+  }
+
+  private speakWebSpeechFallback(text: string, pitch = 1.0, rate = 1.0) {
+    if (!this.synth) return;
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.pitch = pitch;
@@ -207,7 +325,7 @@ export class AIVoiceoverNarrator {
 
     const voices = this.synth.getVoices();
     const preferredVoice = voices.find(
-      (v) => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Alex'))
+      (v) => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Karen') || v.name.includes('Zira'))
     ) || voices.find((v) => v.lang.startsWith('en'));
 
     if (preferredVoice) {
@@ -232,6 +350,11 @@ export class AIVoiceoverNarrator {
   }
 
   public stop() {
+    if (this.currentAudioElement) {
+      this.currentAudioElement.pause();
+      this.currentAudioElement.currentTime = 0;
+      this.currentAudioElement = null;
+    }
     if (this.synth) {
       this.synth.cancel();
     }
@@ -240,14 +363,21 @@ export class AIVoiceoverNarrator {
   }
 
   public pause() {
+    if (this.currentAudioElement) {
+      this.currentAudioElement.pause();
+    }
     if (this.synth && this.isSpeaking) {
       this.synth.pause();
     }
   }
 
   public resume() {
+    if (this.currentAudioElement) {
+      void this.currentAudioElement.play();
+    }
     if (this.synth) {
       this.synth.resume();
     }
   }
 }
+

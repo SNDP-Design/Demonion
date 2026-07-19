@@ -81,5 +81,9 @@ export interface AIDemoConfig {
   voicePitch: number;
   voiceRate: number;
   voiceGender: 'female' | 'male';
+  voiceName: 'Kore' | 'Puck' | 'Charon' | 'Fenrir' | 'Aoede';
+  voiceModel: 'gemini-2.5-flash' | 'gemini-3.1-flash-live-preview' | 'gemini-2.0-flash';
+  geminiApiKey?: string;
 }
+
 

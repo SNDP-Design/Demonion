@@ -51,8 +51,12 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
     enableVoiceover: true,
     voicePitch: 1.0,
     voiceRate: 1.0,
-    voiceGender: 'female'
+    voiceGender: 'female',
+    voiceName: 'Kore',
+    voiceModel: 'gemini-2.5-flash',
+    geminiApiKey: ''
   });
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [canvasEl, setCanvasEl] = useState<HTMLCanvasElement | null>(null);
@@ -126,7 +130,10 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
             narratorRef.current?.speakSceneScript(
               script.scenes[nextSceneIdx].narrationScript,
               config.voicePitch,
-              config.voiceRate
+              config.voiceRate,
+              config.voiceName,
+              config.geminiApiKey,
+              config.voiceModel
             );
           }
         }
@@ -145,7 +152,7 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
         playbackTimerRef.current = null;
       }
     };
-  }, [isPlaying, script, config.enableVoiceover, config.voicePitch, config.voiceRate]);
+  }, [isPlaying, script, config.enableVoiceover, config.voicePitch, config.voiceRate, config.voiceName, config.geminiApiKey, config.voiceModel]);
 
   const handleTogglePlay = () => {
     if (!script) return;
@@ -172,7 +179,10 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
         narratorRef.current?.speakSceneScript(
           activeScene.narrationScript,
           config.voicePitch,
-          config.voiceRate
+          config.voiceRate,
+          config.voiceName,
+          config.geminiApiKey,
+          config.voiceModel
         );
       }
     }
@@ -497,8 +507,26 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
                 </div>
 
                 <div className="ai-voice-controls">
-                  <Sliders size={14} />
-                  <span>Voice Rate:</span>
+                  <div className="ai-voice-badge" title="Google Gemini AI Voice Model">
+                    <Sparkles size={12} className="text-purple-400" />
+                    <span>Gemini Voice:</span>
+                  </div>
+
+                  {(['Kore', 'Puck', 'Charon', 'Fenrir', 'Aoede'] as const).map((vName) => (
+                    <button
+                      key={vName}
+                      onClick={() => setConfig(prev => ({ ...prev, voiceName: vName }))}
+                      className={`ai-rate-chip ${config.voiceName === vName ? 'active' : ''}`}
+                      title={`Google Gemini AI Voice ${vName}`}
+                    >
+                      {vName}
+                    </button>
+                  ))}
+
+                  <div className="ai-voice-divider" />
+
+                  <Sliders size={13} />
+                  <span>Rate:</span>
                   {[0.9, 1.0, 1.15].map((rate) => (
                     <button
                       key={rate}
@@ -508,8 +536,47 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
                       {rate}x
                     </button>
                   ))}
+
+                  <button
+                    onClick={() => setShowApiKeyModal(!showApiKeyModal)}
+                    className={`ai-key-btn ${config.geminiApiKey ? 'active' : ''}`}
+                    title="Configure Google Gemini API Key for direct AI speech"
+                  >
+                    🔑 {config.geminiApiKey ? 'API Key Set' : 'Gemini Key'}
+                  </button>
                 </div>
               </div>
+
+              {/* Gemini API Key Config Drawer */}
+              {showApiKeyModal && (
+                <div className="ai-apikey-drawer animate-fade-in">
+                  <div className="ai-apikey-header">
+                    <div className="ai-apikey-title">
+                      <Sparkles size={14} className="text-purple-400" />
+                      <b>Google Gemini API Voice Settings</b>
+                    </div>
+                    <button onClick={() => setShowApiKeyModal(false)} className="ai-close-mini">
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <p className="ai-apikey-desc">
+                    Voice <b>Kore</b> is powered by <code>gemini-2.5-flash</code> / <code>gemini-3.1-flash-live-preview</code> TTS API.
+                    Enter your free Google Gemini API key below for ultra-realistic narration:
+                  </p>
+                  <div className="ai-apikey-input-row">
+                    <input
+                      type="password"
+                      value={config.geminiApiKey || ''}
+                      onChange={(e) => setConfig(prev => ({ ...prev, geminiApiKey: e.target.value }))}
+                      placeholder="AIzaSy..."
+                      className="ai-apikey-input"
+                    />
+                    <button onClick={() => setShowApiKeyModal(false)} className="ai-apikey-save">
+                      Save & Apply Voice
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -517,3 +584,4 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
     </div>
   );
 };
+
