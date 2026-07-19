@@ -258,7 +258,7 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
         {/* Studio Top Navigation Header */}
         <header className="ai-studio-nav">
           <div className="ai-studio-brand">
-            <DemonionLogo />
+            <DemonionLogo size={28} />
             <div>
               <h3>Demonion AI Studio</h3>
               <span>2-Min 4K 60fps Demo Generator</span>

@@ -244,7 +244,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, onOpenAI
         onTouchMove={handlePointerMove}
       >
         <div className="monza-preview-top">
-          <div><DemonionLogo /><b>Demonion Studio Interactive Demo</b></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><DemonionLogo size={22} /><b>Demonion Studio Interactive Demo</b></div>
           <div className="monza-interactive-badge">
             <span className="live-pulse-dot" /> Try changing controls below
           </div>
@@ -539,7 +539,7 @@ const Footer: React.FC = () => (
       {/* Brand Column */}
       <div className="footer-column brand-col">
         <a href="/" className="footer-brand-info">
-          <span className="footer-logo-wrapper"><DemonionLogo /></span>
+          <span className="footer-logo-wrapper"><DemonionLogo size={28} /></span>
           <div>
             <span className="footer-brand-name">Demonion</span>
             <span className="footer-brand-tagline">Browser recording studio</span>

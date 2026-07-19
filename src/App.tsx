@@ -688,7 +688,7 @@ function App() {
       {!showLandingPage && <header className="xg-nav select-none studio-nav">
         <div className="xg-nav-inner studio-nav-inner">
           <a href="/" className="xg-brand">
-            <div className="xg-brand-mark"><DemonionLogo /></div>
+            <div className="xg-brand-mark"><DemonionLogo size={24} /></div>
             <div>
               <h1>Demonion</h1>
             </div>
@@ -818,7 +818,7 @@ function App() {
             <header className={`xg-nav landing-nav select-none ${hideLandingNav ? 'landing-nav-hidden' : ''}`}>
               <div className="xg-nav-inner">
                 <a href="/" className="xg-brand">
-                  <div className="xg-brand-mark"><DemonionLogo /></div>
+                  <div className="xg-brand-mark"><DemonionLogo size={24} /></div>
                   <div>
                     <h1>Demonion</h1>
                   </div>
