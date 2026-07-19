@@ -719,12 +719,6 @@ function App() {
                 <span className="studio-toggle-track" />
               </label>
               <button 
-                onClick={openAIDemoStudio}
-                className="xg-button ai-create-demo-cta"
-              >
-                <Sparkles size={14} /> Create Demo
-              </button>
-              <button 
                 onClick={handleStartScreenRecording}
                 className="xg-button xg-button-primary"
               >
@@ -733,12 +727,6 @@ function App() {
             </div>
           ) : recordingState === 'editor' && (
           <div className="xg-nav-actions">
-            <button 
-              onClick={openAIDemoStudio}
-              className="xg-button ai-create-demo-cta"
-            >
-              <Sparkles size={14} /> Create Demo
-            </button>
             <button 
               onClick={() => {
                 if (window.confirm('Discard current video and start over?')) {
@@ -830,16 +818,13 @@ function App() {
                   <a href="/#ready">Ready</a>
                 </nav>
                 <div className="xg-nav-actions">
-                  <button onClick={openAIDemoStudio} className="xg-button ai-create-demo-cta">
-                    <Sparkles size={14} /> Create Demo
-                  </button>
                   <button onClick={openStudio} className="xg-button xg-button-primary">
                     Open studio <ArrowRight size={15} />
                   </button>
                 </div>
               </div>
             </header>
-            <LandingPage onOpenStudio={openStudio} onOpenAIDemo={openAIDemoStudio} />
+            <LandingPage onOpenStudio={openStudio} />
 
             {/* Floating Recording Bar */}
             {recordingState === 'recording' && (
