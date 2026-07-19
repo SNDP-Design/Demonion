@@ -180,6 +180,20 @@ export function generateAIDemoScript(rawUrl: string): AIDemoScript {
   };
 }
 
+import type { GeminiModelId } from '../types';
+
+export const GEMINI_MODEL_FALLBACK_ORDER: GeminiModelId[] = [
+  'gemini-3.5-flash',
+  'gemini-3.1-pro-preview',
+  'gemini-3-flash-preview',
+  'gemini-3.1-flash-lite',
+  'gemini-3.1-flash-lite-preview',
+  'gemini-2.5-pro',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-2.0-flash'
+];
+
 // Google Gemini API + Web Speech Synthesis Narrator Manager
 export class AIVoiceoverNarrator {
   private synth: SpeechSynthesis | null = null;
@@ -200,71 +214,81 @@ export class AIVoiceoverNarrator {
 
   /**
    * Fetch audio binary from Google Gemini API using prebuilt voice (e.g. Kore)
+   * Automatically falls back across Gemini models in specified order if quota or API error occurs
    */
   public async fetchGeminiAudio(
     text: string, 
     voiceName = 'Kore', 
     apiKey?: string, 
-    model = 'gemini-2.5-flash'
+    preferredModel: GeminiModelId = 'gemini-3.5-flash'
   ): Promise<string | null> {
     const key = apiKey || import.meta.env.VITE_GEMINI_API_KEY;
     if (!key) return null;
 
-    const cacheKey = `${model}:${voiceName}:${text}`;
-    if (this.audioCache.has(cacheKey)) {
-      return this.audioCache.get(cacheKey)!;
-    }
+    // Construct model priority list starting from preferredModel, then falling back in order
+    const startIdx = GEMINI_MODEL_FALLBACK_ORDER.indexOf(preferredModel);
+    const modelsToTry = startIdx >= 0 
+      ? [...GEMINI_MODEL_FALLBACK_ORDER.slice(startIdx), ...GEMINI_MODEL_FALLBACK_ORDER.slice(0, startIdx)]
+      : GEMINI_MODEL_FALLBACK_ORDER;
 
-    try {
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: `Narrate the following text clearly: ${text}` }]
-            }
-          ],
-          generationConfig: {
-            responseModalities: ['AUDIO'],
-            speechConfig: {
-              voiceConfig: {
-                prebuiltVoiceConfig: {
-                  voiceName: voiceName
+    for (const model of modelsToTry) {
+      const cacheKey = `${model}:${voiceName}:${text}`;
+      if (this.audioCache.has(cacheKey)) {
+        return this.audioCache.get(cacheKey)!;
+      }
+
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [{ text: `Narrate the following text clearly: ${text}` }]
+              }
+            ],
+            generationConfig: {
+              responseModalities: ['AUDIO'],
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: {
+                    voiceName: voiceName
+                  }
                 }
               }
             }
-          }
-        })
-      });
+          })
+        });
 
-      if (!response.ok) {
-        console.warn('Gemini Audio API error:', response.statusText);
-        return null;
-      }
-
-      const data = await response.json();
-      const inlineData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData;
-
-      if (inlineData && inlineData.data) {
-        const mimeType = inlineData.mimeType || 'audio/wav';
-        const byteCharacters = atob(inlineData.data);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        if (!response.ok) {
+          console.warn(`Gemini API model ${model} response status ${response.status}. Attempting fallback to next model in sequence...`);
+          continue;
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: mimeType });
-        const blobUrl = URL.createObjectURL(blob);
 
-        this.audioCache.set(cacheKey, blobUrl);
-        return blobUrl;
+        const data = await response.json();
+        const inlineData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+
+        if (inlineData && inlineData.data) {
+          const mimeType = inlineData.mimeType || 'audio/wav';
+          const byteCharacters = atob(inlineData.data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: mimeType });
+          const blobUrl = URL.createObjectURL(blob);
+
+          this.audioCache.set(cacheKey, blobUrl);
+          return blobUrl;
+        }
+      } catch (err) {
+        console.warn(`Gemini API model ${model} fetch failed. Attempting next fallback model...`, err);
       }
-    } catch (err) {
-      console.warn('Failed to generate Gemini AI audio:', err);
     }
 
+    console.warn('All Gemini API models in fallback sequence were exhausted.');
     return null;
   }
 
@@ -277,7 +301,7 @@ export class AIVoiceoverNarrator {
     rate = 1.0, 
     voiceName = 'Kore', 
     apiKey?: string,
-    model = 'gemini-2.5-flash'
+    model: GeminiModelId = 'gemini-3.5-flash'
   ) {
     this.stop();
 

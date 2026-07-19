@@ -53,7 +53,7 @@ export const AIDemoStudio: React.FC<AIDemoStudioProps> = ({ isOpen, onClose }) =
     voiceRate: 1.0,
     voiceGender: 'female',
     voiceName: 'Kore',
-    voiceModel: 'gemini-2.5-flash',
+    voiceModel: 'gemini-3.5-flash',
     geminiApiKey: ''
   });
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
