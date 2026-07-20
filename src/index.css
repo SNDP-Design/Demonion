@@ -2676,9 +2676,11 @@ aside.sidebar {
 
 .monza-hero {
   min-height: auto;
-  display: grid;
-  place-items: center;
-  padding: 44px 0 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0 12px;
   text-align: center;
 }
 
@@ -2686,7 +2688,7 @@ aside.sidebar {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
+  padding: 5px 13px;
   border: 1px solid rgba(255,255,255,.12);
   border-radius: 999px;
   color: #d4d4d8;
@@ -2698,13 +2700,13 @@ aside.sidebar {
 
 .monza-hero h1 {
   max-width: 1080px;
-  margin: 12px auto 10px;
+  margin: 10px auto 8px;
   color: #fff;
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
-  font-size: 80px;
+  font-size: clamp(32px, 5.8vw, 66px);
   font-weight: 800;
-  line-height: 1.18;
-  letter-spacing: 0;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
   text-align: center;
 }
 
@@ -2714,18 +2716,19 @@ aside.sidebar {
 }
 
 .monza-hero p {
-  max-width: 650px;
+  max-width: 620px;
   margin: 0 auto;
   color: #a1a1aa;
-  font-size: 16px;
-  line-height: 1.55;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .monza-actions {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
 .monza-secondary {
@@ -2748,7 +2751,7 @@ aside.sidebar {
   justify-content: center;
   flex-wrap: wrap;
   gap: 18px;
-  margin-top: 14px;
+  margin-top: 10px;
   color: #8f8f98;
   font-size: 12px;
 }
@@ -4871,9 +4874,10 @@ aside.sidebar {
 
 /* Framer Touch & Interactive Landing Extensions */
 .monza-hero h1 {
-  font-size: clamp(32px, 7vw, 76px) !important;
-  line-height: 1.1 !important;
+  font-size: clamp(32px, 5.5vw, 68px) !important;
+  line-height: 1.15 !important;
   letter-spacing: -0.03em !important;
+  margin: 10px auto 8px !important;
 }
 
 .monza-hero h1 span {
