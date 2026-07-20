@@ -22,7 +22,6 @@ import { DemonionLogo } from './DemonionLogo';
 
 interface LandingPageProps {
   onOpenStudio: () => void;
-  onOpenAIDemo?: () => void;
 }
 
 const previewModes = [
@@ -142,7 +141,7 @@ const legalPages: Record<LegalPageKey, {
   },
 };
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, onOpenAIDemo }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
   const [activeMode, setActiveMode] = useState(0);
   const [activeBgPreset, setActiveBgPreset] = useState('nebula');
   const [activeCamShape, setActiveCamShape] = useState<'circle' | 'rounded'>('rounded');
