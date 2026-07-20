@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Gauge, Pause, Play, RotateCcw, Scissors } from 'lucide-react';
 
 interface TimelineProps {
@@ -13,9 +14,18 @@ interface TimelineProps {
   onPlaybackRateChange: (rate: number) => void;
 }
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-
-export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTimeUpdate, isPlaying, onTogglePlay, trimStart, trimEnd, onTrimChange, playbackRate, onPlaybackRateChange }) => {
+export const Timeline: React.FC<TimelineProps> = ({
+  duration,
+  currentTime,
+  onTimeUpdate,
+  isPlaying,
+  onTogglePlay,
+  trimStart,
+  trimEnd,
+  onTrimChange,
+  playbackRate,
+  onPlaybackRateChange
+}) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const [draggingItem, setDraggingItem] = useState<'playhead' | 'trim-start' | 'trim-end' | null>(null);
   const endTime = trimEnd > 0 ? trimEnd : duration;
@@ -76,10 +86,8 @@ export const Timeline: React.FC<TimelineProps> = ({ duration, currentTime, onTim
             <button onMouseDown={(event) => { event.stopPropagation(); setDraggingItem('trim-end'); }} className="video-editor-handle" style={{ left: `calc(${trimEndPercent}% - 7px)` }} aria-label="Trim end" title="Drag to trim the ending" />
             <button onMouseDown={(event) => { event.stopPropagation(); setDraggingItem('playhead'); }} className="video-editor-playhead" style={{ left: `${progressPercent}%` }} aria-label="Drag playhead" title="Drag to scrub timeline"><i /></button>
           </div>
-
         </div>
       </div>
-
     </section>
   );
 };

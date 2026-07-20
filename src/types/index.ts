@@ -32,7 +32,3 @@ export interface ClickMoment {
   x: number;
   y: number;
 }
-
-
-
-
