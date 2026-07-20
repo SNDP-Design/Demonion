@@ -193,21 +193,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, onOpenAI
         <div className="framer-glow-circle framer-glow-3" />
       </div>
 
-      {/* Floating soundwave lines */}
-      <div className="framer-floating-wave">
-        <svg viewBox="0 0 1440 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 80 C 240 120, 480 40, 720 80 C 960 120, 1200 40, 1440 80" stroke="url(#wave-gradient)" strokeWidth="1.5" strokeOpacity="0.3"/>
-          <path d="M0 120 C 300 60, 600 140, 900 80 C 1200 20, 1350 140, 1440 120" stroke="url(#wave-gradient)" strokeWidth="1.0" strokeOpacity="0.15"/>
-          <defs>
-            <linearGradient id="wave-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#a855f7" />
-              <stop offset="50%" stopColor="#3b82f6" />
-              <stop offset="100%" stopColor="#ec4899" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-
       <section className="monza-hero">
         <div className="monza-badge"><Sparkles size={14} /> Screen recording studio for clear demos</div>
         <h1>

@@ -6,7 +6,6 @@ import { CanvasEditor } from './components/CanvasEditor';
 import { Timeline } from './components/Timeline';
 import { ExportModal } from './components/ExportModal';
 import { LandingPage } from './components/LandingPage';
-import { AIDemoStudio } from './components/AIDemoStudio';
 import { DemonionLogo } from './components/DemonionLogo';
 import { 
   Video, 
@@ -14,8 +13,7 @@ import {
   Camera, 
   Download,
   ArrowRight,
-  RotateCcw,
-  Sparkles
+  RotateCcw
 } from 'lucide-react';
 
 const SIDE_CAMERA_HEIGHT_TO_WIDTH = 5 / 4;
@@ -24,7 +22,6 @@ function App() {
   const [recordingState, setRecordingState] = useState<'idle' | 'recording' | 'editor'>('idle');
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
-  const [isAIDemoStudioOpen, setIsAIDemoStudioOpen] = useState(false);
   const [hideLandingNav, setHideLandingNav] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   
@@ -265,10 +262,6 @@ function App() {
     setIsRecordingModalOpen(true);
   }, []);
 
-  const openAIDemoStudio = useCallback(() => {
-    setIsAIDemoStudioOpen(true);
-  }, []);
-
   useEffect(() => {
     if (recordingState !== 'recording') return;
 
@@ -307,46 +300,6 @@ function App() {
       window.removeEventListener('keydown', handleKeyDown, true);
     };
   }, [recordingState, handleStopRecording]);
-
-  // Global click wave ripple effect for links, buttons, and editor controls
-  useEffect(() => {
-    const handleGlobalClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const clickable = target.closest('a') || 
-                        target.closest('button') || 
-                        target.closest('.video-editor-zoom-pill') || 
-                        target.closest('.video-editor-handle') ||
-                        target.closest('.flat-color-thumbnail') ||
-                        target.closest('.gradient-thumbnail');
-      if (!clickable) return;
-
-      // Create wave ripple container
-      const wave = document.createElement('div');
-      wave.className = 'click-wave-container';
-      wave.style.left = `${e.clientX}px`;
-      wave.style.top = `${e.clientY}px`;
-
-      // Create concentric rings
-      for (let i = 0; i < 3; i++) {
-        const ring = document.createElement('div');
-        ring.className = 'click-wave-ring';
-        ring.style.animationDelay = `${i * 0.12}s`;
-        wave.appendChild(ring);
-      }
-
-      document.body.appendChild(wave);
-
-      // Clean up wave elements after animation completes
-      setTimeout(() => {
-        wave.remove();
-      }, 1200);
-    };
-
-    window.addEventListener('click', handleGlobalClick, { capture: true, passive: true });
-    return () => {
-      window.removeEventListener('click', handleGlobalClick, { capture: true });
-    };
-  }, []);
 
   const handleLandingScroll = useCallback(() => {
     const scrollTop = landingScrollRef.current?.scrollTop ?? 0;
@@ -1013,12 +966,6 @@ function App() {
           </div>
         </div>
       )}
-
-      {/* AI Demo Studio Modal */}
-      <AIDemoStudio 
-        isOpen={isAIDemoStudioOpen}
-        onClose={() => setIsAIDemoStudioOpen(false)}
-      />
 
     </main>
   );
