@@ -3617,6 +3617,15 @@ aside.sidebar {
 
 .monza-secondary {
   color: #eecbff;
+  gap: 6px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.monza-secondary:hover {
+  background: rgba(190, 167, 255, 0.14);
+  border-color: rgba(190, 167, 255, 0.35);
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
 .monza-proof {

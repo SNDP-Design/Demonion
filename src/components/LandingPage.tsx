@@ -205,10 +205,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, onOpenAI
         </p>
         <div className="monza-actions">
           <button onClick={onOpenStudio} className="framer-primary">
-            Start Recording Now <ArrowRight size={17} />
+            <Video size={16} /> Start Recording Now <ArrowRight size={17} />
           </button>
           <a href="#features" className="monza-secondary">
-            Explore features
+            Explore features <ArrowRight size={15} />
           </a>
         </div>
         <div className="monza-proof">
