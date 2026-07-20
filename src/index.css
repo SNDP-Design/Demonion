@@ -2697,7 +2697,7 @@ aside.sidebar {
 
 .monza-hero h1 {
   max-width: 1080px;
-  margin: 22px auto 18px;
+  margin: 11px auto 9px;
   color: #fff;
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 80px;
@@ -2724,7 +2724,7 @@ aside.sidebar {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 28px;
+  margin-top: 14px;
 }
 
 .monza-secondary {
@@ -2747,7 +2747,7 @@ aside.sidebar {
   justify-content: center;
   flex-wrap: wrap;
   gap: 18px;
-  margin-top: 20px;
+  margin-top: 10px;
   color: #8f8f98;
   font-size: 12px;
 }
@@ -4873,6 +4873,7 @@ aside.sidebar {
   font-size: clamp(32px, 7vw, 76px) !important;
   line-height: 1.1 !important;
   letter-spacing: -0.03em !important;
+  margin: 11px auto 9px !important;
 }
 
 .monza-hero h1 span {
