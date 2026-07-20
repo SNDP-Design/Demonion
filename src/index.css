@@ -3594,14 +3594,27 @@ aside.sidebar {
 }
 
 .monza-landing .framer-primary {
-  color: #fff;
-  background: linear-gradient(135deg, #6633ee, #5e38ff);
-  box-shadow: 0 18px 44px rgba(102, 51, 238, .36), inset 0 1px rgba(255,255,255,.22);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.45), inset 0 1px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .monza-landing .framer-primary:hover {
-  background: linear-gradient(135deg, #7c55ff, #6633ee);
-  box-shadow: 0 22px 54px rgba(102, 51, 238, .46), inset 0 1px rgba(255,255,255,.28);
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #a855f7 0%, #4f46e5 100%);
+  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.65), inset 0 1px rgba(255, 255, 255, 0.4);
 }
 
 .monza-secondary,
@@ -3616,14 +3629,26 @@ aside.sidebar {
 }
 
 .monza-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 1px solid rgba(190, 167, 255, 0.25);
+  border-radius: 12px;
   color: #eecbff;
-  gap: 6px;
+  background: rgba(190, 167, 255, 0.08);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .monza-secondary:hover {
-  background: rgba(190, 167, 255, 0.14);
-  border-color: rgba(190, 167, 255, 0.35);
+  background: rgba(190, 167, 255, 0.18);
+  border-color: rgba(190, 167, 255, 0.5);
   color: #ffffff;
   transform: translateY(-2px);
 }
