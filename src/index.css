@@ -3598,23 +3598,23 @@ aside.sidebar {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px;
-  padding: 0 24px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 700;
+  min-height: 46px;
+  padding: 0 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 650;
   color: #ffffff;
-  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.45), inset 0 1px rgba(255, 255, 255, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 0;
+  background: linear-gradient(135deg, #6633ee, #8b5cf6);
+  box-shadow: 0 18px 44px rgba(102, 51, 238, .36), inset 0 1px 0 rgba(255,255,255,.22);
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform .2s cubic-bezier(.2,.8,.2,1), box-shadow .2s, background .2s;
 }
 
 .monza-landing .framer-primary:hover {
+  background: linear-gradient(135deg, #7c55ff, #6633ee);
   transform: translateY(-2px);
-  background: linear-gradient(135deg, #a855f7 0%, #4f46e5 100%);
-  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.65), inset 0 1px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 22px 54px rgba(102, 51, 238, .46), inset 0 1px 0 rgba(255,255,255,.28);
 }
 
 .monza-secondary,
