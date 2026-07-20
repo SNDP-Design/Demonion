@@ -204,14 +204,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, onOpenAI
           right layout for tutorials, demos, updates, and support videos.
         </p>
         <div className="monza-actions">
-          {onOpenAIDemo && (
-            <button onClick={onOpenAIDemo} className="framer-primary ai-hero-cta">
-              <Sparkles size={17} /> Create Demo (AI)
-            </button>
-          )}
-          <button onClick={onOpenStudio} className="monza-secondary">
-            Screen Recorder <ArrowRight size={15} />
+          <button onClick={onOpenStudio} className="framer-primary">
+            Start Recording Now <ArrowRight size={17} />
           </button>
+          <a href="#features" className="monza-secondary">
+            Explore features
+          </a>
         </div>
         <div className="monza-proof">
           <span><Check size={13} /> No install</span>
