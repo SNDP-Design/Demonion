@@ -5020,17 +5020,27 @@ aside.sidebar {
   }
 
   .monza-hero {
-    padding: 48px 0 32px !important;
+    padding: 36px 0 27px !important;
     min-height: auto !important;
   }
 
   .monza-hero h1 {
     font-size: clamp(26px, 8vw, 42px) !important;
     line-height: 1.15 !important;
+    margin: 11px auto 9px !important;
   }
 
   .monza-hero p {
     font-size: 15px !important;
+    margin: 0 auto !important;
+  }
+
+  .monza-actions {
+    margin-top: 14px !important;
+  }
+
+  .monza-proof {
+    margin-top: 10px !important;
   }
 
   .monza-preview-shell {
