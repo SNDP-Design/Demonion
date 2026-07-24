@@ -3825,20 +3825,21 @@ aside.sidebar {
   .monza-stats,
   .monza-split,
   .monza-free-plan {
-    margin-top: 184px;
-    margin-bottom: 184px;
+    margin-top: 54px;
+    margin-bottom: 54px;
   }
 
   .monza-split {
-    padding-top: 136px;
-    padding-bottom: 136px;
+    padding-top: 36px;
+    padding-bottom: 36px;
   }
 
   .monza-final {
-    margin-top: 184px;
-    min-height: 420px;
-    padding-top: 84px;
-    padding-bottom: 84px;
+    margin-top: 54px;
+    margin-bottom: 0;
+    min-height: auto;
+    padding-top: 48px;
+    padding-bottom: 48px;
   }
 
   .legal-page {
@@ -5039,6 +5040,28 @@ aside.sidebar {
   .monza-proof {
     margin-top: 10px !important;
   }
+
+  .monza-logos,
+  .monza-section,
+  .monza-band,
+  .monza-stats,
+  .monza-split,
+  .monza-free-plan,
+  .monza-final {
+    margin-top: 96px !important;
+    margin-bottom: 96px !important;
+  }
+
+  .monza-split {
+    padding-top: 64px !important;
+    padding-bottom: 64px !important;
+  }
+
+  .monza-final {
+    margin-bottom: 0 !important;
+    min-height: auto !important;
+    padding: 64px 28px !important;
+  }
 }
 
 /* Mobile Phone Spacing Refinements */
@@ -5087,9 +5110,16 @@ aside.sidebar {
   .monza-band,
   .monza-stats,
   .monza-split,
-  .monza-free-plan {
+  .monza-free-plan,
+  .monza-final {
     margin-top: 54px !important;
     margin-bottom: 54px !important;
+  }
+
+  .monza-final {
+    margin-bottom: 0 !important;
+    min-height: auto !important;
+    padding: 48px 16px !important;
   }
 
   .monza-split {
