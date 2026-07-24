@@ -16,6 +16,8 @@ interface ExportModalProps {
   settings: EditorSettings;
   onChangeSettings: (settings: Partial<EditorSettings>) => void;
   duration: number;
+  trimStart: number;
+  trimEnd: number;
 }
 
 // This component deliberately has no visual UI. It renders the video in the
@@ -31,7 +33,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   micStream,
   settings,
   onChangeSettings,
-  duration
+  duration,
+  trimStart,
+  trimEnd
 }) => {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -111,8 +115,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
       videoElement.pause();
       cameraVideoElement?.pause();
-      const startSec = settings.trimStart;
-      const endSec = settings.trimEnd > 0 ? settings.trimEnd : duration;
+      const startSec = trimStart;
+      const endSec = trimEnd > 0 ? trimEnd : duration;
       const exportDuration = Math.max(endSec - startSec, 0.1);
 
       await new Promise<void>((resolve) => {
@@ -323,8 +327,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     onProgress,
     restoreEditor,
     settings.aspectRatio,
-    settings.trimEnd,
-    settings.trimStart,
+    trimEnd,
+    trimStart,
     videoElement
   ]);
 

@@ -433,7 +433,6 @@ function App() {
           audioContext?.close();
           activeMicStream?.getTracks().forEach((track) => track.stop());
           setMicStream(null);
-          setRecordingIncludesWebcam(false);
           setClickMoments(clickMomentsRef.current);
           setPlaybackRate(1);
           setVideoSrc(URL.createObjectURL(blob));
@@ -444,6 +443,7 @@ function App() {
         recorder.start();
         recordingStartTimeRef.current = performance.now();
         setRecordingState('recording');
+        setRecordingIncludesWebcam(includeWebcam && isBrowserTabRecording);
         setRecTime(0);
         timerRef.current = setInterval(() => setRecTime((time) => time + 1), 1000);
       };
@@ -848,6 +848,8 @@ function App() {
         settings={settings}
         onChangeSettings={(updates) => setSettings((current) => ({ ...current, ...updates }))}
         duration={duration}
+        trimStart={trimStart}
+        trimEnd={trimEnd}
       />
 
       {/* Recording Configuration Modal */}

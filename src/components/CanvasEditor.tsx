@@ -51,7 +51,7 @@ const calculateLayout = (
   const sideCardW = Math.max(cw * 0.48, cw - sideOuterMargin * 2 - sideCameraW - sideGap);
   const finalW = isSideCamera ? sideCardW : defaultCardW;
   const finalH = finalW * frameRatio;
-  const headerH = settings.macOSHeader ? 32 : 0;
+  const headerH = settings.macOSHeader ? 32 * renderScale : 0;
   const totalH = finalH + headerH;
 
   const groupW = isSideCamera ? finalW + sideGap + sideCameraW : finalW;
@@ -472,7 +472,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           ctx.fillStyle = '#0a0d14';
           ctx.fillRect(0, 0, cw, ch);
           ctx.fillStyle = 'rgba(255,255,255,0.7)';
-          ctx.font = 'bold 24px Inter';
+          ctx.font = `bold ${24 * renderScale}px Inter`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillText('Screen Recording Preview', cw / 2, ch / 2);
@@ -515,7 +515,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.shadowOffsetY = settings.shadowIntensity * 0.3;
         
         ctx.beginPath();
-        ctx.roundRect(x0, y0, finalW, totalH, 24);
+        ctx.roundRect(x0, y0, finalW, totalH, 24 * renderScale);
         ctx.fillStyle = '#111317';
         ctx.fill();
         ctx.restore();
@@ -524,7 +524,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       // 4. Draw Composite Card Frame (clipped rounded borders)
       ctx.save();
       ctx.beginPath();
-      ctx.roundRect(x0, y0, finalW, totalH, 24);
+      ctx.roundRect(x0, y0, finalW, totalH, 24 * renderScale);
       ctx.clip();
 
       // Card base background
@@ -536,11 +536,11 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillStyle = '#131417';
         ctx.fillRect(x0, y0, finalW, headerH);
 
-        const dotRadius = 4.5;
+        const dotRadius = 4.5 * renderScale;
         const colors = ['#ff5f56', '#ffbd2e', '#27c93f'];
         colors.forEach((color, idx) => {
           ctx.beginPath();
-          ctx.arc(x0 + 16 + idx * 14, y0 + headerH / 2, dotRadius, 0, Math.PI * 2);
+          ctx.arc(x0 + 16 * renderScale + idx * 14 * renderScale, y0 + headerH / 2, dotRadius, 0, Math.PI * 2);
           ctx.fillStyle = color;
           ctx.fill();
         });
@@ -560,7 +560,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         ctx.fillStyle = '#0a0d14';
         ctx.fillRect(x0, y0 + headerH, finalW, finalH);
         ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        ctx.font = 'bold 24px Inter';
+        ctx.font = `bold ${24 * renderScale}px Inter`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('Screen Recording Preview', x0 + finalW / 2, y0 + headerH + finalH / 2);
@@ -591,8 +591,8 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       // Draw Card Border
       if (settings.borderWidth > 0) {
         ctx.beginPath();
-        ctx.roundRect(x0, y0, finalW, totalH, 24);
-        ctx.lineWidth = settings.borderWidth * 2;
+        ctx.roundRect(x0, y0, finalW, totalH, 24 * renderScale);
+        ctx.lineWidth = settings.borderWidth * 2 * renderScale;
         ctx.strokeStyle = settings.borderColor;
         ctx.stroke();
       }
