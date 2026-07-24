@@ -5013,7 +5013,35 @@ aside.sidebar {
   opacity: 1 !important;
 }
 
-/* Mobile Responsive Layout Refinements */
+/* Tablet & Medium Screen Spacing Refinements */
+@media (max-width: 1024px) {
+  .monza-hero {
+    padding: 36px 0 18px !important;
+    min-height: auto !important;
+  }
+
+  .monza-hero h1 {
+    font-size: clamp(28px, 6.2vw, 54px) !important;
+    line-height: 1.1 !important;
+    margin: 11px auto 9px !important;
+  }
+
+  .monza-hero p {
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+    margin: 0 auto !important;
+  }
+
+  .monza-actions {
+    margin-top: 14px !important;
+  }
+
+  .monza-proof {
+    margin-top: 10px !important;
+  }
+}
+
+/* Mobile Phone Spacing Refinements */
 @media (max-width: 640px) {
   .monza-landing {
     padding: 0 16px !important;
