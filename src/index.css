@@ -2693,12 +2693,12 @@ aside.sidebar {
   background: rgba(255,255,255,.04);
   font-size: 12px;
   font-weight: 650;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .monza-hero h1 {
   max-width: 1080px;
-  margin: 14px auto 12px;
+  margin: 18px auto 16px;
   color: #fff;
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 80px;
@@ -2725,7 +2725,7 @@ aside.sidebar {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 28px;
 }
 
 .monza-secondary {
@@ -2748,7 +2748,7 @@ aside.sidebar {
   justify-content: center;
   flex-wrap: wrap;
   gap: 18px;
-  margin-top: 16px;
+  margin-top: 24px;
   color: #8f8f98;
   font-size: 12px;
 }
@@ -3044,7 +3044,7 @@ aside.sidebar {
 
 .monza-section-heading {
   max-width: 720px;
-  margin-bottom: 34px;
+  margin-bottom: 36px;
 }
 
 .monza-section-heading h3,
@@ -3087,7 +3087,7 @@ aside.sidebar {
 
 .monza-feature-grid article {
   min-height: 230px;
-  padding: 24px;
+  padding: 28px;
 }
 
 .monza-feature-grid h4,
@@ -3125,7 +3125,7 @@ aside.sidebar {
 
 .monza-layouts article {
   min-height: 260px;
-  padding: 24px;
+  padding: 28px;
 }
 
 .monza-stats {
@@ -3139,7 +3139,7 @@ aside.sidebar {
   min-height: 140px;
   display: grid;
   place-items: center;
-  padding: 20px;
+  padding: 24px 20px;
   border: 1px solid rgba(255,255,255,.1);
   border-radius: 16px;
   background: rgba(255,255,255,.03);
@@ -3243,10 +3243,10 @@ aside.sidebar {
 .monza-free-plan {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 40px;
+  gap: 48px;
   align-items: center;
   margin: 160px 0;
-  padding: 36px;
+  padding: 48px;
   border: 1px solid rgba(255,255,255,.1);
   border-radius: 20px;
   background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
@@ -3293,8 +3293,8 @@ aside.sidebar {
   display: grid;
   place-items: center;
   margin: 160px 0 0;
-  min-height: 520px;
-  padding: 96px 28px;
+  min-height: 480px;
+  padding: 84px 36px;
   border: 1px solid rgba(255,255,255,.13);
   border-radius: 22px;
   background: #101012;
@@ -5020,14 +5020,16 @@ aside.sidebar {
 /* Tablet & Medium Screen Spacing Refinements */
 @media (max-width: 1024px) {
   .monza-hero {
-    padding: 48px 0 24px !important;
-    min-height: auto !important;
+    padding: 56px 0 36px !important;
+    min-height: calc(100svh - 72px) !important;
+    display: grid !important;
+    place-items: center !important;
   }
 
   .monza-hero h1 {
     font-size: clamp(28px, 6.2vw, 54px) !important;
     line-height: 1.15 !important;
-    margin: 14px auto 12px !important;
+    margin: 18px auto 16px !important;
   }
 
   .monza-hero p {
@@ -5037,11 +5039,11 @@ aside.sidebar {
   }
 
   .monza-actions {
-    margin-top: 20px !important;
+    margin-top: 28px !important;
   }
 
   .monza-proof {
-    margin-top: 16px !important;
+    margin-top: 24px !important;
   }
 
   .monza-logos,
@@ -5074,18 +5076,20 @@ aside.sidebar {
   }
 
   .monza-hero {
-    padding: 40px 0 24px !important;
-    min-height: auto !important;
+    padding: 48px 0 32px !important;
+    min-height: calc(100svh - 72px) !important;
+    display: grid !important;
+    place-items: center !important;
   }
 
   .monza-badge {
-    margin-bottom: 14px !important;
+    margin-bottom: 16px !important;
   }
 
   .monza-hero h1 {
-    font-size: clamp(24px, 7.5vw, 36px) !important;
-    line-height: 1.15 !important;
-    margin: 14px auto 12px !important;
+    font-size: clamp(26px, 8vw, 36px) !important;
+    line-height: 1.18 !important;
+    margin: 18px auto 16px !important;
   }
 
   .monza-hero p {
@@ -5095,19 +5099,25 @@ aside.sidebar {
   }
 
   .monza-actions {
-    margin-top: 20px !important;
+    margin-top: 28px !important;
     margin-bottom: 0 !important;
-    gap: 10px !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+
+  .monza-actions a {
+    width: 100% !important;
+    text-align: center !important;
   }
 
   .monza-proof {
-    margin-top: 16px !important;
+    margin-top: 24px !important;
     margin-bottom: 0 !important;
-    gap: 10px 16px !important;
+    gap: 12px 18px !important;
   }
 
   .monza-preview-shell {
-    margin-bottom: 32px !important;
+    margin-bottom: 96px !important;
   }
 
   .monza-logos,
@@ -5117,23 +5127,37 @@ aside.sidebar {
   .monza-split,
   .monza-free-plan,
   .monza-final {
-    margin-top: 80px !important;
-    margin-bottom: 80px !important;
+    margin-top: 96px !important;
+    margin-bottom: 96px !important;
+  }
+
+  .monza-section-heading {
+    margin-bottom: 28px !important;
+  }
+
+  .monza-feature-grid article,
+  .monza-layouts article {
+    padding: 22px !important;
+  }
+
+  .monza-stats article {
+    padding: 20px 16px !important;
   }
 
   .monza-final {
     margin-bottom: 0 !important;
     min-height: auto !important;
-    padding: 48px 16px !important;
+    padding: 56px 20px !important;
   }
 
   .monza-free-plan {
-    padding: 20px !important;
+    padding: 28px 20px !important;
+    gap: 28px !important;
   }
 
   .monza-split {
-    padding-top: 36px !important;
-    padding-bottom: 36px !important;
+    padding-top: 64px !important;
+    padding-bottom: 64px !important;
   }
 }
 
