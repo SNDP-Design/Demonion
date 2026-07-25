@@ -120,7 +120,7 @@ function App() {
 
   const connectWebcamVideo = useCallback(async (stream: MediaStream) => {
     const video = webcamVideoRef.current;
-    if (!video) return false;
+    if (!video) return true;
 
     if (video.srcObject !== stream) {
       video.srcObject = stream;
@@ -130,11 +130,10 @@ function App() {
       await video.play();
     } catch (error) {
       console.warn('Camera preview could not start:', error);
-      return false;
     }
 
-    return waitForVideoFrame(video);
-  }, [waitForVideoFrame]);
+    return true;
+  }, []);
 
   const ensureWebcamStream = useCallback(async () => {
     const existingStream = webcamStreamRef.current;
@@ -235,10 +234,13 @@ function App() {
   useEffect(() => {
     let active = true;
     if (isRecordingModalOpen && useWebcam) {
-      void ensureWebcamStream().then((ready) => {
+      void ensureWebcamStream().then(() => {
         if (!active) return;
-        if (ready && modalWebcamVideoRef.current && webcamStreamRef.current) {
-          modalWebcamVideoRef.current.srcObject = webcamStreamRef.current;
+        const stream = webcamStreamRef.current;
+        if (stream && modalWebcamVideoRef.current) {
+          if (modalWebcamVideoRef.current.srcObject !== stream) {
+            modalWebcamVideoRef.current.srcObject = stream;
+          }
           void modalWebcamVideoRef.current.play().catch((err) => {
             console.warn('Webcam stream play failed in modal preview:', err);
           });
@@ -745,7 +747,19 @@ function App() {
         playsInline
         muted
       />
-      <video ref={setRecordedCameraVideoRef} src={cameraSrc || undefined} style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0.001, pointerEvents: 'none', zIndex: -1000 }} muted playsInline />
+      <video 
+        ref={setRecordedCameraVideoRef} 
+        src={cameraSrc || undefined} 
+        style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0.001, pointerEvents: 'none', zIndex: -1000 }} 
+        muted 
+        playsInline 
+        preload="auto"
+        onLoadedData={() => {
+          if (recordedCameraVideoRef.current && editorVideoRef.current) {
+            recordedCameraVideoRef.current.currentTime = editorVideoRef.current.currentTime;
+          }
+        }}
+      />
 
       {/* Layout Content Body */}
       <div

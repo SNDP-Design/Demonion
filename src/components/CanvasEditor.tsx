@@ -425,7 +425,7 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         }
         ctx.clip();
 
-        if (webcamElement && webcamElement.readyState >= 2) {
+        if (webcamElement && (webcamElement.readyState >= 1 || webcamElement.currentTime > 0) && webcamElement.videoWidth > 0) {
           const webW = webcamElement.videoWidth;
           const webH = webcamElement.videoHeight;
           const targetRatio = cameraW / cameraH;
