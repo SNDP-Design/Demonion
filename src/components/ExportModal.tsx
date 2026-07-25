@@ -139,7 +139,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (includeExportAudio && AudioContextClass) {
         if (!persistentAudioCtx) {
-          persistentAudioCtx = new AudioContextClass();
+          try {
+            persistentAudioCtx = new AudioContextClass({ sampleRate: 44100 });
+          } catch {
+            persistentAudioCtx = new AudioContextClass();
+          }
         }
         if (persistentAudioCtx.state === 'suspended') {
           await persistentAudioCtx.resume();
@@ -193,27 +197,31 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       const outputStream = new MediaStream(canvasTracks);
       if (mixedAudioTrack) outputStream.addTrack(mixedAudioTrack);
 
-      let mimeType = 'video/webm;codecs=vp9,opus';
-      let extension = 'webm';
-      if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
-        mimeType = 'video/webm;codecs=vp9,opus';
-        extension = 'webm';
-      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
-        mimeType = 'video/webm;codecs=vp8,opus';
-        extension = 'webm';
-      } else if (MediaRecorder.isTypeSupported('video/webm')) {
-        mimeType = 'video/webm';
-        extension = 'webm';
-      } else if (MediaRecorder.isTypeSupported('video/mp4;codecs=h264,aac')) {
-        mimeType = 'video/mp4;codecs=h264,aac';
-        extension = 'mp4';
-      } else if (MediaRecorder.isTypeSupported('video/mp4')) {
-        mimeType = 'video/mp4';
-        extension = 'mp4';
-      } else {
-        mimeType = '';
-        extension = 'webm';
-      }
+      const getPreferredFormat = () => {
+        const mp4Types = [
+          'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+          'video/mp4;codecs=h264,aac',
+          'video/mp4'
+        ];
+        for (const type of mp4Types) {
+          if (MediaRecorder.isTypeSupported(type)) {
+            return { mimeType: type, extension: 'mp4' };
+          }
+        }
+        const webmTypes = [
+          'video/webm;codecs=vp8,opus',
+          'video/webm;codecs=vp9,opus',
+          'video/webm'
+        ];
+        for (const type of webmTypes) {
+          if (MediaRecorder.isTypeSupported(type)) {
+            return { mimeType: type, extension: 'webm' };
+          }
+        }
+        return { mimeType: '', extension: 'webm' };
+      };
+
+      const { mimeType, extension } = getPreferredFormat();
 
       const recorder = new MediaRecorder(outputStream, {
         mimeType: mimeType || undefined,
