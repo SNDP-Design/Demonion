@@ -40,7 +40,6 @@ function App() {
   const [playbackRate, setPlaybackRate] = useState(1);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportProgress, setExportProgress] = useState<number | null>(null);
-  const [recordingIncludesWebcam, setRecordingIncludesWebcam] = useState(false);
   const [clickMoments, setClickMoments] = useState<ClickMoment[]>([]);
 
   // Recorder flags
@@ -445,7 +444,6 @@ function App() {
         recorder.start();
         recordingStartTimeRef.current = performance.now();
         setRecordingState('recording');
-        setRecordingIncludesWebcam(includeWebcam && isBrowserTabRecording);
         setRecTime(0);
         timerRef.current = setInterval(() => setRecTime((time) => time + 1), 1000);
       };
@@ -690,7 +688,6 @@ function App() {
                   setCameraSrc('');
                   setClickMoments([]);
                   setPlaybackRate(1);
-                  setRecordingIncludesWebcam(false);
                   setShowLandingPage(true);
                   setIsRecordingModalOpen(true);
                   setCurrentTime(0);
@@ -823,8 +820,8 @@ function App() {
                 canvasRef={canvasRef}
                 onCanvasElementChange={setCanvasEl}
                 videoElement={editorVideoEl}
-                webcamElement={useWebcam && !recordingIncludesWebcam ? recordedCameraVideoEl : null}
-                showWebcamOverlay={useWebcam && !recordingIncludesWebcam && Boolean(cameraSrc)}
+                webcamElement={useWebcam ? (recordedCameraVideoEl || webcamVideoRef.current) : null}
+                showWebcamOverlay={useWebcam && Boolean(cameraSrc || webcamStreamRef.current)}
                 settings={settings}
                 clickMoments={clickMoments}
                 onAddClickMoment={handleAddPreviewClick}
