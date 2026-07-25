@@ -100,13 +100,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             return { width: 3840, height: 2160 };
         }
       })();
+
+      // Give React event loop time to flush 4K canvas settings re-render
+      await new Promise<void>((resolve) => window.setTimeout(resolve, 100));
+
       const resizeDeadline = performance.now() + 2000;
       while ((canvasElement.width < expectedSize.width || canvasElement.height < expectedSize.height) && performance.now() < resizeDeadline) {
-        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-      }
-
-      if (canvasElement.width < expectedSize.width || canvasElement.height < expectedSize.height) {
-        throw new Error('The 4K video canvas was not ready. Please try again.');
+        await new Promise<void>((resolve) => window.setTimeout(resolve, 50));
       }
 
       chunksRef.current = [];
@@ -147,7 +147,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         const destination = persistentAudioCtx.createMediaStreamDestination();
         let hasAudioInput = false;
 
-        if (!persistentVideoSourceNode) {
+        if (!persistentVideoSourceNode && persistentAudioCtx) {
           try {
             persistentVideoSourceNode = persistentAudioCtx.createMediaElementSource(videoElement);
           } catch (err) {
@@ -193,22 +193,28 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       const outputStream = new MediaStream(canvasTracks);
       if (mixedAudioTrack) outputStream.addTrack(mixedAudioTrack);
 
-      let mimeType = 'video/mp4;codecs=h264,aac';
-      let extension = 'mp4';
-      if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/mp4;codecs=h264,opus';
-      if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/mp4;codecs=h264';
-      if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/mp4';
-      if (!MediaRecorder.isTypeSupported(mimeType)) {
+      let mimeType = 'video/webm;codecs=vp9,opus';
+      let extension = 'webm';
+      if (MediaRecorder.isTypeSupported('video/mp4;codecs=h264,aac')) {
+        mimeType = 'video/mp4;codecs=h264,aac';
+        extension = 'mp4';
+      } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+        mimeType = 'video/mp4';
+        extension = 'mp4';
+      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
         mimeType = 'video/webm;codecs=vp9,opus';
         extension = 'webm';
-        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm;codecs=vp8,opus';
-        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm';
-        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = '';
+      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
+        mimeType = 'video/webm;codecs=vp8,opus';
+        extension = 'webm';
+      } else if (MediaRecorder.isTypeSupported('video/webm')) {
+        mimeType = 'video/webm';
+        extension = 'webm';
       }
 
       const recorder = new MediaRecorder(outputStream, {
         mimeType: mimeType || undefined,
-        videoBitsPerSecond: 80000000
+        videoBitsPerSecond: 25000000
       });
       recorderRef.current = recorder;
       recorder.ondataavailable = (event) => {
@@ -284,10 +290,20 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         onClose();
       };
 
-      recorder.start();
+      recorder.start(200);
       document.addEventListener('visibilitychange', handleVisibilityChange);
-      await videoElement.play();
-      await cameraVideoElement?.play();
+      try {
+        await videoElement.play();
+      } catch (err) {
+        console.warn('Video play error during export:', err);
+      }
+      if (cameraVideoElement) {
+        try {
+          await cameraVideoElement.play();
+        } catch (err) {
+          console.warn('Camera video play error during export:', err);
+        }
+      }
 
       const requestCanvasFrame = () => {
         canvasTracks.forEach((track) => {
