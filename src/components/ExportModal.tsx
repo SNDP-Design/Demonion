@@ -195,13 +195,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
       let mimeType = 'video/webm;codecs=vp9,opus';
       let extension = 'webm';
-      if (MediaRecorder.isTypeSupported('video/mp4;codecs=h264,aac')) {
-        mimeType = 'video/mp4;codecs=h264,aac';
-        extension = 'mp4';
-      } else if (MediaRecorder.isTypeSupported('video/mp4')) {
-        mimeType = 'video/mp4';
-        extension = 'mp4';
-      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
+      if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
         mimeType = 'video/webm;codecs=vp9,opus';
         extension = 'webm';
       } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
@@ -209,6 +203,15 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         extension = 'webm';
       } else if (MediaRecorder.isTypeSupported('video/webm')) {
         mimeType = 'video/webm';
+        extension = 'webm';
+      } else if (MediaRecorder.isTypeSupported('video/mp4;codecs=h264,aac')) {
+        mimeType = 'video/mp4;codecs=h264,aac';
+        extension = 'mp4';
+      } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+        mimeType = 'video/mp4';
+        extension = 'mp4';
+      } else {
+        mimeType = '';
         extension = 'webm';
       }
 
@@ -232,6 +235,16 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           window.clearInterval(frameRequestTimer);
           frameRequestTimer = null;
         }
+      };
+
+      recorder.onerror = (event) => {
+        console.error('MediaRecorder error during export:', event);
+        stopTimers();
+        restoreEditor();
+        recorderRef.current = null;
+        hasStartedRef.current = false;
+        onError('MediaRecorder encountered an encoding error. Please try again.');
+        onClose();
       };
       const stopRecording = () => {
         if (recorder.state === 'recording') recorder.stop();
@@ -314,10 +327,15 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
       const checkProgress = () => {
         if (recorder.state !== 'recording') return;
-        const progress = Math.round(Math.min(100, ((videoElement.currentTime - startSec) / exportDuration) * 100));
+        const current = videoElement.currentTime;
+        const progress = Math.max(0, Math.min(99, Math.round(((current - startSec) / exportDuration) * 100)));
         onProgress(progress);
         setLocalProgress(progress);
-        if (videoElement.currentTime >= endSec || videoElement.ended) recorder.stop();
+        if (current >= endSec || videoElement.ended) {
+          if (recorder.state === 'recording') {
+            recorder.stop();
+          }
+        }
       };
 
       videoElement.addEventListener('ended', stopRecording, { once: true });
