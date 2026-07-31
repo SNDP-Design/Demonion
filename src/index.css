@@ -5464,6 +5464,268 @@ aside.sidebar {
   color: rgba(255, 255, 255, 0.65);
 }
 
+/* Canva Video Editor Timeline Styles */
+.canva-timeline-wrapper {
+  background: rgba(10, 6, 26, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.canva-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(18, 12, 42, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.canva-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.canva-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.canva-zoom-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.canva-zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 0;
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.canva-zoom-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.canva-zoom-slider {
+  width: 70px;
+  accent-color: #ec4899;
+  cursor: pointer;
+}
+
+.canva-timeline-scroll-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(236, 72, 153, 0.5) rgba(0, 0, 0, 0.3);
+}
+
+.canva-video-clip-row {
+  min-height: 52px;
+}
+
+.canva-editor-track {
+  min-height: 52px;
+  position: relative;
+  background: rgba(15, 10, 32, 0.8);
+}
+
+.canva-scene-card {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.35) 0%, rgba(236, 72, 153, 0.4) 100%);
+  border: 1.5px solid rgba(192, 132, 252, 0.6);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  cursor: grab;
+  user-select: none;
+  z-index: 5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.canva-scene-card:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.55) 0%, rgba(236, 72, 153, 0.6) 100%);
+  border-color: #ec4899;
+  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.4);
+}
+
+.canva-scene-card.selected {
+  border-color: #ec4899;
+  border-width: 2px;
+  box-shadow: 0 0 14px rgba(236, 72, 153, 0.7);
+}
+
+.canva-scene-card.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.canva-scene-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.canva-scene-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.canva-scene-duration {
+  font-size: 10px;
+  font-weight: 700;
+  color: #f0abfc;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+.canva-scene-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.canva-scene-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.canva-scene-delete-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+  transform: scale(1.2);
+}
+
+/* Inter-Clip Transition Badges */
+.canva-transition-badge-wrap {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+}
+
+.canva-transition-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #1e1b4b;
+  border: 1.5px solid rgba(168, 85, 247, 0.6);
+  color: #c084fc;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  transition: all 0.18s ease;
+}
+
+.canva-transition-badge:hover, .canva-transition-badge.active {
+  background: #ec4899;
+  border-color: #ffffff;
+  color: #ffffff;
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(236, 72, 153, 0.8);
+}
+
+.canva-transition-popover {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0f0a28;
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  padding: 8px;
+  z-index: 60;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.canva-popover-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #a78bfa;
+  padding: 4px 6px;
+}
+
+.canva-transition-option {
+  text-align: left;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.canva-transition-option:hover {
+  background: rgba(168, 85, 247, 0.25);
+  color: #ffffff;
+}
+
+.canva-transition-option.active {
+  background: #ec4899;
+  color: #ffffff;
+}
+
+
 
 
 
