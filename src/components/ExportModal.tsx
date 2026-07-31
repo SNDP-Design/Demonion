@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import type { EditorSettings } from '../types';
+import type { AudioTrackState, EditorSettings, VideoSegment } from '../types';
 
 let persistentAudioCtx: AudioContext | null = null;
 let persistentVideoSourceNode: MediaElementAudioSourceNode | null = null;
@@ -18,10 +18,10 @@ interface ExportModalProps {
   duration: number;
   trimStart: number;
   trimEnd: number;
+  clips?: VideoSegment[];
+  importedAudio?: AudioTrackState | null;
 }
 
-// This component deliberately has no visual UI. It renders the video in the
-// background while App keeps the person in the editor and shows progress in the header.
 export const ExportModal: React.FC<ExportModalProps> = ({
   isOpen,
   onClose,
@@ -35,7 +35,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   onChangeSettings,
   duration,
   trimStart,
-  trimEnd
+  trimEnd,
+  clips = [],
+  importedAudio = null
 }) => {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -101,7 +103,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         }
       })();
 
-      // Give React event loop time to flush 4K canvas settings re-render
       await new Promise<void>((resolve) => window.setTimeout(resolve, 100));
 
       const resizeDeadline = performance.now() + 2000;
@@ -115,9 +116,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
       videoElement.pause();
       cameraVideoElement?.pause();
-      const startSec = trimStart;
-      const endSec = trimEnd > 0 ? trimEnd : duration;
-      const exportDuration = Math.max(endSec - startSec, 0.1);
+
+      const activeSegments = clips && clips.length > 0
+        ? clips
+        : [{ id: 'full', start: trimStart, end: trimEnd > 0 ? trimEnd : duration }];
+
+      const initialStartSec = activeSegments[0].start;
+      const totalExportDuration = activeSegments.reduce((acc, c) => acc + Math.max(0, c.end - c.start), 0) || 0.1;
 
       await new Promise<void>((resolve) => {
         let settled = false;
@@ -130,11 +135,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         };
         const timeout = window.setTimeout(done, 250);
         videoElement.addEventListener('seeked', done);
-        videoElement.currentTime = startSec;
-        if (cameraVideoElement) cameraVideoElement.currentTime = startSec;
+        videoElement.currentTime = initialStartSec;
+        if (cameraVideoElement) cameraVideoElement.currentTime = initialStartSec;
       });
 
       let mixedAudioTrack: MediaStreamTrack | null = null;
+      let importedAudioEl: HTMLAudioElement | null = null;
+      let importedAudioSourceNode: MediaElementAudioSourceNode | null = null;
+
       const includeExportAudio = true;
       const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (includeExportAudio && AudioContextClass) {
@@ -181,6 +189,21 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             hasAudioInput = true;
           } catch (err) {
             console.warn('Failed to connect mic stream to export destination:', err);
+          }
+        }
+
+        // Mix imported background audio track if present
+        if (importedAudio && !importedAudio.muted && importedAudio.src) {
+          try {
+            importedAudioEl = new Audio(importedAudio.src);
+            importedAudioEl.currentTime = Math.max(0, initialStartSec - importedAudio.startTime + importedAudio.trimStart);
+            importedAudioEl.volume = importedAudio.volume;
+            importedAudioSourceNode = persistentAudioCtx.createMediaElementSource(importedAudioEl);
+            importedAudioSourceNode.connect(destination);
+            hasAudioInput = true;
+            void importedAudioEl.play().catch(e => console.warn('Imported audio play during export warning:', e));
+          } catch (err) {
+            console.warn('Failed to mix imported audio into export destination:', err);
           }
         }
 
@@ -248,6 +271,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       recorder.onerror = (event) => {
         console.error('MediaRecorder error during export:', event);
         stopTimers();
+        if (importedAudioEl) {
+          importedAudioEl.pause();
+          importedAudioEl = null;
+        }
         restoreEditor();
         recorderRef.current = null;
         hasStartedRef.current = false;
@@ -262,6 +289,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           pausedForHiddenTab = true;
           videoElement.pause();
           cameraVideoElement?.pause();
+          importedAudioEl?.pause();
           recorder.pause();
           return;
         }
@@ -275,11 +303,22 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           void cameraVideoElement?.play().catch((error) => {
             console.warn('Camera export preview could not resume:', error);
           });
+          void importedAudioEl?.play().catch((error) => {
+            console.warn('Imported audio export preview could not resume:', error);
+          });
         }
       };
 
       recorder.onstop = () => {
         stopTimers();
+        if (importedAudioEl) {
+          importedAudioEl.pause();
+          importedAudioEl = null;
+        }
+        if (importedAudioSourceNode) {
+          try { importedAudioSourceNode.disconnect(); } catch { /* safe */ }
+          importedAudioSourceNode = null;
+        }
         videoElement.removeEventListener('ended', stopRecording);
         document.removeEventListener('visibilitychange', handleVisibilityChange);
 
@@ -333,13 +372,42 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         });
       };
 
+      let currentSegmentIdx = 0;
       const checkProgress = () => {
         if (recorder.state !== 'recording') return;
         const current = videoElement.currentTime;
-        const progress = Math.max(0, Math.min(99, Math.round(((current - startSec) / exportDuration) * 100)));
+        const activeSeg = activeSegments[currentSegmentIdx];
+
+        if (activeSeg && current >= activeSeg.end - 0.05) {
+          currentSegmentIdx++;
+          if (currentSegmentIdx < activeSegments.length) {
+            const nextSeg = activeSegments[currentSegmentIdx];
+            videoElement.currentTime = nextSeg.start;
+            if (cameraVideoElement) cameraVideoElement.currentTime = nextSeg.start;
+            if (importedAudioEl && importedAudio) {
+              importedAudioEl.currentTime = Math.max(0, nextSeg.start - importedAudio.startTime + importedAudio.trimStart);
+            }
+          } else {
+            if (recorder.state === 'recording') {
+              recorder.stop();
+            }
+            return;
+          }
+        }
+
+        let processedDuration = 0;
+        for (let i = 0; i < currentSegmentIdx; i++) {
+          processedDuration += activeSegments[i].end - activeSegments[i].start;
+        }
+        if (activeSeg) {
+          processedDuration += Math.max(0, current - activeSeg.start);
+        }
+
+        const progress = Math.max(0, Math.min(99, Math.round((processedDuration / totalExportDuration) * 100)));
         onProgress(progress);
         setLocalProgress(progress);
-        if (current >= endSec || videoElement.ended) {
+
+        if (videoElement.ended) {
           if (recorder.state === 'recording') {
             recorder.stop();
           }
@@ -371,7 +439,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     settings.aspectRatio,
     trimEnd,
     trimStart,
-    videoElement
+    videoElement,
+    clips,
+    importedAudio
   ]);
 
   useEffect(() => {
