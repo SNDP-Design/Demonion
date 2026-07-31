@@ -201,7 +201,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             importedAudioSourceNode = persistentAudioCtx.createMediaElementSource(importedAudioEl);
             importedAudioSourceNode.connect(destination);
             hasAudioInput = true;
-            void importedAudioEl.play().catch(e => console.warn('Imported audio play during export warning:', e));
+            void importedAudioEl.play().catch((e) => console.warn('Imported audio play during export warning:', e));
           } catch (err) {
             console.warn('Failed to mix imported audio into export destination:', err);
           }
@@ -256,7 +256,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       };
       let progressTimer: number | null = null;
       let frameRequestTimer: number | null = null;
-      let pausedForHiddenTab = false;
+
       const stopTimers = () => {
         if (progressTimer !== null) {
           window.clearInterval(progressTimer);
@@ -284,30 +284,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       const stopRecording = () => {
         if (recorder.state === 'recording') recorder.stop();
       };
-      const handleVisibilityChange = () => {
-        if (document.hidden && recorder.state === 'recording') {
-          pausedForHiddenTab = true;
-          videoElement.pause();
-          cameraVideoElement?.pause();
-          importedAudioEl?.pause();
-          recorder.pause();
-          return;
-        }
-
-        if (!document.hidden && pausedForHiddenTab && recorder.state === 'paused') {
-          pausedForHiddenTab = false;
-          recorder.resume();
-          void videoElement.play().catch((error) => {
-            console.warn('Video export preview could not resume:', error);
-          });
-          void cameraVideoElement?.play().catch((error) => {
-            console.warn('Camera export preview could not resume:', error);
-          });
-          void importedAudioEl?.play().catch((error) => {
-            console.warn('Imported audio export preview could not resume:', error);
-          });
-        }
-      };
 
       recorder.onstop = () => {
         stopTimers();
@@ -320,7 +296,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           importedAudioSourceNode = null;
         }
         videoElement.removeEventListener('ended', stopRecording);
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
 
         videoElement.playbackRate = originalPlayRateRef.current;
         videoElement.currentTime = originalTimeRef.current;
@@ -351,7 +326,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       };
 
       recorder.start(200);
-      document.addEventListener('visibilitychange', handleVisibilityChange);
       try {
         await videoElement.play();
       } catch (err) {
@@ -375,6 +349,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({
       let currentSegmentIdx = 0;
       const checkProgress = () => {
         if (recorder.state !== 'recording') return;
+
+        // Ensure playback continues even if browser attempts to suspend background media
+        if (videoElement.paused && recorder.state === 'recording') {
+          void videoElement.play().catch(() => {/* safe */});
+        }
+        if (cameraVideoElement && cameraVideoElement.paused && recorder.state === 'recording') {
+          void cameraVideoElement.play().catch(() => {/* safe */});
+        }
+        if (importedAudioEl && importedAudioEl.paused && recorder.state === 'recording') {
+          void importedAudioEl.play().catch(() => {/* safe */});
+        }
+
         const current = videoElement.currentTime;
         const activeSeg = activeSegments[currentSegmentIdx];
 
@@ -473,15 +459,15 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           />
         </div>
 
-        {/* Warning card */}
+        {/* Informative background card */}
         <div className="export-warning-card">
-          <div className="export-warning-icon">⚠️</div>
+          <div className="export-warning-icon">🚀</div>
           <div className="export-warning-content">
-            <h4>Keep this tab active</h4>
+            <h4>Exporting in background</h4>
             <p>
-              Please <strong>do not switch tabs, minimize this window, or navigate away</strong>.
-              <br /><br />
-              Keep this screen active until the export completes, otherwise the export will fail.
+              Your video is rendering continuously.
+              <br />
+              You can <strong>freely switch tabs, open other applications, or minimize this window</strong> — your export will finish automatically.
             </p>
           </div>
         </div>
