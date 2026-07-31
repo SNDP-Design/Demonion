@@ -199,6 +199,10 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
       animId = requestAnimationFrame(render);
     };
 
+    let currentZoom = 1.0;
+    let currentFocalX = 0.5;
+    let currentFocalY = 0.5;
+
     const render = () => {
       animId = null;
       timeoutId = null;
@@ -235,6 +239,64 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         }
       }
 
+      // Smooth Video Zoom target calculation
+      let targetZoom = 1.0;
+      let targetFocalX = 0.5;
+      let targetFocalY = 0.5;
+
+      const autoZoomEnabled = settings.enableAutoZoom ?? true;
+      const maxZoomScale = settings.zoomFactor ?? 1.4;
+
+      if (autoZoomEnabled && clickMoments.length > 0) {
+        const zoomWindowDuration = 2.0;
+        let activeMoment: ClickMoment | null = null;
+        let minTimeOffset = Infinity;
+
+        for (const moment of clickMoments) {
+          const offset = displayTime - moment.time;
+          if (offset >= 0 && offset <= zoomWindowDuration && offset < minTimeOffset) {
+            activeMoment = moment;
+            minTimeOffset = offset;
+          }
+        }
+
+        if (activeMoment) {
+          targetFocalX = activeMoment.x;
+          targetFocalY = activeMoment.y;
+
+          if (minTimeOffset < 0.5) {
+            const p = minTimeOffset / 0.5;
+            const easeP = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+            targetZoom = 1.0 + (maxZoomScale - 1.0) * easeP;
+          } else if (minTimeOffset <= 1.5) {
+            targetZoom = maxZoomScale;
+          } else {
+            const p = (2.0 - minTimeOffset) / 0.5;
+            const easeP = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+            targetZoom = 1.0 + (maxZoomScale - 1.0) * easeP;
+          }
+        }
+      }
+
+      // High quality lerp for 60fps ultra-smooth camera movements
+      const lerpFactor = 0.12;
+      currentZoom += (targetZoom - currentZoom) * lerpFactor;
+      currentFocalX += (targetFocalX - currentFocalX) * lerpFactor;
+      currentFocalY += (targetFocalY - currentFocalY) * lerpFactor;
+
+      const activeZoom = Math.max(1.0, currentZoom);
+      const fx = Math.min(1.0, Math.max(0, currentFocalX));
+      const fy = Math.min(1.0, Math.max(0, currentFocalY));
+
+      const cropRatioW = 1.0 / activeZoom;
+      const cropRatioH = 1.0 / activeZoom;
+
+      let cropRatioX = fx - cropRatioW / 2;
+      let cropRatioY = fy - cropRatioH / 2;
+
+      cropRatioX = Math.max(0, Math.min(1.0 - cropRatioW, cropRatioX));
+      cropRatioY = Math.max(0, Math.min(1.0 - cropRatioH, cropRatioY));
+
       const drawClickRipples = (
         targetX: number,
         targetY: number,
@@ -248,8 +310,11 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
           const age = displayTime - moment.time;
           if (age < 0 || age > rippleDuration) return;
 
-          const screenX = targetX + moment.x * targetWidth;
-          const screenY = targetY + moment.y * targetHeight;
+          const normX = (moment.x - cropRatioX) / cropRatioW;
+          const normY = (moment.y - cropRatioY) / cropRatioH;
+
+          const screenX = targetX + normX * targetWidth;
+          const screenY = targetY + normY * targetHeight;
 
           // Draw concentric rings
           for (let j = 0; j < 3; j++) {
@@ -286,7 +351,12 @@ export const CanvasEditor: React.FC<CanvasEditorProps> = ({
         targetWidth: number,
         targetHeight: number
       ) => {
-        ctx.drawImage(sourceVideo, 0, 0, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight);
+        const cropX = cropRatioX * sourceWidth;
+        const cropY = cropRatioY * sourceHeight;
+        const cropW = cropRatioW * sourceWidth;
+        const cropH = cropRatioH * sourceHeight;
+
+        ctx.drawImage(sourceVideo, cropX, cropY, cropW, cropH, targetX, targetY, targetWidth, targetHeight);
       };
 
       // Enable high-quality image smoothing

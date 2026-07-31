@@ -74,6 +74,34 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({ settings, onCh
           </div>
         </section>}
 
+        <section className="sidebar-module border-t border-glass pt-5">
+          <div className="space-y-3">
+            <label className="sidebar-toggle-label">
+              <span>Auto-Zoom on Clicks</span>
+              <span className="switch-container">
+                <input
+                  type="checkbox"
+                  checked={settings.enableAutoZoom ?? true}
+                  onChange={(event) => update('enableAutoZoom', event.target.checked)}
+                  className="switch-input"
+                />
+                <span className="switch-slider" />
+              </span>
+            </label>
+            {(settings.enableAutoZoom ?? true) && (
+              <Slider
+                label="Zoom Scale"
+                value={`${(settings.zoomFactor ?? 1.4).toFixed(1)}x`}
+                min="1.1"
+                max="2.0"
+                step="0.05"
+                current={settings.zoomFactor ?? 1.4}
+                onChange={(value) => update('zoomFactor', value)}
+              />
+            )}
+          </div>
+        </section>
+
         {settings.layoutMode === 'framed' && <section className="sidebar-module border-t border-glass pt-5">
 
           <div className="gradient-thumbnail-grid">{GRADIENT_PRESETS.map((preset) => <button key={preset.id} onClick={() => onChangeSettings({ gradientPresetId: preset.id, backgroundType: 'gradient' })} title={preset.name} aria-label={preset.name} className={`gradient-thumbnail ${settings.gradientPresetId === preset.id && settings.backgroundType === 'gradient' ? 'active-pink' : 'border-glass hover:border-white/10'}`}><span style={{ background: preset.css }} /></button>)}

@@ -25,6 +25,8 @@ export interface EditorSettings {
   trimStart: number; // in seconds
   trimEnd: number; // in seconds
   exportResolution?: '1080p' | '4k';
+  enableAutoZoom?: boolean;
+  zoomFactor?: number; // 1.1 to 2.0
 }
 
 export interface ClickMoment {

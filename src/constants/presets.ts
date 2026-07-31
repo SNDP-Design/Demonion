@@ -26,4 +26,6 @@ export const DEFAULT_SETTINGS: EditorSettings = {
   cameraBorderColor: '#ffffff',
   trimStart: 0,
   trimEnd: 0,
+  enableAutoZoom: true,
+  zoomFactor: 1.4,
 };
