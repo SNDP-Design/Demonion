@@ -3,15 +3,15 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "main": "electron/main.js",
+  "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron:build": "tsc -b && vite build && electron-builder --mac",
-    "make:mac": "electron-builder --mac"
+    "electron:build": "tsc -b && vite build && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac",
+    "make:mac": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac"
   },
   "build": {
     "appId": "com.demonion.videoeditor",
@@ -25,15 +25,14 @@
       "electron/**/*"
     ],
     "mac": {
+      "identity": null,
       "category": "public.app-category.video",
       "target": [
         "dmg",
         "zip"
       ],
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "electron/entitlements.mac.plist",
-      "entitlementsInherit": "electron/entitlements.mac.plist"
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
     }
   },
   "dependencies": {
