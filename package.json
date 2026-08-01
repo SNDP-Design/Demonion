@@ -25,6 +25,7 @@
       "electron/**/*"
     ],
     "mac": {
+      "icon": "build/icon.icns",
       "identity": null,
       "category": "public.app-category.video",
       "target": [

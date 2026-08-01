@@ -14,6 +14,7 @@ function createMainWindow() {
     vibrancy: 'sidebar',
     visualEffectState: 'active',
     backgroundColor: '#0a061a',
+    icon: path.join(__dirname, '../build/icon.png'),
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
