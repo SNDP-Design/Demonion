@@ -60,4 +60,20 @@ export interface AudioTrackState {
   fadeOut?: number;  // seconds
 }
 
+export interface ElectronDesktopSource {
+  id: string;
+  name: string;
+  thumbnail: string;
+}
+
+declare global {
+  interface Window {
+    electronAPI?: {
+      isElectron: boolean;
+      getDesktopSources: (opts?: { types: string[] }) => Promise<ElectronDesktopSource[]>;
+    };
+  }
+}
+
+
 
