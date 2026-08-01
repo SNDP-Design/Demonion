@@ -22,6 +22,7 @@ import { DemonionLogo } from './DemonionLogo';
 
 interface LandingPageProps {
   onOpenStudio: () => void;
+  heroOnly?: boolean;
 }
 
 const previewModes = [
@@ -141,7 +142,7 @@ const legalPages: Record<LegalPageKey, {
   },
 };
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, heroOnly = false }) => {
   const [activeMode, setActiveMode] = useState(0);
   const [activeBgPreset, setActiveBgPreset] = useState('nebula');
   const [activeCamShape, setActiveCamShape] = useState<'circle' | 'rounded'>('rounded');
@@ -326,59 +327,213 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio }) => {
         </div>
       </section>
 
-      {/* Infinite Framer Ticker Marquee Band */}
-      <section className="framer-marquee-ribbon" aria-label="Feature highlights">
-        <div className="framer-marquee-track">
-          {[
-            '⚡ 4K Ultra HD Export',
-            '🎥 Screen & Camera Overlay',
-            '🎨 Framed & Styled Backgrounds',
-            '✂️ Precise Video Trimming',
-            '🔒 100% Local & Private Processing',
-            '🚀 Zero Installation Needed',
-            '⚡ 4K Ultra HD Export',
-            '🎥 Screen & Camera Overlay',
-            '🎨 Framed & Styled Backgrounds',
-            '✂️ Precise Video Trimming',
-            '🔒 100% Local & Private Processing',
-            '🚀 Zero Installation Needed',
-          ].map((item, i) => (
-            <div key={i} className="framer-marquee-badge">
-              {item}
+      {!heroOnly && (
+        <>
+          {/* Infinite Framer Ticker Marquee Band */}
+          <section className="framer-marquee-ribbon" aria-label="Feature highlights">
+            <div className="framer-marquee-track">
+              {[
+                '⚡ 4K Ultra HD Export',
+                '🎥 Screen & Camera Overlay',
+                '🎨 Framed & Styled Backgrounds',
+                '✂️ Precise Video Trimming',
+                '🔒 100% Local & Private Processing',
+                '🚀 Zero Installation Needed',
+                '⚡ 4K Ultra HD Export',
+                '🎥 Screen & Camera Overlay',
+                '🎨 Framed & Styled Backgrounds',
+                '✂️ Precise Video Trimming',
+                '🔒 100% Local & Private Processing',
+                '🚀 Zero Installation Needed',
+              ].map((item, i) => (
+                <div key={i} className="framer-marquee-badge">
+                  {item}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
 
-      <section className="monza-logos" aria-label="Demonion use cases">
-        <span>For founders</span>
-        <span>For designers</span>
-        <span>For educators</span>
-        <span>For support teams</span>
-        <span>For product teams</span>
-      </section>
+          <section className="monza-logos" aria-label="Demonion use cases">
+            <span>For founders</span>
+            <span>For designers</span>
+            <span>For educators</span>
+            <span>For support teams</span>
+            <span>For product teams</span>
+          </section>
 
-      <section className="monza-section" id="features">
-        <div className="monza-section-heading">
-          <span className="framer-kicker">Features</span>
-          <h3>Everything you need to make a clear walkthrough.</h3>
-          <p>Record, style, trim, and export without jumping between multiple tools.</p>
-        </div>
-        <div className="monza-feature-grid">
-          {featureRows.map((feature) => (
-            <article 
-              key={feature.title}
-              onMouseMove={handlePointerMove}
-              onTouchStart={handlePointerMove}
-              onTouchMove={handlePointerMove}
-            >
-              <feature.icon size={22} />
-              <h4>{feature.title}</h4>
-              <p>{feature.copy}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+          <section className="monza-section" id="features">
+            <div className="monza-section-heading">
+              <span className="framer-kicker">Features</span>
+              <h3>Everything you need to make a clear walkthrough.</h3>
+              <p>Record, style, trim, and export without jumping between multiple tools.</p>
+            </div>
+            <div className="monza-feature-grid">
+              {featureRows.map((feature) => (
+                <article 
+                  key={feature.title}
+                  onMouseMove={handlePointerMove}
+                  onTouchStart={handlePointerMove}
+                  onTouchMove={handlePointerMove}
+                >
+                  <feature.icon size={22} />
+                  <h4>{feature.title}</h4>
+                  <p>{feature.copy}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="monza-band" id="how-it-works">
+            <div className="monza-band-heading">
+              <span className="framer-kicker">Workflow</span>
+              <h3>Three steps from idea to export.</h3>
+            </div>
+            <div className="monza-steps">
+              <div>
+                <span className="monza-step-num">01</span>
+                <h4>Record</h4>
+                <p>Pick screen + camera layout or full screen focus.</p>
+              </div>
+              <div>
+                <span className="monza-step-num">02</span>
+                <h4>Style</h4>
+                <p>Adjust padding, background color, framing, and camera shape.</p>
+              </div>
+              <div>
+                <span className="monza-step-num">03</span>
+                <h4>Export</h4>
+                <p>Trim slow starts and save a high quality video file.</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="monza-layouts">
+            <div className="monza-section-heading">
+              <span className="framer-kicker">Presets</span>
+              <h3>Built for every type of video.</h3>
+            </div>
+            <div className="monza-layout-cards">
+              <article>
+                <div className="monza-mini-stage mini-screen-only">
+                  <div className="monza-mini-screen" />
+                  <div className="monza-mini-cam" />
+                </div>
+                <h4>Screen + Camera Only</h4>
+                <p>No padding, no background. Maximum focus on the application interface.</p>
+              </article>
+              <article>
+                <div className="monza-mini-stage mini-styled">
+                  <div className="monza-mini-screen" />
+                  <div className="monza-mini-cam" />
+                </div>
+                <h4>Styled Background</h4>
+                <p>Framed browser card with gradient or solid background for marketing demos.</p>
+              </article>
+              <article>
+                <div className="monza-mini-stage mini-sidecam">
+                  <div className="monza-mini-sidecam-box" />
+                  <div className="monza-mini-screen" />
+                </div>
+                <h4>5:4 Side Camera</h4>
+                <p>Dedicated side-by-side camera view for structured video courses.</p>
+              </article>
+            </div>
+          </section>
+
+          <section className="monza-stats">
+            {stats.map(([num, label]) => (
+              <div key={num} className="monza-stat">
+                <strong>{num}</strong>
+                <span>{label}</span>
+              </div>
+            ))}
+          </section>
+
+          <section className="monza-split" id="use-cases">
+            <div>
+              <span className="framer-kicker">Use Cases</span>
+              <h3>Who uses Demonion?</h3>
+              <p>Designed for anyone who needs to explain software clearly.</p>
+            </div>
+            <div className="monza-usecase-grid">
+              {useCases.map(([title, desc]) => (
+                <div key={title}>
+                  <h4>{title}</h4>
+                  <p>{desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="monza-testimonials">
+            <div className="monza-section-heading">
+              <span className="framer-kicker">Feedback</span>
+              <h3>What creators say</h3>
+            </div>
+            <div className="monza-testimonial-grid">
+              {testimonials.map(([quote, role], i) => (
+                <div key={i} className="monza-testimonial-card">
+                  <div className="monza-stars">
+                    {[...Array(5)].map((_, idx) => (
+                      <Star key={idx} size={14} fill="#f59e0b" color="#f59e0b" />
+                    ))}
+                  </div>
+                  <p>"{quote}"</p>
+                  <span>— {role}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="monza-free-plan">
+            <div className="monza-free-plan-card">
+              <div className="monza-free-plan-header">
+                <span className="framer-kicker">Pricing</span>
+                <h3>100% Free & Local</h3>
+                <p>Everything runs in your browser. No sign up, no watermarks, no limits.</p>
+              </div>
+              <div className="monza-free-plan-features">
+                <div><Check size={16} /> Unlimited recording length</div>
+                <div><Check size={16} /> Up to 4K resolution export</div>
+                <div><Check size={16} /> Camera overlay & side-by-side mode</div>
+                <div><Check size={16} /> Custom gradient backgrounds</div>
+                <div><Check size={16} /> Built-in video trimming</div>
+                <div><Check size={16} /> 100% private local processing</div>
+              </div>
+              <button onClick={onOpenStudio} className="framer-primary">
+                <Video size={16} /> Open Studio Now <ArrowRight size={17} />
+              </button>
+            </div>
+          </section>
+
+          <section className="monza-faq">
+            <div className="monza-section-heading">
+              <span className="framer-kicker">FAQ</span>
+              <h3>Frequently asked questions</h3>
+            </div>
+            <div className="monza-faq-list">
+              {faqs.map(([q, a]) => (
+                <details key={q}>
+                  <summary>{q}</summary>
+                  <p>{a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+
+          <section className="monza-final" id="ready">
+            <div className="monza-final-card">
+              <h3>Start recording your next demo now.</h3>
+              <p>No downloads or account required. Launch the studio in your browser.</p>
+              <button onClick={onOpenStudio} className="framer-primary">
+                <Video size={16} /> Open Demonion Studio <ArrowRight size={17} />
+              </button>
+            </div>
+          </section>
+
+          <Footer />
+        </>
+      )}
 
       <section className="monza-band">
         <div>

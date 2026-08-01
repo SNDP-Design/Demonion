@@ -60,6 +60,11 @@ function App() {
   const importedAudioRef = useRef<HTMLAudioElement | null>(null);
   const landingScrollRef = useRef<HTMLDivElement | null>(null);
   const lastLandingScrollTopRef = useRef(0);
+  const isMacPlatform = typeof window !== 'undefined' && (
+    Boolean(window.electronAPI?.isElectron) ||
+    navigator.userAgent.includes('Electron') ||
+    navigator.platform.toUpperCase().includes('MAC')
+  );
   const webcamStreamRef = useRef<MediaStream | null>(null);
   const webcamRequestRef = useRef<Promise<boolean> | null>(null);
   const screenRecorderRef = useRef<MediaRecorder | null>(null);
@@ -929,9 +934,9 @@ function App() {
 
       {/* Layout Content Body */}
       <div
-        ref={showLandingPage ? landingScrollRef : undefined}
-        onScroll={showLandingPage ? handleLandingScroll : undefined}
-        className={showLandingPage ? 'landing-scroll-container flex-1' : 'flex-1 flex overflow-hidden'}
+        ref={showLandingPage && !isMacPlatform ? landingScrollRef : undefined}
+        onScroll={showLandingPage && !isMacPlatform ? handleLandingScroll : undefined}
+        className={showLandingPage ? `landing-scroll-container flex-1 ${isMacPlatform ? 'overflow-hidden max-h-screen' : ''}` : 'flex-1 flex overflow-hidden'}
       >
 
         {showLandingPage ? (
@@ -944,12 +949,14 @@ function App() {
                     <h1>Demonion</h1>
                   </div>
                 </a>
-                <nav className="xg-nav-links" aria-label="Main sections">
-                  <a href="/#features">Features</a>
-                  <a href="/#how-it-works">How it works</a>
-                  <a href="/#use-cases">Use cases</a>
-                  <a href="/#ready">Ready</a>
-                </nav>
+                {!isMacPlatform && (
+                  <nav className="xg-nav-links" aria-label="Main sections">
+                    <a href="/#features">Features</a>
+                    <a href="/#how-it-works">How it works</a>
+                    <a href="/#use-cases">Use cases</a>
+                    <a href="/#ready">Ready</a>
+                  </nav>
+                )}
                 <div className="xg-nav-actions">
                   <button onClick={openStudio} className="xg-button xg-button-primary">
                     Open studio <ArrowRight size={15} />
@@ -957,7 +964,7 @@ function App() {
                 </div>
               </div>
             </header>
-            <LandingPage onOpenStudio={openStudio} />
+            <LandingPage onOpenStudio={openStudio} heroOnly={isMacPlatform} />
 
             {/* Floating Recording Bar */}
             {recordingState === 'recording' && (
