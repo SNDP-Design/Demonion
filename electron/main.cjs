@@ -1,4 +1,4 @@
-const { app, BrowserWindow, desktopCapturer, ipcMain, Menu, shell, systemPreferences } = require('electron');
+const { app, BrowserWindow, desktopCapturer, ipcMain, Menu, shell, systemPreferences, session } = require('electron');
 const path = require('path');
 
 let mainWindow = null;
@@ -62,6 +62,24 @@ app.whenReady().then(async () => {
     } catch (err) {
       console.warn('macOS Media Permission error:', err);
     }
+  }
+
+  // Handle getDisplayMedia screen recording requests natively in Electron
+  if (session.defaultSession) {
+    session.defaultSession.setDisplayMediaRequestHandler(async (request, callback) => {
+      try {
+        const sources = await desktopCapturer.getSources({ types: ['screen', 'window'] });
+        const primary = sources.find((s) => s.id.startsWith('screen')) || sources[0];
+        if (primary) {
+          callback({ video: primary });
+        } else {
+          callback({});
+        }
+      } catch (err) {
+        console.warn('Display media request handler error:', err);
+        callback({});
+      }
+    });
   }
 
   setupAppMenu();

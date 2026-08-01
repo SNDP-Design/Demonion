@@ -476,9 +476,10 @@ function App() {
 
     } catch (err) {
       console.error('Recording initialization failed:', err);
+      setIsRecordingModalOpen(false);
       setShowLandingPage(true);
-      setIsRecordingModalOpen(true);
       setRecordingState('idle');
+      window.alert('Screen recording could not be started. Please ensure Screen Recording permission is enabled in macOS System Settings > Privacy & Security > Screen & System Audio Recording.');
     }
   };
 
