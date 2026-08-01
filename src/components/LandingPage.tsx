@@ -4,13 +4,10 @@ import {
   Camera,
   Check,
   FileText,
-  Film,
   Layers3,
   Maximize2,
   Mic,
-  Monitor,
   MousePointer2,
-  Play,
   Scissors,
   ShieldCheck,
   Sparkles,
@@ -182,7 +179,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, heroOnly
   };
 
   return (
-    <main className="monza-landing" id="home">
+    <main className={`monza-landing ${heroOnly ? 'hero-only-landing' : ''}`} id="home">
       {/* Framer Dotted Grid Backdrop */}
       <div className="framer-grid-overlay" />
 
@@ -207,14 +204,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, heroOnly
           <button onClick={onOpenStudio} className="framer-primary">
             <Video size={16} /> Start Recording Now <ArrowRight size={17} />
           </button>
-          <a href="#features" className="monza-secondary">
-            Explore features <ArrowRight size={15} />
-          </a>
+          {!heroOnly && (
+            <a href="#features" className="monza-secondary">
+              Explore features <ArrowRight size={15} />
+            </a>
+          )}
         </div>
         <div className="monza-proof">
-          <span><Check size={13} /> No install</span>
-          <span><Check size={13} /> 16:9 output</span>
           <span><Check size={13} /> Screen + camera</span>
+          <span><Check size={13} /> 16:9 output</span>
+          <span><Check size={13} /> 4K export</span>
         </div>
       </section>
 
@@ -534,99 +533,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, heroOnly
           <Footer />
         </>
       )}
-
-      <section className="monza-band">
-        <div>
-          <span className="framer-kicker">Layouts</span>
-          <h3>Choose clean or designed after recording.</h3>
-          <p>One recording can become a focused tutorial or a polished product demo.</p>
-        </div>
-        <div className="monza-layouts">
-          <article><Monitor size={22} /><h4>Screen + Camera</h4><p>Full screen, camera overlay, no background.</p></article>
-          <article><Layers3 size={22} /><h4>Styled Background</h4><p>Gradient canvas, rounded browser frame, and soft shadow.</p></article>
-        </div>
-      </section>
-
-      <section className="monza-stats">
-        {stats.map(([value, label]) => (
-          <article key={value}><b>{value}</b><span>{label}</span></article>
-        ))}
-      </section>
-
-      <section className="monza-split" id="how-it-works">
-        <div>
-          <span className="framer-kicker">Workflow</span>
-          <h3>From raw screen to shareable demo.</h3>
-        </div>
-        <ol>
-          <li><b>01</b><div><h4>Record</h4><p>Pick screen, camera, and mic options before capture.</p></div></li>
-          <li><b>02</b><div><h4>Style</h4><p>Choose screen-only or styled background, then position the facecam.</p></div></li>
-          <li><b>03</b><div><h4>Export</h4><p>Trim the ends and download the final video.</p></div></li>
-        </ol>
-      </section>
-
-      <section className="monza-section" id="use-cases">
-        <div className="monza-section-heading">
-          <span className="framer-kicker">Use cases</span>
-          <h3>Make videos people can actually follow.</h3>
-        </div>
-        <div className="monza-usecase-grid">
-          {useCases.map(([title, copy]) => (
-            <article key={title}><h4>{title}</h4><p>{copy}</p></article>
-          ))}
-        </div>
-      </section>
-
-      <section className="monza-testimonials">
-        <div className="monza-section-heading">
-          <span className="framer-kicker">What it feels like</span>
-          <h3>Simple enough to use every day.</h3>
-        </div>
-        <div>
-          {testimonials.map(([quote, role]) => (
-            <article key={quote}>
-              <div><Star size={15} /><Star size={15} /><Star size={15} /></div>
-              <p>"{quote}"</p>
-              <span>{role}</span>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="monza-free-plan">
-        <div>
-          <span className="framer-kicker">Free plan</span>
-          <h3>Start with the browser studio.</h3>
-          <p>Use Demonion without a paid tool. Record, style, trim, and export from your browser.</p>
-        </div>
-        <ul>
-          <li><Check size={15} /> Screen recording</li>
-          <li><Check size={15} /> Camera overlay</li>
-          <li><Check size={15} /> 16:9 canvas</li>
-          <li><Check size={15} /> Video export</li>
-        </ul>
-      </section>
-
-      <section className="monza-faq">
-        <div className="monza-section-heading">
-          <span className="framer-kicker">FAQ</span>
-          <h3>Questions before you record.</h3>
-        </div>
-        <div>
-          {faqs.map(([question, answer]) => (
-            <article key={question}><h4>{question}</h4><p>{answer}</p></article>
-          ))}
-        </div>
-      </section>
-
-      <section className="monza-final" id="ready">
-        <Film size={30} />
-        <h3>Ready to make your next screen recording easier to watch?</h3>
-        <p>Open the free studio, record your screen, and choose the style that fits.</p>
-        <button onClick={onOpenStudio} className="framer-primary">Start recording free <Play size={16} /></button>
-      </section>
-
-      <Footer />
     </main>
   );
 };
