@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Gauge, Music, Pause, Play, RotateCcw, Scissors, Trash2, Volume2, VolumeX, Plus, Copy, ZoomIn, ZoomOut, Maximize2, Sparkles, Layers } from 'lucide-react';
+import { Gauge, Music, Pause, Play, RotateCcw, Scissors, Trash2, Volume2, VolumeX, Copy, ZoomIn, ZoomOut, Maximize2, Sparkles, Layers } from 'lucide-react';
 import type { AudioTrackState, VideoSegment, ClipTransition } from '../types';
 
 interface TimelineProps {
@@ -434,7 +434,7 @@ export const Timeline: React.FC<TimelineProps> = ({
         {/* Canva Audio Track Row under Video Timeline */}
         <div className="timeline-audio-row canva-audio-row">
           <div className="audio-row-control">
-            {audioTrack ? (
+            {audioTrack && (
               <div className="audio-track-info-badge">
                 <Music size={14} className="text-pink-400 shrink-0" />
                 <span className="audio-name" title={audioTrack.name}>{audioTrack.name}</span>
@@ -482,16 +482,6 @@ export const Timeline: React.FC<TimelineProps> = ({
                   <Trash2 size={12} />
                 </button>
               </div>
-            ) : (
-              <button
-                onClick={() => audioFileInputRef.current?.click()}
-                className="import-audio-btn"
-                title="Import audio file from your computer"
-              >
-                <Plus size={14} />
-                <Music size={14} />
-                <span>Import Audio</span>
-              </button>
             )}
           </div>
 
