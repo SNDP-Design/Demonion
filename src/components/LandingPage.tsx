@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   ArrowRight,
   Camera,
@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Sparkles,
   Star,
+  Upload,
   Video,
   WandSparkles,
 } from 'lucide-react';
@@ -19,6 +20,7 @@ import { DemonionLogo } from './DemonionLogo';
 
 interface LandingPageProps {
   onOpenStudio: () => void;
+  onImportVideoFile?: (file: File) => void;
   heroOnly?: boolean;
 }
 
@@ -139,7 +141,8 @@ const legalPages: Record<LegalPageKey, {
   },
 };
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, heroOnly = false }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, onImportVideoFile, heroOnly = false }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeMode, setActiveMode] = useState(0);
   const [activeBgPreset, setActiveBgPreset] = useState('nebula');
   const [activeCamShape, setActiveCamShape] = useState<'circle' | 'rounded'>('rounded');
@@ -207,8 +210,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, heroOnly
         </p>
         <div className="monza-actions">
           <button onClick={onOpenStudio} className="framer-primary">
-            <Video size={16} /> Start Recording Now <ArrowRight size={17} />
+            <Video size={16} /> Start Web Recording <ArrowRight size={17} />
           </button>
+          {onImportVideoFile && (
+            <>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/*"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) onImportVideoFile(file);
+                }}
+              />
+              <button onClick={() => fileInputRef.current?.click()} className="monza-secondary" title="Open native recording (.mp4/.mov) or existing video file">
+                <Upload size={15} /> Open Native Recording
+              </button>
+            </>
+          )}
           {!heroOnly && (
             <a href="#features" className="monza-secondary">
               Explore features <ArrowRight size={15} />
