@@ -144,11 +144,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, heroOnly
   const [activeBgPreset, setActiveBgPreset] = useState('nebula');
   const [activeCamShape, setActiveCamShape] = useState<'circle' | 'rounded'>('rounded');
   const [activeCamPos, setActiveCamPos] = useState<'bottom-right' | 'top-right' | 'side-right'>('bottom-right');
+  const [currentLegalPage, setCurrentLegalPage] = useState<LegalPageKey | null>(() => {
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+    if (path === '/terms' || hash === '#terms') return 'terms';
+    if (path === '/privacy' || hash === '#privacy') return 'privacy';
+    return null;
+  });
 
   const active = previewModes[activeMode];
   const ActiveIcon = active.icon;
-  const path = window.location.pathname;
-  const legalPageKey = path === '/terms' ? 'terms' : path === '/privacy' ? 'privacy' : null;
 
   const handlePointerMove = (e: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>) => {
     const card = e.currentTarget;
@@ -162,11 +167,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, heroOnly
     card.setAttribute('data-active', 'true');
   };
 
-  if (legalPageKey) {
+  if (currentLegalPage) {
     return (
       <main className="monza-landing" id="home">
-        <LegalPage pageKey={legalPageKey} />
-        <Footer />
+        <LegalPage pageKey={currentLegalPage} onBackToHome={() => setCurrentLegalPage(null)} />
+        <Footer onNavigateLegal={(key) => setCurrentLegalPage(key)} onBackToHome={() => setCurrentLegalPage(null)} />
       </main>
     );
   }
@@ -537,14 +542,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, heroOnly
   );
 };
 
-const LegalPage: React.FC<{ pageKey: LegalPageKey }> = ({ pageKey }) => {
+const LegalPage: React.FC<{ pageKey: LegalPageKey; onBackToHome: () => void }> = ({ pageKey, onBackToHome }) => {
   const page = legalPages[pageKey];
   const PageIcon = page.icon;
 
   return (
     <section className="legal-page">
       <div className="legal-container">
-        <a href="/" className="legal-back">Back to home</a>
+        <button onClick={onBackToHome} className="legal-back" style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', color: 'inherit', padding: 0 }}>
+          ← Back to home
+        </button>
         <div className="legal-hero">
           <div className="legal-icon"><PageIcon size={24} /></div>
           <span className="framer-kicker">{page.eyebrow}</span>
@@ -575,19 +582,19 @@ const LegalPage: React.FC<{ pageKey: LegalPageKey }> = ({ pageKey }) => {
   );
 };
 
-const Footer: React.FC = () => (
+const Footer: React.FC<{ onNavigateLegal?: (key: LegalPageKey) => void; onBackToHome?: () => void }> = ({ onNavigateLegal, onBackToHome }) => (
   <footer className="demonion-footer">
     <div className="footer-top-glow" />
     <div className="footer-grid">
       {/* Brand Column */}
       <div className="footer-column brand-col">
-        <a href="/" className="footer-brand-info">
+        <button onClick={onBackToHome} className="footer-brand-info" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}>
           <span className="footer-logo-wrapper"><DemonionLogo size={28} /></span>
           <div>
             <span className="footer-brand-name">Demonion</span>
             <span className="footer-brand-tagline">Browser recording studio</span>
           </div>
-        </a>
+        </button>
         <p className="footer-description">
           Record your screen, camera, and audio, style with beautiful backgrounds, and export 4K walkthroughs directly from your browser.
         </p>
@@ -618,8 +625,12 @@ const Footer: React.FC = () => (
         <nav aria-label="Resource Links">
           <a href="https://github.com/SNDP-Design/Demonion" target="_blank" rel="noopener noreferrer">GitHub Repo</a>
           <a href="https://www.demonion.uno/" target="_blank" rel="noopener noreferrer">Live Site</a>
-          <a href="/terms">Terms of Service</a>
-          <a href="/privacy">Privacy Policy</a>
+          <button onClick={() => onNavigateLegal?.('terms')} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0, textAlign: 'left' }}>
+            Terms of Service
+          </button>
+          <button onClick={() => onNavigateLegal?.('privacy')} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0, textAlign: 'left' }}>
+            Privacy Policy
+          </button>
         </nav>
       </div>
     </div>

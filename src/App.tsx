@@ -808,12 +808,12 @@ function App() {
       {/* Studio Header Bar */}
       {!showLandingPage && <header className="xg-nav select-none studio-nav">
         <div className="xg-nav-inner studio-nav-inner">
-          <a href="/" className="xg-brand">
+          <button onClick={() => setShowLandingPage(true)} className="xg-brand" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}>
             <div className="xg-brand-mark"><DemonionLogo size={24} /></div>
             <div>
               <h1>Demonion</h1>
             </div>
-          </a>
+          </button>
 
           {recordingState === 'idle' ? (
             <div className="xg-nav-actions studio-record-actions">
@@ -943,12 +943,12 @@ function App() {
           <>
             <header className={`xg-nav landing-nav select-none ${hideLandingNav ? 'landing-nav-hidden' : ''}`}>
               <div className="xg-nav-inner">
-                <a href="/" className="xg-brand">
+                <button onClick={() => setShowLandingPage(true)} className="xg-brand" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}>
                   <div className="xg-brand-mark"><DemonionLogo size={24} /></div>
                   <div>
                     <h1>Demonion</h1>
                   </div>
-                </a>
+                </button>
                 {!isElectronApp && (
                   <nav className="xg-nav-links" aria-label="Main sections">
                     <a href="/#features">Features</a>
