@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import type { EditorSettings, ClickMoment, VideoSegment, AudioTrackState, ClipTransition } from './types';
+import type { EditorSettings, ClickMoment, VideoSegment, AudioTrackState } from './types';
 import { DEFAULT_SETTINGS } from './constants/presets';
 import { SidebarControls } from './components/SidebarControls';
 import { CanvasEditor } from './components/CanvasEditor';
@@ -554,37 +554,6 @@ function App() {
     setTrimEnd(duration);
   }, [duration]);
 
-  const handleDuplicateSegment = useCallback((id: string) => {
-    setClips((currentClips) => {
-      const idx = currentClips.findIndex((c) => c.id === id);
-      if (idx === -1) return currentClips;
-      const target = currentClips[idx];
-      const dup: VideoSegment = {
-        ...target,
-        id: `clip-${Date.now()}`
-      };
-      const updated = [...currentClips];
-      updated.splice(idx + 1, 0, dup);
-      return updated;
-    });
-  }, []);
-
-  const handleReorderSegments = useCallback((fromIdx: number, toIdx: number) => {
-    setClips((currentClips) => {
-      if (fromIdx < 0 || fromIdx >= currentClips.length || toIdx < 0 || toIdx >= currentClips.length) return currentClips;
-      const updated = [...currentClips];
-      const [moved] = updated.splice(fromIdx, 1);
-      updated.splice(toIdx, 0, moved);
-      return updated;
-    });
-  }, []);
-
-  const handleSetClipTransition = useCallback((id: string, transition: ClipTransition) => {
-    setClips((currentClips) => {
-      return currentClips.map((c) => (c.id === id ? { ...c, transition } : c));
-    });
-  }, []);
-
   // Audio Import Handlers
   const handleImportAudio = useCallback((file: File) => {
     if (importedAudio?.src) {
@@ -1025,11 +994,8 @@ function App() {
                 selectedSegmentId={selectedSegmentId}
                 onSelectSegment={setSelectedSegmentId}
                 onCutAtPlayhead={handleCutAtPlayhead}
-                onDuplicateSegment={handleDuplicateSegment}
                 onDeleteSegment={handleDeleteSegment}
                 onResetCuts={handleResetCuts}
-                onReorderSegments={handleReorderSegments}
-                onSetClipTransition={handleSetClipTransition}
                 audioTrack={importedAudio}
                 onImportAudio={handleImportAudio}
                 onRemoveAudio={handleRemoveAudio}

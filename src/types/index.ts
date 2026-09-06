@@ -35,15 +35,10 @@ export interface ClickMoment {
   y: number;
 }
 
-export type ClipTransition = 'none' | 'fade' | 'dissolve' | 'slide';
-
 export interface VideoSegment {
   id: string;
-  name?: string;
-  start: number; // start time in source video (seconds)
-  end: number;   // end time in source video (seconds)
-  transition?: ClipTransition;
-  transitionDuration?: number; // default 0.5s
+  start: number; // start time in video (seconds)
+  end: number;   // end time in video (seconds)
 }
 
 export interface AudioTrackState {
@@ -56,8 +51,6 @@ export interface AudioTrackState {
   trimEnd: number;   // end trim within audio file in seconds
   volume: number;    // 0 to 1
   muted: boolean;
-  fadeIn?: number;   // seconds
-  fadeOut?: number;  // seconds
 }
 
 export interface ElectronDesktopSource {
