@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, ArrowUpRight, Camera, Check, Circle, Download, FileText, Layers3, Maximize2, Mic, MousePointer2, Pause, Play, Scissors, ShieldCheck, Sparkles, Upload, Video, WandSparkles } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Camera, Check, Circle, Download, FileText, Layers3, Maximize2, Mic, MousePointer2, Pause, Play, Scissors, ShieldCheck, Sparkles, Video, WandSparkles } from 'lucide-react';
 import { DemonionLogo } from './DemonionLogo';
 import './landing.css';
 
 interface LandingPageProps {
   onOpenStudio: () => void;
-  onImportVideoFile?: (file: File) => void;
   heroOnly?: boolean;
 }
 
@@ -71,7 +70,6 @@ const questions = [
   ['Do I need to install anything?', 'No. Open the studio in your browser to record your screen, camera, and voice. Screen capture support depends on your browser and device; a desktop browser works best.'],
   ['Is Demonion really free?', 'Yes. Record, style, trim, and export without a subscription or an account.'],
   ['Where do my recordings go?', 'Your recordings are processed locally in your browser. Export the finished video directly to your device.'],
-  ['Can I edit a video I already have?', 'Yes. Choose Import video to open an existing video in the editor, then style, trim, and export it.'],
   ['Can I record without my camera?', 'Yes. Turn off Camera Overlay before recording. In the editor, Hide camera also removes voice audio from the export.'],
 ];
 const palettes = [
@@ -80,9 +78,8 @@ const palettes = [
   { name: 'Rose', color: 'linear-gradient(135deg, #57309d, #ba69bd 60%, #f3cbec)' },
 ];
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, onImportVideoFile, heroOnly = false }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, heroOnly = false }) => {
   const rootRef = useRef<HTMLElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [palette, setPalette] = useState(0);
   const [layout, setLayout] = useState('Styled');
   const [playing, setPlaying] = useState(true);
@@ -119,8 +116,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, onImport
         <div className="dm-eyebrow"><span className="dm-status" /> YOUR SCREEN. A LITTLE MORE CINEMATIC.</div>
         <h1>Good ideas deserve<br /><span>a great demo.</span><Sparkles className="dm-title-spark" aria-hidden="true" /></h1>
         <p>Turn everyday screen recordings into something worth watching.<br className="dm-desktop-break" /> Record, add your style, and make your next big idea click.</p>
-        <div className="dm-actions"><button className="dm-button" onClick={onOpenStudio}><Video size={18} /> Start creating — it’s free <ArrowUpRight size={19} /></button>{onImportVideoFile && <button className="dm-button dm-button-quiet" onClick={() => fileInputRef.current?.click()}><Upload size={17} /> Import video</button>}</div>
-        <input hidden type="file" accept="video/*" ref={fileInputRef} onChange={event => { const file = event.target.files?.[0]; if (file) onImportVideoFile?.(file); event.target.value = ''; }} />
+        <div className="dm-actions"><button className="dm-button" onClick={onOpenStudio}><Video size={18} /> Start creating — it’s free <ArrowUpRight size={19} /></button></div>
         <div className="dm-proof"><span><Check size={13} /> No sign-up</span><span><Check size={13} /> No watermarks</span><span><ShieldCheck size={13} /> Stays on your device</span></div>
       </section>
 

@@ -321,15 +321,6 @@ function App() {
     lastLandingScrollTopRef.current = Math.max(scrollTop, 0);
   }, []);
 
-  const handleImportVideoFile = useCallback((file: File) => {
-    const url = URL.createObjectURL(file);
-    if (videoSrc) URL.revokeObjectURL(videoSrc);
-    hasInitializedZoomPointsRef.current = false;
-    setVideoSrc(url);
-    setRecordingState('editor');
-    setShowLandingPage(false);
-  }, [videoSrc]);
-
   // Handle countdown overlay before screen recording starts
   const handleStartScreenRecording = async () => {
     try {
@@ -804,7 +795,7 @@ function App() {
                 </div>
               </div>
             </header>
-            <LandingPage onOpenStudio={openStudio} onImportVideoFile={handleImportVideoFile} heroOnly={isElectronApp} />
+            <LandingPage onOpenStudio={openStudio} heroOnly={isElectronApp} />
 
             {/* Floating Recording Bar */}
             {recordingState === 'recording' && (
