@@ -5237,6 +5237,12 @@ aside.sidebar {
   box-shadow: 0 0 16px rgba(56, 189, 248, 0.95), 0 0 0 4px rgba(6, 182, 212, 0.3);
 }
 
+.timeline-zoom-dot.selected {
+  border-color: #f43f5e;
+  box-shadow: 0 0 16px rgba(244, 63, 94, 0.95), 0 0 0 4px rgba(244, 63, 94, 0.35);
+  transform: translate(-50%, -50%) scale(1.22);
+}
+
 .timeline-zoom-dot.disabled {
   opacity: 0.45;
   filter: grayscale(0.5);
@@ -5249,6 +5255,36 @@ aside.sidebar {
   background: #ffffff;
   box-shadow: 0 0 4px #ffffff;
   pointer-events: none;
+}
+
+.timeline-zoom-dot-badge-delete {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 1.5px solid #ffffff;
+  color: #ffffff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  z-index: 30;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.timeline-zoom-dot:hover .timeline-zoom-dot-badge-delete,
+.timeline-zoom-dot.selected .timeline-zoom-dot-badge-delete {
+  display: flex;
+}
+
+.timeline-zoom-dot-badge-delete:hover {
+  background: #dc2626;
+  transform: scale(1.2);
 }
 
 .timeline-zoom-dot-tooltip {
@@ -5280,25 +5316,45 @@ aside.sidebar {
 .timeline-zoom-dot-delete {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: rgba(239, 68, 68, 0.3);
-  border: 1px solid rgba(239, 68, 68, 0.6);
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.25);
+  border: 1px solid rgba(239, 68, 68, 0.5);
   color: #fca5a5;
-  font-size: 11px;
-  line-height: 1;
+  font-size: 10px;
+  font-weight: 600;
   cursor: pointer;
-  padding: 0;
-  margin-left: 2px;
   transition: all 0.15s ease;
 }
 
 .timeline-zoom-dot-delete:hover {
   background: #ef4444;
+  border-color: #ef4444;
   color: #ffffff;
-  transform: scale(1.15);
+  transform: scale(1.05);
+}
+
+.video-editor-delete-zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 7px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.video-editor-delete-zoom-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.7);
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 
 .video-editor-add-zoom-btn {

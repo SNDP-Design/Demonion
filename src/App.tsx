@@ -65,6 +65,7 @@ function App() {
   const recordedCameraChunksRef = useRef<Blob[]>([]);
   const recordingStartTimeRef = useRef(0);
   const clickMomentsRef = useRef<ClickMoment[]>([]);
+  const hasInitializedZoomPointsRef = useRef(false);
   const lastPointerRef = useRef({ x: 0.5, y: 0.5 });
   const timerRef = useRef<ReturnType<typeof window.setInterval> | null>(null);
   const [recTime, setRecTime] = useState(0);
@@ -323,6 +324,7 @@ function App() {
   const handleImportVideoFile = useCallback((file: File) => {
     const url = URL.createObjectURL(file);
     if (videoSrc) URL.revokeObjectURL(videoSrc);
+    hasInitializedZoomPointsRef.current = false;
     setVideoSrc(url);
     setRecordingState('editor');
     setShowLandingPage(false);
@@ -504,13 +506,14 @@ function App() {
       setTrimStart(0);
       setTrimEnd(dur);
 
-      // Default auto-zoom click dot if none exist yet
-      if (clickMomentsRef.current.length === 0 && dur > 0) {
+      // Default auto-zoom click dot if none exist yet upon initial video load
+      if (!hasInitializedZoomPointsRef.current && clickMomentsRef.current.length === 0 && dur > 0) {
         const initialTime = Math.min(2.0, Math.max(0.5, dur * 0.25));
         const initialMoment: ClickMoment = { time: initialTime, x: 0.5, y: 0.5 };
         setClickMoments([initialMoment]);
         clickMomentsRef.current = [initialMoment];
       }
+      hasInitializedZoomPointsRef.current = true;
     }
   };
 

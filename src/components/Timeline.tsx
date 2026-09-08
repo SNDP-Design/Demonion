@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Pause, Play, Scissors, ZoomIn } from 'lucide-react';
+import { Pause, Play, Scissors, Trash2, X, ZoomIn } from 'lucide-react';
 import type { ClickMoment } from '../types';
 
 interface TimelineProps {
@@ -36,6 +36,7 @@ export const Timeline: React.FC<TimelineProps> = ({
   const trackRef = useRef<HTMLDivElement>(null);
   const [draggingItem, setDraggingItem] = useState<'playhead' | 'trim-start' | 'trim-end' | null>(null);
   const [draggingZoomIndex, setDraggingZoomIndex] = useState<number | null>(null);
+  const [selectedZoomIndex, setSelectedZoomIndex] = useState<number | null>(null);
 
   const endTime = trimEnd > 0 ? trimEnd : duration;
 
@@ -80,6 +81,24 @@ export const Timeline: React.FC<TimelineProps> = ({
     };
   }, [draggingItem, draggingZoomIndex, updateFromPointer]);
 
+  // Keyboard shortcut: Delete or Backspace to delete selected zoom point
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (selectedZoomIndex === null) return;
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        e.preventDefault();
+        onDeleteClickMoment?.(selectedZoomIndex);
+        setSelectedZoomIndex(null);
+      } else if (e.key === 'Escape') {
+        setSelectedZoomIndex(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedZoomIndex, onDeleteClickMoment]);
+
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
   const trimStartPercent = duration > 0 ? (trimStart / duration) * 100 : 0;
   const trimEndPercent = duration > 0 ? (endTime / duration) * 100 : 100;
@@ -101,8 +120,25 @@ export const Timeline: React.FC<TimelineProps> = ({
           <span>Timeline Editor</span>
         </div>
         <div className="video-editor-actions">
+          {/* Delete selected zoom point button */}
+          {selectedZoomIndex !== null && clickMoments[selectedZoomIndex] && onDeleteClickMoment && (
+            <button
+              type="button"
+              onClick={() => {
+                onDeleteClickMoment(selectedZoomIndex);
+                setSelectedZoomIndex(null);
+              }}
+              className="video-editor-delete-zoom-btn"
+              title="Delete selected zoom point (or press Backspace/Delete)"
+            >
+              <Trash2 size={12} />
+              <span>Delete Zoom</span>
+            </button>
+          )}
+
           {onAddClickMoment && (
             <button
+              type="button"
               onClick={handleAddZoomAtPlayhead}
               className="video-editor-add-zoom-btn"
               title="Add auto-zoom click dot at playhead"
@@ -111,6 +147,7 @@ export const Timeline: React.FC<TimelineProps> = ({
               <span>+ Zoom Dot</span>
             </button>
           )}
+
           <div className="video-editor-timecodes">
             <b>Length</b> {formatTime(endTime - trimStart)}
           </div>
@@ -130,7 +167,10 @@ export const Timeline: React.FC<TimelineProps> = ({
         <div className="video-editor-track-wrap">
           <div
             ref={trackRef}
-            onClick={(event) => updateFromPointer(event.clientX, 'playhead')}
+            onClick={(event) => {
+              setSelectedZoomIndex(null);
+              updateFromPointer(event.clientX, 'playhead');
+            }}
             className="video-editor-track"
           >
             {/* Background Frame Strips */}
@@ -154,6 +194,7 @@ export const Timeline: React.FC<TimelineProps> = ({
             {clickMoments.map((moment, index) => {
               const dotLeft = duration > 0 ? (moment.time / duration) * 100 : 0;
               const isDragging = draggingZoomIndex === index;
+              const isSelected = selectedZoomIndex === index;
               const isWithinActiveZoom = Math.abs(currentTime - moment.time) <= 1.5;
               const zoomDuration = 2.0; // 2s active auto-zoom window
               const zoomWidth = duration > 0 ? (zoomDuration / duration) * 100 : 0;
@@ -171,30 +212,63 @@ export const Timeline: React.FC<TimelineProps> = ({
 
                   {/* Draggable Dot */}
                   <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedZoomIndex(index);
+                      onTimeUpdate(moment.time);
+                    }}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onDeleteClickMoment?.(index);
+                      if (selectedZoomIndex === index) setSelectedZoomIndex(null);
+                    }}
                     onMouseDown={(e) => {
                       e.stopPropagation();
+                      setSelectedZoomIndex(index);
                       setDraggingZoomIndex(index);
                       onTimeUpdate(moment.time);
                     }}
-                    className={`timeline-zoom-dot ${isDragging ? 'dragging' : ''} ${isWithinActiveZoom ? 'active' : ''} ${!autoZoomEnabled ? 'disabled' : ''}`}
+                    className={`timeline-zoom-dot ${isDragging ? 'dragging' : ''} ${isSelected ? 'selected' : ''} ${isWithinActiveZoom ? 'active' : ''} ${!autoZoomEnabled ? 'disabled' : ''}`}
                     style={{ left: `${dotLeft}%` }}
-                    title={`Auto-Zoom Click at ${formatTime(moment.time)} • Drag to move`}
+                    title={`Auto-Zoom Click at ${formatTime(moment.time)} • Click to select, Drag to move, Right-click to delete`}
                   >
                     <span className="timeline-zoom-dot-inner" />
+
+                    {/* Quick delete badge on hover/selection */}
+                    {onDeleteClickMoment && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteClickMoment(index);
+                          if (selectedZoomIndex === index) setSelectedZoomIndex(null);
+                        }}
+                        className="timeline-zoom-dot-badge-delete"
+                        title="Delete this zoom point"
+                        aria-label="Delete this zoom point"
+                      >
+                        <X size={9} />
+                      </button>
+                    )}
+
+                    {/* Tooltip on hover */}
                     <div className="timeline-zoom-dot-tooltip">
                       <span>🔍 Auto-Zoom {formatTime(moment.time)}</span>
-                      {onDeleteClickMoment && clickMoments.length > 1 && (
+                      {onDeleteClickMoment && (
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             onDeleteClickMoment(index);
+                            if (selectedZoomIndex === index) setSelectedZoomIndex(null);
                           }}
                           className="timeline-zoom-dot-delete"
-                          title="Delete zoom dot"
-                          aria-label="Delete zoom dot"
+                          title="Delete zoom point"
+                          aria-label="Delete zoom point"
                         >
-                          ×
+                          <Trash2 size={10} />
+                          <span>Delete</span>
                         </button>
                       )}
                     </div>
