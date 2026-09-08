@@ -35,24 +35,6 @@ export interface ClickMoment {
   y: number;
 }
 
-export interface VideoSegment {
-  id: string;
-  start: number; // start time in video (seconds)
-  end: number;   // end time in video (seconds)
-}
-
-export interface AudioTrackState {
-  id: string;
-  name: string;
-  src: string;
-  duration: number;
-  startTime: number; // position on timeline in seconds where audio starts playing
-  trimStart: number; // offset within audio file in seconds
-  trimEnd: number;   // end trim within audio file in seconds
-  volume: number;    // 0 to 1
-  muted: boolean;
-}
-
 export interface ElectronDesktopSource {
   id: string;
   name: string;

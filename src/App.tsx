@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import type { EditorSettings, ClickMoment, VideoSegment, AudioTrackState } from './types';
+import type { EditorSettings, ClickMoment } from './types';
 import { DEFAULT_SETTINGS } from './constants/presets';
 import { SidebarControls } from './components/SidebarControls';
 import { CanvasEditor } from './components/CanvasEditor';
@@ -37,15 +37,9 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [trimStart, setTrimStart] = useState(0);
   const [trimEnd, setTrimEnd] = useState(0);
-  const [playbackRate, setPlaybackRate] = useState(1);
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [exportProgress, setExportProgress] = useState<number | null>(null);
   const [clickMoments, setClickMoments] = useState<ClickMoment[]>([]);
-
-  // Video clips & imported audio state
-  const [clips, setClips] = useState<VideoSegment[]>([]);
-  const [selectedSegmentId, setSelectedSegmentId] = useState<string | null>(null);
-  const [importedAudio, setImportedAudio] = useState<AudioTrackState | null>(null);
 
   // Recorder flags
   const [useMic, setUseMic] = useState(true);
@@ -57,7 +51,6 @@ function App() {
   const webcamVideoRef = useRef<HTMLVideoElement | null>(null);
   const modalWebcamVideoRef = useRef<HTMLVideoElement | null>(null);
   const recordedCameraVideoRef = useRef<HTMLVideoElement | null>(null);
-  const importedAudioRef = useRef<HTMLAudioElement | null>(null);
   const landingScrollRef = useRef<HTMLDivElement | null>(null);
   const lastLandingScrollTopRef = useRef(0);
   const isElectronApp = typeof window !== 'undefined' && (
@@ -453,7 +446,6 @@ function App() {
           activeMicStream?.getTracks().forEach((track) => track.stop());
           setMicStream(null);
           setClickMoments(clickMomentsRef.current);
-          setPlaybackRate(1);
           setVideoSrc(URL.createObjectURL(blob));
           setRecordingState('editor');
           setShowLandingPage(false); // Hide landing page to show editor
@@ -507,93 +499,12 @@ function App() {
   const handleMetadata = () => {
     if (editorVideoRef.current) {
       const dur = editorVideoRef.current.duration;
-      editorVideoRef.current.playbackRate = playbackRate;
+      editorVideoRef.current.playbackRate = 1;
       setDuration(dur);
       setTrimStart(0);
       setTrimEnd(dur);
-      setClips([{ id: `clip-${Date.now()}`, start: 0, end: dur }]);
     }
   };
-
-  // Video Cut Handlers
-  const handleCutAtPlayhead = useCallback(() => {
-    const time = editorVideoRef.current ? editorVideoRef.current.currentTime : currentTime;
-    setClips((currentClips) => {
-      if (currentClips.length === 0) {
-        return [
-          { id: `clip-${Date.now()}-1`, start: 0, end: time },
-          { id: `clip-${Date.now()}-2`, start: time, end: duration }
-        ];
-      }
-      const targetIndex = currentClips.findIndex((c) => time > c.start + 0.05 && time < c.end - 0.05);
-      if (targetIndex === -1) return currentClips;
-
-      const targetClip = currentClips[targetIndex];
-      const firstHalf: VideoSegment = { id: `clip-${Date.now()}-1`, start: targetClip.start, end: time };
-      const secondHalf: VideoSegment = { id: `clip-${Date.now()}-2`, start: time, end: targetClip.end };
-
-      const updated = [...currentClips];
-      updated.splice(targetIndex, 1, firstHalf, secondHalf);
-      return updated;
-    });
-  }, [currentTime, duration]);
-
-  const handleDeleteSegment = useCallback((id: string) => {
-    setClips((currentClips) => {
-      const updated = currentClips.filter((c) => c.id !== id);
-      if (updated.length === 0) {
-        return [{ id: `clip-${Date.now()}`, start: 0, end: duration }];
-      }
-      return updated;
-    });
-  }, [duration]);
-
-  const handleResetCuts = useCallback(() => {
-    setClips([{ id: `clip-${Date.now()}`, start: 0, end: duration }]);
-    setTrimStart(0);
-    setTrimEnd(duration);
-  }, [duration]);
-
-  // Audio Import Handlers
-  const handleImportAudio = useCallback((file: File) => {
-    if (importedAudio?.src) {
-      URL.revokeObjectURL(importedAudio.src);
-    }
-    const url = URL.createObjectURL(file);
-    const tempAudio = new Audio(url);
-    tempAudio.onloadedmetadata = () => {
-      setImportedAudio({
-        id: `audio-${Date.now()}`,
-        name: file.name,
-        src: url,
-        duration: tempAudio.duration || 0,
-        startTime: 0,
-        trimStart: 0,
-        trimEnd: tempAudio.duration || 0,
-        volume: 1,
-        muted: false,
-      });
-    };
-  }, [importedAudio]);
-
-  const handleRemoveAudio = useCallback(() => {
-    if (importedAudio?.src) {
-      URL.revokeObjectURL(importedAudio.src);
-    }
-    setImportedAudio(null);
-  }, [importedAudio]);
-
-  const handleToggleAudioMute = useCallback(() => {
-    setImportedAudio((curr) => (curr ? { ...curr, muted: !curr.muted } : null));
-  }, []);
-
-  const handleAudioVolumeChange = useCallback((volume: number) => {
-    setImportedAudio((curr) => (curr ? { ...curr, volume, muted: volume === 0 } : null));
-  }, []);
-
-  const handleAudioPositionChange = useCallback((startTime: number) => {
-    setImportedAudio((curr) => (curr ? { ...curr, startTime } : null));
-  }, []);
 
   const handleTogglePlay = async () => {
     const video = editorVideoRef.current;
@@ -602,25 +513,18 @@ function App() {
     if (!video.paused) {
       video.pause();
       recordedCameraVideoRef.current?.pause();
-      importedAudioRef.current?.pause();
       setIsPlaying(false);
     } else {
       const end = trimEnd > 0 ? trimEnd : duration;
       if (video.currentTime >= end) {
-        const startPos = clips && clips[0] ? clips[0].start : trimStart;
-        video.currentTime = startPos;
+        video.currentTime = trimStart;
         if (recordedCameraVideoRef.current) {
-          recordedCameraVideoRef.current.currentTime = startPos;
+          recordedCameraVideoRef.current.currentTime = trimStart;
         }
       }
       try {
         await video.play();
         void recordedCameraVideoRef.current?.play().catch((e) => console.error(e));
-        if (importedAudioRef.current && importedAudio) {
-          const audioTime = Math.max(0, video.currentTime - importedAudio.startTime + importedAudio.trimStart);
-          importedAudioRef.current.currentTime = audioTime;
-          void importedAudioRef.current.play().catch((e) => console.error(e));
-        }
         setIsPlaying(true);
       } catch (e) {
         console.error(e);
@@ -634,9 +538,6 @@ function App() {
     if (video) {
       video.currentTime = time;
       if (recordedCameraVideoRef.current) recordedCameraVideoRef.current.currentTime = time;
-      if (importedAudioRef.current && importedAudio) {
-        importedAudioRef.current.currentTime = Math.max(0, time - importedAudio.startTime + importedAudio.trimStart);
-      }
       setCurrentTime(time);
     }
   };
@@ -662,80 +563,20 @@ function App() {
     }
   };
 
-  // Playback Rate
-  const handlePlaybackRate = (rate: number) => {
-    setPlaybackRate(rate);
-    if (editorVideoRef.current) {
-      editorVideoRef.current.playbackRate = rate;
-    }
-    if (recordedCameraVideoRef.current) {
-      recordedCameraVideoRef.current.playbackRate = rate;
-    }
-    if (importedAudioRef.current) {
-      importedAudioRef.current.playbackRate = rate;
-    }
-  };
-
-  useEffect(() => {
-    if (editorVideoRef.current) editorVideoRef.current.playbackRate = playbackRate;
-    if (recordedCameraVideoRef.current) recordedCameraVideoRef.current.playbackRate = playbackRate;
-    if (importedAudioRef.current) importedAudioRef.current.playbackRate = playbackRate;
-  }, [playbackRate, videoSrc, cameraSrc, importedAudio]);
-
-  // Audio property updates sync
-  useEffect(() => {
-    const audio = importedAudioRef.current;
-    if (!audio || !importedAudio) return;
-    audio.volume = importedAudio.muted ? 0 : importedAudio.volume;
-    audio.muted = importedAudio.muted;
-    audio.playbackRate = playbackRate;
-  }, [importedAudio, playbackRate]);
-
-  // Video looping inside trim & clip boundaries
+  // Video looping inside trim boundaries
   useEffect(() => {
     const video = editorVideoRef.current;
     if (!video) return;
 
     const handleLoopCheck = () => {
       const cur = video.currentTime;
-      if (clips && clips.length > 0) {
-        const currentClip = clips.find((c) => cur >= c.start && cur < c.end - 0.02);
-        if (!currentClip) {
-          const nextClip = clips.find((c) => c.start > cur);
-          if (nextClip) {
-            video.currentTime = nextClip.start;
-            if (recordedCameraVideoRef.current) recordedCameraVideoRef.current.currentTime = nextClip.start;
-            if (importedAudioRef.current && importedAudio) {
-              importedAudioRef.current.currentTime = Math.max(0, nextClip.start - importedAudio.startTime + importedAudio.trimStart);
-            }
-          } else {
-            const firstClip = clips[0];
-            const startPos = firstClip ? firstClip.start : trimStart;
-            video.currentTime = startPos;
-            if (recordedCameraVideoRef.current) recordedCameraVideoRef.current.currentTime = startPos;
-            if (importedAudioRef.current && importedAudio) {
-              importedAudioRef.current.currentTime = Math.max(0, startPos - importedAudio.startTime + importedAudio.trimStart);
-            }
-            if (!isPlaying) {
-              video.pause();
-              recordedCameraVideoRef.current?.pause();
-              importedAudioRef.current?.pause();
-            }
-          }
-        }
-      } else {
-        const end = trimEnd > 0 ? trimEnd : duration;
-        if (cur >= end) {
-          video.currentTime = trimStart;
-          if (recordedCameraVideoRef.current) recordedCameraVideoRef.current.currentTime = trimStart;
-          if (importedAudioRef.current && importedAudio) {
-            importedAudioRef.current.currentTime = Math.max(0, trimStart - importedAudio.startTime + importedAudio.trimStart);
-          }
-          if (!isPlaying) {
-            video.pause();
-            recordedCameraVideoRef.current?.pause();
-            importedAudioRef.current?.pause();
-          }
+      const end = trimEnd > 0 ? trimEnd : duration;
+      if (cur >= end) {
+        video.currentTime = trimStart;
+        if (recordedCameraVideoRef.current) recordedCameraVideoRef.current.currentTime = trimStart;
+        if (!isPlaying) {
+          video.pause();
+          recordedCameraVideoRef.current?.pause();
         }
       }
     };
@@ -746,7 +587,7 @@ function App() {
       video.removeEventListener('timeupdate', handleLoopCheck);
       video.removeEventListener('ended', handleLoopCheck);
     };
-  }, [trimStart, trimEnd, duration, isPlaying, clips, importedAudio]);
+  }, [trimStart, trimEnd, duration, isPlaying]);
 
   useEffect(() => {
     const video = editorVideoEl;
@@ -832,7 +673,6 @@ function App() {
                   setVideoSrc('');
                   setCameraSrc('');
                   setClickMoments([]);
-                  setPlaybackRate(1);
                   setShowLandingPage(true);
                   setIsRecordingModalOpen(true);
                   setCurrentTime(0);
@@ -901,12 +741,6 @@ function App() {
             recordedCameraVideoRef.current.currentTime = editorVideoRef.current.currentTime;
           }
         }}
-      />
-      <audio
-        ref={importedAudioRef}
-        src={importedAudio?.src || undefined}
-        style={{ display: 'none' }}
-        preload="auto"
       />
 
       {/* Layout Content Body */}
@@ -988,20 +822,6 @@ function App() {
                 trimStart={trimStart}
                 trimEnd={trimEnd}
                 onTrimChange={handleTrimChange}
-                playbackRate={playbackRate}
-                onPlaybackRateChange={handlePlaybackRate}
-                clips={clips}
-                selectedSegmentId={selectedSegmentId}
-                onSelectSegment={setSelectedSegmentId}
-                onCutAtPlayhead={handleCutAtPlayhead}
-                onDeleteSegment={handleDeleteSegment}
-                onResetCuts={handleResetCuts}
-                audioTrack={importedAudio}
-                onImportAudio={handleImportAudio}
-                onRemoveAudio={handleRemoveAudio}
-                onToggleAudioMute={handleToggleAudioMute}
-                onAudioVolumeChange={handleAudioVolumeChange}
-                onAudioPositionChange={handleAudioPositionChange}
               />
             </div>
           </div>
@@ -1026,8 +846,6 @@ function App() {
         duration={duration}
         trimStart={trimStart}
         trimEnd={trimEnd}
-        clips={clips}
-        importedAudio={importedAudio}
       />
 
       {/* Recording Configuration Modal */}
