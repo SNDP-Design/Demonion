@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Pause, Play, Scissors } from 'lucide-react';
+import { Pause, Play, Scissors, ZoomIn } from 'lucide-react';
+import type { ClickMoment } from '../types';
 
 interface TimelineProps {
   duration: number;
@@ -10,6 +11,11 @@ interface TimelineProps {
   trimStart: number;
   trimEnd: number;
   onTrimChange: (start: number, end: number) => void;
+  clickMoments?: ClickMoment[];
+  onUpdateClickMomentTime?: (index: number, newTime: number) => void;
+  onAddClickMoment?: (moment: ClickMoment) => void;
+  onDeleteClickMoment?: (index: number) => void;
+  autoZoomEnabled?: boolean;
 }
 
 export const Timeline: React.FC<TimelineProps> = ({
@@ -21,9 +27,15 @@ export const Timeline: React.FC<TimelineProps> = ({
   trimStart,
   trimEnd,
   onTrimChange,
+  clickMoments = [],
+  onUpdateClickMomentTime,
+  onAddClickMoment,
+  onDeleteClickMoment,
+  autoZoomEnabled = true,
 }) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const [draggingItem, setDraggingItem] = useState<'playhead' | 'trim-start' | 'trim-end' | null>(null);
+  const [draggingZoomIndex, setDraggingZoomIndex] = useState<number | null>(null);
 
   const endTime = trimEnd > 0 ? trimEnd : duration;
 
@@ -35,35 +47,50 @@ export const Timeline: React.FC<TimelineProps> = ({
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${tenths}`;
   };
 
-  const updateFromPointer = useCallback((clientX: number, activeItem = draggingItem) => {
+  const updateFromPointer = useCallback((clientX: number, activeItem = draggingItem, zoomIdx = draggingZoomIndex) => {
     if (!trackRef.current || duration <= 0) return;
     const rect = trackRef.current.getBoundingClientRect();
     const targetTime = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) * duration;
 
-    if (activeItem === 'trim-start') {
+    if (zoomIdx !== null && onUpdateClickMomentTime) {
+      const clampedTime = Math.max(0, Math.min(duration, targetTime));
+      onUpdateClickMomentTime(zoomIdx, clampedTime);
+      onTimeUpdate(clampedTime);
+    } else if (activeItem === 'trim-start') {
       onTrimChange(Math.min(targetTime, endTime - 0.2), endTime);
     } else if (activeItem === 'trim-end') {
       onTrimChange(trimStart, Math.max(targetTime, trimStart + 0.2));
     } else {
       onTimeUpdate(targetTime);
     }
-  }, [draggingItem, duration, endTime, onTimeUpdate, onTrimChange, trimStart]);
+  }, [draggingItem, draggingZoomIndex, duration, endTime, onTimeUpdate, onTrimChange, trimStart, onUpdateClickMomentTime]);
 
   useEffect(() => {
-    if (!draggingItem) return;
+    if (!draggingItem && draggingZoomIndex === null) return;
     const move = (event: MouseEvent) => updateFromPointer(event.clientX);
-    const up = () => setDraggingItem(null);
+    const up = () => {
+      setDraggingItem(null);
+      setDraggingZoomIndex(null);
+    };
     window.addEventListener('mousemove', move);
     window.addEventListener('mouseup', up);
     return () => {
       window.removeEventListener('mousemove', move);
       window.removeEventListener('mouseup', up);
     };
-  }, [draggingItem, updateFromPointer]);
+  }, [draggingItem, draggingZoomIndex, updateFromPointer]);
 
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
   const trimStartPercent = duration > 0 ? (trimStart / duration) * 100 : 0;
   const trimEndPercent = duration > 0 ? (endTime / duration) * 100 : 100;
+
+  const handleAddZoomAtPlayhead = () => {
+    onAddClickMoment?.({
+      time: currentTime,
+      x: 0.5,
+      y: 0.5,
+    });
+  };
 
   return (
     <section className="video-editor" aria-label="Video editing controls">
@@ -74,6 +101,16 @@ export const Timeline: React.FC<TimelineProps> = ({
           <span>Timeline Editor</span>
         </div>
         <div className="video-editor-actions">
+          {onAddClickMoment && (
+            <button
+              onClick={handleAddZoomAtPlayhead}
+              className="video-editor-add-zoom-btn"
+              title="Add auto-zoom click dot at playhead"
+            >
+              <ZoomIn size={12} />
+              <span>+ Zoom Dot</span>
+            </button>
+          )}
           <div className="video-editor-timecodes">
             <b>Length</b> {formatTime(endTime - trimStart)}
           </div>
@@ -112,6 +149,59 @@ export const Timeline: React.FC<TimelineProps> = ({
             {/* Cut / Inactive Regions */}
             <div className="video-editor-cut video-editor-cut-start" style={{ width: `${trimStartPercent}%` }} />
             <div className="video-editor-cut video-editor-cut-end" style={{ left: `${trimEndPercent}%`, width: `${100 - trimEndPercent}%` }} />
+
+            {/* Auto-Zoom Click Dots & Regions */}
+            {clickMoments.map((moment, index) => {
+              const dotLeft = duration > 0 ? (moment.time / duration) * 100 : 0;
+              const isDragging = draggingZoomIndex === index;
+              const isWithinActiveZoom = Math.abs(currentTime - moment.time) <= 1.5;
+              const zoomDuration = 2.0; // 2s active auto-zoom window
+              const zoomWidth = duration > 0 ? (zoomDuration / duration) * 100 : 0;
+
+              return (
+                <React.Fragment key={`${index}-${moment.time.toFixed(2)}`}>
+                  {/* Translucent 2s zoom duration tail */}
+                  <div
+                    className={`timeline-zoom-region ${isWithinActiveZoom ? 'active' : ''}`}
+                    style={{
+                      left: `${dotLeft}%`,
+                      width: `${Math.min(zoomWidth, Math.max(0, 100 - dotLeft))}%`
+                    }}
+                  />
+
+                  {/* Draggable Dot */}
+                  <div
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      setDraggingZoomIndex(index);
+                      onTimeUpdate(moment.time);
+                    }}
+                    className={`timeline-zoom-dot ${isDragging ? 'dragging' : ''} ${isWithinActiveZoom ? 'active' : ''} ${!autoZoomEnabled ? 'disabled' : ''}`}
+                    style={{ left: `${dotLeft}%` }}
+                    title={`Auto-Zoom Click at ${formatTime(moment.time)} • Drag to move`}
+                  >
+                    <span className="timeline-zoom-dot-inner" />
+                    <div className="timeline-zoom-dot-tooltip">
+                      <span>🔍 Auto-Zoom {formatTime(moment.time)}</span>
+                      {onDeleteClickMoment && clickMoments.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteClickMoment(index);
+                          }}
+                          className="timeline-zoom-dot-delete"
+                          title="Delete zoom dot"
+                          aria-label="Delete zoom dot"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </React.Fragment>
+              );
+            })}
 
             {/* Trim Handles */}
             <button

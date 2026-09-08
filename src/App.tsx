@@ -503,8 +503,34 @@ function App() {
       setDuration(dur);
       setTrimStart(0);
       setTrimEnd(dur);
+
+      // Default auto-zoom click dot if none exist yet
+      if (clickMomentsRef.current.length === 0 && dur > 0) {
+        const initialTime = Math.min(2.0, Math.max(0.5, dur * 0.25));
+        const initialMoment: ClickMoment = { time: initialTime, x: 0.5, y: 0.5 };
+        setClickMoments([initialMoment]);
+        clickMomentsRef.current = [initialMoment];
+      }
     }
   };
+
+  const handleUpdateClickMomentTime = useCallback((index: number, newTime: number) => {
+    setClickMoments((current) => {
+      if (index < 0 || index >= current.length) return current;
+      const updated = [...current];
+      updated[index] = { ...updated[index], time: newTime };
+      clickMomentsRef.current = updated;
+      return updated;
+    });
+  }, []);
+
+  const handleDeleteClickMoment = useCallback((index: number) => {
+    setClickMoments((current) => {
+      const next = current.filter((_, i) => i !== index);
+      clickMomentsRef.current = next;
+      return next;
+    });
+  }, []);
 
   const handleTogglePlay = async () => {
     const video = editorVideoRef.current;
@@ -822,6 +848,11 @@ function App() {
                 trimStart={trimStart}
                 trimEnd={trimEnd}
                 onTrimChange={handleTrimChange}
+                clickMoments={clickMoments}
+                onUpdateClickMomentTime={handleUpdateClickMomentTime}
+                onAddClickMoment={handleAddPreviewClick}
+                onDeleteClickMoment={handleDeleteClickMoment}
+                autoZoomEnabled={settings.enableAutoZoom ?? true}
               />
             </div>
           </div>

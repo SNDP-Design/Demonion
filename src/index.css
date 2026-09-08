@@ -5182,3 +5182,144 @@ aside.sidebar {
   background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
   box-shadow: 0 12px 35px rgba(139, 92, 246, 0.45) !important;
 }
+
+/* Auto-Zoom Click Dot & Region on Timeline */
+.timeline-zoom-region {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  border-radius: 4px;
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.28) 0%, rgba(14, 165, 233, 0.05) 100%);
+  border-left: 1.5px solid rgba(6, 182, 212, 0.65);
+  z-index: 4;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.timeline-zoom-region.active {
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.45) 0%, rgba(14, 165, 233, 0.12) 100%);
+  border-left-color: #38bdf8;
+}
+
+.timeline-zoom-dot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.75), 0 2px 6px rgba(0, 0, 0, 0.6);
+  cursor: grab;
+  user-select: none;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+}
+
+.timeline-zoom-dot:hover {
+  transform: translate(-50%, -50%) scale(1.22);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 1), 0 3px 10px rgba(0, 0, 0, 0.8);
+}
+
+.timeline-zoom-dot.dragging {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.3);
+  box-shadow: 0 0 22px rgba(6, 182, 212, 1), 0 4px 14px rgba(0, 0, 0, 0.9);
+  z-index: 12;
+}
+
+.timeline-zoom-dot.active {
+  border-color: #e0f2fe;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.95), 0 0 0 4px rgba(6, 182, 212, 0.3);
+}
+
+.timeline-zoom-dot.disabled {
+  opacity: 0.45;
+  filter: grayscale(0.5);
+}
+
+.timeline-zoom-dot-inner {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 4px #ffffff;
+  pointer-events: none;
+}
+
+.timeline-zoom-dot-tooltip {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(11, 6, 36, 0.95);
+  border: 1px solid rgba(6, 182, 212, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+  color: #e0f2fe;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: auto;
+  z-index: 25;
+}
+
+.timeline-zoom-dot:hover .timeline-zoom-dot-tooltip,
+.timeline-zoom-dot.dragging .timeline-zoom-dot-tooltip {
+  display: flex;
+}
+
+.timeline-zoom-dot-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.6);
+  color: #fca5a5;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 2px;
+  transition: all 0.15s ease;
+}
+
+.timeline-zoom-dot-delete:hover {
+  background: #ef4444;
+  color: #ffffff;
+  transform: scale(1.15);
+}
+
+.video-editor-add-zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 7px;
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  color: #38bdf8;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.video-editor-add-zoom-btn:hover {
+  background: rgba(6, 182, 212, 0.25);
+  border-color: rgba(6, 182, 212, 0.6);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
