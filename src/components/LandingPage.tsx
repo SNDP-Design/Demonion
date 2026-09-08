@@ -1,88 +1,13 @@
-import { useState, useRef } from 'react';
-import {
-  ArrowRight,
-  Camera,
-  Check,
-  FileText,
-  Layers3,
-  Maximize2,
-  Mic,
-  MousePointer2,
-  Scissors,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  Upload,
-  Video,
-  WandSparkles,
-} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowRight, ArrowUpRight, Camera, Check, Circle, Download, FileText, Layers3, Maximize2, Mic, MousePointer2, Pause, Play, Scissors, ShieldCheck, Sparkles, Upload, Video, WandSparkles } from 'lucide-react';
 import { DemonionLogo } from './DemonionLogo';
+import './landing.css';
 
 interface LandingPageProps {
   onOpenStudio: () => void;
   onImportVideoFile?: (file: File) => void;
   heroOnly?: boolean;
 }
-
-const previewModes = [
-  {
-    label: 'Screen only',
-    title: 'Full screen. Camera on top.',
-    copy: 'Clean walkthroughs with no background, no frame, and no distraction.',
-    icon: Maximize2,
-    className: 'screen-only',
-  },
-  {
-    label: 'Styled',
-    title: 'Polished framed demos.',
-    copy: 'Gradient backgrounds, browser frame, rounded camera, and export-ready layout.',
-    icon: Layers3,
-    className: 'polish-view',
-  },
-  {
-    label: 'Facecam',
-    title: 'Camera where it helps.',
-    copy: 'Corner camera or 5:4 side camera for more personal explainers.',
-    icon: Camera,
-    className: 'camera-view',
-  },
-];
-
-const featureRows = [
-  { icon: Video, title: 'Record browser, window, or full screen', copy: 'Capture the exact thing you want to explain, right from the browser.' },
-  { icon: Camera, title: 'Add camera without extra setup', copy: 'Use corner bubbles or left/right side camera with a clean 5:4 shape.' },
-  { icon: Mic, title: 'Control voice with the camera', copy: 'Hide the camera when you want a silent export, or keep it visible with voice.' },
-  { icon: Maximize2, title: 'Screen + Camera Only mode', copy: 'Remove the background and keep the viewer focused on the real screen.' },
-  { icon: WandSparkles, title: 'Styled Background mode', copy: 'Turn raw recordings into product-ready demos with color and framing.' },
-  { icon: Scissors, title: 'Trim and export', copy: 'Cut the slow parts and download a finished video in a clean format.' },
-];
-
-const stats = [
-  ['16:9', 'Standard widescreen output'],
-  ['5:4', 'Side facecam ratio'],
-  ['4K', 'High quality export'],
-  ['Free', 'Browser based workflow'],
-];
-
-const useCases = [
-  ['Product demos', 'Show a new feature with a polished frame.'],
-  ['Tutorials', 'Keep the full screen visible for step-by-step teaching.'],
-  ['Client updates', 'Send a clear walkthrough instead of scheduling another meeting.'],
-  ['Support videos', 'Record the fix once and reuse it.'],
-];
-
-const testimonials = [
-  ['This makes my walkthroughs feel cleaner before I even export.', 'Founder'],
-  ['The screen-only mode is perfect for tutorials where every edge matters.', 'Designer'],
-  ['I can record, trim, and send a client update without opening another tool.', 'Product lead'],
-];
-
-const faqs = [
-  ['Is it free to start?', 'Yes. The current workflow runs in your browser without a paid tool.'],
-  ['Can I hide the camera?', 'Yes. Choose Hide camera in Facecam Overlay. The export will also remove voice audio.'],
-  ['Can I remove the background?', 'Yes. Choose Screen + Camera in Video Layout.'],
-  ['Can I make it look polished?', 'Yes. Choose Styled Background and adjust camera, padding, and background.'],
-];
 
 type LegalPageKey = 'terms' | 'privacy';
 
@@ -141,423 +66,96 @@ const legalPages: Record<LegalPageKey, {
   },
 };
 
+
+const questions = [
+  ['Do I need to install anything?', 'No. Open the studio in your browser to record your screen, camera, and voice. Screen capture support depends on your browser and device; a desktop browser works best.'],
+  ['Is Demonion really free?', 'Yes. Record, style, trim, and export without a subscription or an account.'],
+  ['Where do my recordings go?', 'Your recordings are processed locally in your browser. Export the finished video directly to your device.'],
+  ['Can I edit a video I already have?', 'Yes. Choose Import video to open an existing video in the editor, then style, trim, and export it.'],
+  ['Can I record without my camera?', 'Yes. Turn off Camera Overlay before recording. In the editor, Hide camera also removes voice audio from the export.'],
+];
+const palettes = [
+  { name: 'Violet', color: 'linear-gradient(135deg, #3d228a, #9464ed 55%, #e4bfff)' },
+  { name: 'Midnight', color: 'linear-gradient(135deg, #08051b, #322060 60%, #6e4bb0)' },
+  { name: 'Rose', color: 'linear-gradient(135deg, #57309d, #ba69bd 60%, #f3cbec)' },
+];
+
 export const LandingPage: React.FC<LandingPageProps> = ({ onOpenStudio, onImportVideoFile, heroOnly = false }) => {
+  const rootRef = useRef<HTMLElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [activeMode, setActiveMode] = useState(0);
-  const [activeBgPreset, setActiveBgPreset] = useState('nebula');
-  const [activeCamShape, setActiveCamShape] = useState<'circle' | 'rounded'>('rounded');
-  const [activeCamPos, setActiveCamPos] = useState<'bottom-right' | 'top-right' | 'side-right'>('bottom-right');
+  const [palette, setPalette] = useState(0);
+  const [layout, setLayout] = useState('Styled');
+  const [playing, setPlaying] = useState(true);
   const [currentLegalPage, setCurrentLegalPage] = useState<LegalPageKey | null>(() => {
-    const path = window.location.pathname;
-    const hash = window.location.hash;
-    if (path === '/terms' || hash === '#terms') return 'terms';
-    if (path === '/privacy' || hash === '#privacy') return 'privacy';
-    return null;
+    const route = window.location.pathname.replace('/', '') || window.location.hash.replace('#', '');
+    return route === 'terms' || route === 'privacy' ? route : null;
   });
-
-  const active = previewModes[activeMode];
-  const ActiveIcon = active.icon;
-
-  const handlePointerMove = (e: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>) => {
-    const card = e.currentTarget;
-    const rect = card.getBoundingClientRect();
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
-    card.setAttribute('data-active', 'true');
+  const navigateLegal = (page: LegalPageKey | null) => {
+    setCurrentLegalPage(page);
+    window.history.pushState(null, '', page ? `/${page}` : '/');
+    document.querySelector('.landing-scroll-container')?.scrollTo({ top: 0 });
   };
-
-  if (currentLegalPage) {
-    return (
-      <main className="monza-landing" id="home">
-        <LegalPage pageKey={currentLegalPage} onBackToHome={() => setCurrentLegalPage(null)} />
-        <Footer onNavigateLegal={(key) => setCurrentLegalPage(key)} onBackToHome={() => setCurrentLegalPage(null)} />
-      </main>
-    );
-  }
-
-  const bgGradientMap: Record<string, string> = {
-    sunset: 'linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%)',
-    cyberpunk: 'linear-gradient(135deg, #a855f7 0%, #06b6d4 100%)',
-    aurora: 'linear-gradient(135deg, #10b981 0%, #06b6d4 50%, #3b82f6 100%)',
-    nebula: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #db2777 100%)',
-  };
-
+  useEffect(() => {
+    const syncRoute = () => {
+      const route = window.location.pathname.replace('/', '') || window.location.hash.replace('#', '');
+      setCurrentLegalPage(route === 'terms' || route === 'privacy' ? route : null);
+    };
+    window.addEventListener('popstate', syncRoute);
+    return () => window.removeEventListener('popstate', syncRoute);
+  }, []);
+  useEffect(() => {
+    const nodes = rootRef.current?.querySelectorAll('.dm-reveal');
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+    }), { threshold: 0.08 });
+    nodes?.forEach(node => observer.observe(node));
+    return () => observer.disconnect();
+  }, [currentLegalPage]);
+  if (currentLegalPage) return <main className="monza-landing dm-legal"><LegalPage pageKey={currentLegalPage} onBackToHome={() => navigateLegal(null)} /><Footer onNavigateLegal={navigateLegal} onBackToHome={() => navigateLegal(null)} /></main>;
   return (
-    <main className={`monza-landing ${heroOnly ? 'hero-only-landing' : ''}`} id="home">
-      {/* Framer Dotted Grid Backdrop */}
-      <div className="framer-grid-overlay" />
-
-      {/* Framer Aurora Glowing Circles */}
-      <div className="framer-glow-bg">
-        <div className="framer-glow-circle framer-glow-1" />
-        <div className="framer-glow-circle framer-glow-2" />
-        <div className="framer-glow-circle framer-glow-3" />
-      </div>
-
-      <section className="monza-hero">
-        <div className="monza-badge"><Sparkles size={14} /> Screen recording studio for clear demos</div>
-        <h1>
-          <span>Turn screen recordings into</span>
-          <span>polished product demos</span>
-        </h1>
-        <p>
-          Demonion records your screen, camera, and voice, then helps you choose the
-          right layout for tutorials, demos, updates, and support videos.
-        </p>
-        <div className="monza-actions">
-          <button onClick={onOpenStudio} className="framer-primary">
-            <Video size={16} /> Start Web Recording <ArrowRight size={17} />
-          </button>
-          {onImportVideoFile && (
-            <>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="video/*"
-                style={{ display: 'none' }}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) onImportVideoFile(file);
-                }}
-              />
-              <button onClick={() => fileInputRef.current?.click()} className="monza-secondary" title="Open native recording (.mp4/.mov) or existing video file">
-                <Upload size={15} /> Open Native Recording
-              </button>
-            </>
-          )}
-          {!heroOnly && (
-            <a href="#features" className="monza-secondary">
-              Explore features <ArrowRight size={15} />
-            </a>
-          )}
-        </div>
-        <div className="monza-proof">
-          <span><Check size={13} /> Screen + camera</span>
-          <span><Check size={13} /> 16:9 output</span>
-          <span><Check size={13} /> 4K export</span>
-        </div>
+    <main ref={rootRef} className={`dm-site ${playing ? '' : 'dm-paused'} ${heroOnly ? 'dm-desktop' : ''}`} id="home">
+      <section className="dm-hero">
+        <div className="dm-orbit dm-orbit-one" aria-hidden="true" /><div className="dm-orbit dm-orbit-two" aria-hidden="true" />
+        <div className="dm-eyebrow"><span className="dm-status" /> YOUR SCREEN. A LITTLE MORE CINEMATIC.</div>
+        <h1>Good ideas deserve<br /><span>a great demo.</span><Sparkles className="dm-title-spark" aria-hidden="true" /></h1>
+        <p>Turn everyday screen recordings into something worth watching.<br className="dm-desktop-break" /> Record, add your style, and make your next big idea click.</p>
+        <div className="dm-actions"><button className="dm-button" onClick={onOpenStudio}><Video size={18} /> Start creating — it’s free <ArrowUpRight size={19} /></button>{onImportVideoFile && <button className="dm-button dm-button-quiet" onClick={() => fileInputRef.current?.click()}><Upload size={17} /> Import video</button>}</div>
+        <input hidden type="file" accept="video/*" ref={fileInputRef} onChange={event => { const file = event.target.files?.[0]; if (file) onImportVideoFile?.(file); event.target.value = ''; }} />
+        <div className="dm-proof"><span><Check size={13} /> No sign-up</span><span><Check size={13} /> No watermarks</span><span><ShieldCheck size={13} /> Stays on your device</span></div>
       </section>
 
-      {/* Interactive Framer Studio Preview Shell */}
-      <section 
-        className="monza-preview-shell" 
-        aria-label="Interactive Demonion preview"
-        onMouseMove={handlePointerMove}
-        onTouchStart={handlePointerMove}
-        onTouchMove={handlePointerMove}
-      >
-        <div className="monza-preview-top">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><DemonionLogo size={22} /><b>Demonion Studio Interactive Demo</b></div>
-          <div className="monza-interactive-badge">
-            <span className="live-pulse-dot" /> Try changing controls below
+      <section className="dm-playground" aria-label="Interactive style preview" id="playground">
+        <div className="dm-float dm-float-record"><span className="dm-status" /> A little polish. A big difference.</div>
+        <div className="dm-preview-top"><span><DemonionLogo size={20} /> The demo before your demo</span><span className="dm-preview-label">INTERACTIVE PREVIEW <span className="dm-status" /></span></div>
+        <div className={`dm-stage dm-layout-${layout.toLowerCase()}`} style={{ background: palettes[palette].color }}>
+          <div className="dm-demo-window">
+            <div className="dm-window-bar"><span>● ● ●</span><span>your-next-big-idea.app</span><Maximize2 size={12} /></div>
+            <div className="dm-demo-content"><aside><div className="dm-demo-mark">a<span>✳</span></div><i /><i /><i /><i /><div className="dm-sidebar-bottom" /></aside>
+              <div className="dm-dashboard"><div className="dm-dash-heading"><div><small>WORKSPACE / OVERVIEW</small><h3>Make room for big ideas.</h3></div><span className="dm-avatar">J</span></div><div className="dm-metric-row"><div><small>Total views</small><b>24,890 <em>↗ 18.6%</em></b></div><div><small>Engagement</small><b>86.4% <em>↗ 12.2%</em></b></div></div><div className="dm-chart"><div><span>Audience growth</span><small>This month ↗</small></div><svg viewBox="0 0 600 145" preserveAspectRatio="none" aria-label="Illustrative audience growth chart"><defs><linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#a583ff" stopOpacity=".4" /><stop offset="1" stopColor="#a583ff" stopOpacity="0" /></linearGradient></defs><path d="M0 125 C35 125 40 100 75 105 S125 65 165 80 S225 110 260 65 S315 80 355 45 S405 65 450 30 S520 50 600 5 L600 145 L0 145Z" fill="url(#chart-fill)" /><path className="dm-chart-line" d="M0 125 C35 125 40 100 75 105 S125 65 165 80 S225 110 260 65 S315 80 355 45 S405 65 450 30 S520 50 600 5" fill="none" stroke="#b99cff" strokeWidth="3" /></svg><div className="dm-chart-dates"><small>01 JUN</small><small>15 JUN</small><small>30 JUN</small></div></div></div>
+            </div>
           </div>
+          <div className="dm-facecam" aria-label="Illustrated camera overlay"><div className="dm-person"><div className="dm-person-hair" /><div className="dm-person-face" /><div className="dm-person-body" /></div><span><Mic size={10} /> Your story, your voice</span></div>
+          <div className="dm-preview-cursor" aria-hidden="true"><MousePointer2 size={25} fill="#f0dfff" /><span>You, but polished</span></div>
         </div>
-        <div className="monza-preview-grid">
-          <div 
-            className={`monza-stage ${active.className}`}
-            style={activeMode === 1 ? { background: bgGradientMap[activeBgPreset] } : undefined}
-          >
-            <div className="monza-screen">
-              <div className="monza-browser"><i /><i /><i /><span>demo-recording.mp4</span></div>
-              <div className="monza-screen-content">
-                <aside><i /><i /><i /><i /></aside>
-                <div>
-                  <ActiveIcon size={28} />
-                  <b>{active.title}</b>
-                  <p>{active.copy}</p>
-                  <span className="monza-cursor"><MousePointer2 size={14} /></span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Interactive Camera Bubble */}
-            {activeMode !== 0 && (
-              <div 
-                className={`monza-camera ${activeCamShape} pos-${activeCamPos}`}
-              >
-                CAM
-              </div>
-            )}
-
-            <div className="monza-timeline"><i /><i /><i /><i /><b /></div>
-          </div>
-
-          <div className="monza-mode-list">
-            <div className="monza-control-group-title">Layout Mode</div>
-            {previewModes.map((mode, index) => (
-              <button key={mode.label} onClick={() => setActiveMode(index)} className={activeMode === index ? 'active' : ''}>
-                <mode.icon size={17} />
-                <span>{mode.label}</span>
-              </button>
-            ))}
-
-            {activeMode === 1 && (
-              <>
-                <div className="monza-control-group-title" style={{ marginTop: '16px' }}>Canvas Preset</div>
-                <div className="monza-preset-chips">
-                  {Object.keys(bgGradientMap).map((presetKey) => (
-                    <button
-                      key={presetKey}
-                      onClick={() => setActiveBgPreset(presetKey)}
-                      className={`preset-chip ${activeBgPreset === presetKey ? 'active' : ''}`}
-                      style={{ background: bgGradientMap[presetKey] }}
-                      title={presetKey}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-
-            <div className="monza-control-group-title" style={{ marginTop: '16px' }}>Camera Style & Position</div>
-            <div className="monza-cam-style-row">
-              <button
-                onClick={() => setActiveCamShape('circle')}
-                className={`cam-style-btn ${activeCamShape === 'circle' ? 'active' : ''}`}
-              >
-                Circle
-              </button>
-              <button
-                onClick={() => setActiveCamShape('rounded')}
-                className={`cam-style-btn ${activeCamShape === 'rounded' ? 'active' : ''}`}
-              >
-                Rounded
-              </button>
-            </div>
-            <div className="monza-cam-style-row" style={{ marginTop: '8px' }}>
-              <button
-                onClick={() => setActiveCamPos('bottom-right')}
-                className={`cam-style-btn ${activeCamPos === 'bottom-right' ? 'active' : ''}`}
-              >
-                Bottom Right
-              </button>
-              <button
-                onClick={() => setActiveCamPos('top-right')}
-                className={`cam-style-btn ${activeCamPos === 'top-right' ? 'active' : ''}`}
-              >
-                Top Right
-              </button>
-              <button
-                onClick={() => setActiveCamPos('side-right')}
-                className={`cam-style-btn ${activeCamPos === 'side-right' ? 'active' : ''}`}
-              >
-                Side 5:4
-              </button>
-            </div>
-          </div>
-        </div>
+        <div className="dm-preview-controls"><div className="dm-layout-switch" aria-label="Preview layout">{['Styled', 'Minimal', 'Sidecam'].map(name => <button key={name} aria-pressed={layout === name} className={layout === name ? 'selected' : ''} onClick={() => setLayout(name)}>{name}</button>)}</div><div className="dm-swatches"><span>Make it yours</span>{palettes.map((item, i) => <button key={item.name} aria-label={`${item.name} background`} aria-pressed={palette === i} className={palette === i ? 'selected' : ''} style={{ background: item.color }} onClick={() => setPalette(i)} />)}</div><button className="dm-motion-button" aria-label={playing ? 'Pause animations' : 'Play animations'} onClick={() => setPlaying(!playing)}>{playing ? <Pause size={15} /> : <Play size={15} />}</button></div>
+        <div className="dm-preview-caption"><span>Not a video. Go ahead, play with it.</span><ArrowUpRight size={15} /></div>
       </section>
-
-      {!heroOnly && (
-        <>
-          {/* Infinite Framer Ticker Marquee Band */}
-          <section className="framer-marquee-ribbon" aria-label="Feature highlights">
-            <div className="framer-marquee-track">
-              {[
-                '⚡ 4K Ultra HD Export',
-                '🎥 Screen & Camera Overlay',
-                '🎨 Framed & Styled Backgrounds',
-                '✂️ Precise Video Trimming',
-                '🔒 100% Local & Private Processing',
-                '🚀 Zero Installation Needed',
-                '⚡ 4K Ultra HD Export',
-                '🎥 Screen & Camera Overlay',
-                '🎨 Framed & Styled Backgrounds',
-                '✂️ Precise Video Trimming',
-                '🔒 100% Local & Private Processing',
-                '🚀 Zero Installation Needed',
-              ].map((item, i) => (
-                <div key={i} className="framer-marquee-badge">
-                  {item}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="monza-logos" aria-label="Demonion use cases">
-            <span>For founders</span>
-            <span>For designers</span>
-            <span>For educators</span>
-            <span>For support teams</span>
-            <span>For product teams</span>
-          </section>
-
-          <section className="monza-section" id="features">
-            <div className="monza-section-heading">
-              <span className="framer-kicker">Features</span>
-              <h3>Everything you need to make a clear walkthrough.</h3>
-              <p>Record, style, trim, and export without jumping between multiple tools.</p>
-            </div>
-            <div className="monza-feature-grid">
-              {featureRows.map((feature) => (
-                <article 
-                  key={feature.title}
-                  onMouseMove={handlePointerMove}
-                  onTouchStart={handlePointerMove}
-                  onTouchMove={handlePointerMove}
-                >
-                  <feature.icon size={22} />
-                  <h4>{feature.title}</h4>
-                  <p>{feature.copy}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="monza-band" id="how-it-works">
-            <div className="monza-band-heading">
-              <span className="framer-kicker">Workflow</span>
-              <h3>Three steps from idea to export.</h3>
-            </div>
-            <div className="monza-steps">
-              <div>
-                <span className="monza-step-num">01</span>
-                <h4>Record</h4>
-                <p>Pick screen + camera layout or full screen focus.</p>
-              </div>
-              <div>
-                <span className="monza-step-num">02</span>
-                <h4>Style</h4>
-                <p>Adjust padding, background color, framing, and camera shape.</p>
-              </div>
-              <div>
-                <span className="monza-step-num">03</span>
-                <h4>Export</h4>
-                <p>Trim slow starts and save a high quality video file.</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="monza-layouts">
-            <div className="monza-section-heading">
-              <span className="framer-kicker">Presets</span>
-              <h3>Built for every type of video.</h3>
-            </div>
-            <div className="monza-layout-cards">
-              <article>
-                <div className="monza-mini-stage mini-screen-only">
-                  <div className="monza-mini-screen" />
-                  <div className="monza-mini-cam" />
-                </div>
-                <h4>Screen + Camera Only</h4>
-                <p>No padding, no background. Maximum focus on the application interface.</p>
-              </article>
-              <article>
-                <div className="monza-mini-stage mini-styled">
-                  <div className="monza-mini-screen" />
-                  <div className="monza-mini-cam" />
-                </div>
-                <h4>Styled Background</h4>
-                <p>Framed browser card with gradient or solid background for marketing demos.</p>
-              </article>
-              <article>
-                <div className="monza-mini-stage mini-sidecam">
-                  <div className="monza-mini-sidecam-box" />
-                  <div className="monza-mini-screen" />
-                </div>
-                <h4>5:4 Side Camera</h4>
-                <p>Dedicated side-by-side camera view for structured video courses.</p>
-              </article>
-            </div>
-          </section>
-
-          <section className="monza-stats">
-            {stats.map(([num, label]) => (
-              <div key={num} className="monza-stat">
-                <strong>{num}</strong>
-                <span>{label}</span>
-              </div>
-            ))}
-          </section>
-
-          <section className="monza-split" id="use-cases">
-            <div>
-              <span className="framer-kicker">Use Cases</span>
-              <h3>Who uses Demonion?</h3>
-              <p>Designed for anyone who needs to explain software clearly.</p>
-            </div>
-            <div className="monza-usecase-grid">
-              {useCases.map(([title, desc]) => (
-                <div key={title}>
-                  <h4>{title}</h4>
-                  <p>{desc}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="monza-testimonials">
-            <div className="monza-section-heading">
-              <span className="framer-kicker">Feedback</span>
-              <h3>What creators say</h3>
-            </div>
-            <div className="monza-testimonial-grid">
-              {testimonials.map(([quote, role], i) => (
-                <div key={i} className="monza-testimonial-card">
-                  <div className="monza-stars">
-                    {[...Array(5)].map((_, idx) => (
-                      <Star key={idx} size={14} fill="#f59e0b" color="#f59e0b" />
-                    ))}
-                  </div>
-                  <p>"{quote}"</p>
-                  <span>— {role}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="monza-free-plan">
-            <div className="monza-free-plan-card">
-              <div className="monza-free-plan-header">
-                <span className="framer-kicker">Pricing</span>
-                <h3>100% Free & Local</h3>
-                <p>Everything runs in your browser. No sign up, no watermarks, no limits.</p>
-              </div>
-              <div className="monza-free-plan-features">
-                <div><Check size={16} /> Unlimited recording length</div>
-                <div><Check size={16} /> Up to 4K resolution export</div>
-                <div><Check size={16} /> Camera overlay & side-by-side mode</div>
-                <div><Check size={16} /> Custom gradient backgrounds</div>
-                <div><Check size={16} /> Built-in video trimming</div>
-                <div><Check size={16} /> 100% private local processing</div>
-              </div>
-              <button onClick={onOpenStudio} className="framer-primary">
-                <Video size={16} /> Open Studio Now <ArrowRight size={17} />
-              </button>
-            </div>
-          </section>
-
-          <section className="monza-faq">
-            <div className="monza-section-heading">
-              <span className="framer-kicker">FAQ</span>
-              <h3>Frequently asked questions</h3>
-            </div>
-            <div className="monza-faq-list">
-              {faqs.map(([q, a]) => (
-                <details key={q}>
-                  <summary>{q}</summary>
-                  <p>{a}</p>
-                </details>
-              ))}
-            </div>
-          </section>
-
-          <section className="monza-final" id="ready">
-            <div className="monza-final-card">
-              <h3>Start recording your next demo now.</h3>
-              <p>No downloads or account required. Launch the studio in your browser.</p>
-              <button onClick={onOpenStudio} className="framer-primary">
-                <Video size={16} /> Open Demonion Studio <ArrowRight size={17} />
-              </button>
-            </div>
-          </section>
-
-          <Footer />
-        </>
-      )}
+      {!heroOnly && <>
+      <div className="dm-audience"><span>BIG IDEAS COME FROM EVERYWHERE.</span><div><b>Independent makers</b><i>✳</i><b>Product teams</b><i>✳</i><b>Designers</b><i>✳</i><b>Educators</b></div></div>
+      <section className="dm-section dm-reveal" id="features"><div className="dm-section-heading"><span className="dm-eyebrow">LESS FRICTION. MORE CREATION.</span><h2>Everything you need.<br /><span>Nothing in your way.</span></h2><p>From “let me show you” to “just sent it.”<br />One simple studio for the whole story.</p></div>
+      <div className="dm-bento">
+        <article className="dm-feature dm-feature-wide"><div className="dm-feature-copy"><span className="dm-icon"><Video size={20} /></span><h3>Capture the good stuff.</h3><p>Your screen, your face, your voice.<br />Bring the whole explanation together.</p></div><div className="dm-capture-art" aria-hidden="true"><div className="dm-capture-rings"><div /><div /><Video size={42} /></div><div className="dm-record-bar"><span className="dm-status" /> REC <b>00:24</b><div className="dm-wave">{Array.from({length: 17}, (_, i) => <i key={i} style={{ animationDelay: `${i * .12}s`, height: `${8 + (i * 7 % 19)}px` }} />)}</div><Mic size={15} /><Camera size={15} /></div><span className="dm-art-note">All together. Beautifully.</span></div></article>
+        <article className="dm-feature"><div className="dm-style-art" aria-hidden="true"><div /><div /><div><WandSparkles size={32} /></div></div><span className="dm-icon"><Layers3 size={20} /></span><h3>A look that’s all you.</h3><p>Rich backgrounds, clean frames, and a camera layout that fits your story.</p></article>
+        <article className="dm-feature"><div className="dm-timeline-art" aria-hidden="true"><div className="dm-time-labels"><span>00:00</span><span>00:15</span><span>00:30</span></div><div className="dm-filmstrip">{Array.from({length: 8}, (_, i) => <i key={i} />)}</div><div className="dm-audio-track" /><div className="dm-playhead" /><Scissors size={20} /></div><span className="dm-icon"><Scissors size={20} /></span><h3>Get to the best part.</h3><p>Trim the slow start. Cut the extra seconds. Keep the moments that matter.</p></article>
+        <article className="dm-feature dm-feature-wide dm-export-feature"><div className="dm-feature-copy"><span className="dm-icon"><Download size={20} /></span><h3>Big-screen energy.<br />Ready to share.</h3><p>Export up to 4K. No watermark.<br />Just your work, looking its best.</p></div><div className="dm-export-art" aria-hidden="true"><div className="dm-export-disc">4K<small>MADE TO BE SEEN</small></div><div className="dm-export-pill"><Check size={14} /> Looking sharp.</div></div></article>
+      </div></section>
+      <section className="dm-workflow dm-section dm-reveal" id="how-it-works"><div className="dm-section-heading"><span className="dm-eyebrow">FROM FIRST TAKE TO FINAL FILE</span><h2>Three steps.<br /><span>That’s the whole production.</span></h2></div><div className="dm-steps">{[{icon: Circle, title:'Hit record.', copy:'Choose a screen, window, or tab. Add your camera and talk it through.'},{icon: Sparkles,title:'Find your look.',copy:'Pick a background, frame your camera, and trim things down.'},{icon: ArrowUpRight,title:'Send it out.',copy:'Export to your device. Share your demo wherever your audience is.'}].map((step,i)=><article key={step.title}><span className="dm-step-count">0{i+1}</span><div className="dm-step-icon"><step.icon size={25}/></div><h3>{step.title}</h3><p>{step.copy}</p></article>)}</div></section>
+      <section className="dm-section dm-usecases dm-reveal" id="use-cases"><div><span className="dm-eyebrow">SHOW. DON’T JUST TELL.</span><h2>A better way<br />to get it across.</h2><p>Less explaining in paragraphs.<br />More “oh, I get it now.”</p><a href="#playground" className="dm-text-link">Find your style <ArrowRight size={17}/></a></div><div className="dm-usecase-list">{[['01','Launch the thing','Product walkthroughs that put your hard work in the spotlight.'],['02','Teach the shortcut','Step-by-step tutorials with you right there in the frame.'],['03','Skip the meeting','Clear client updates they can watch on their own time.'],['04','Show the solution','Support videos that make the next step obvious.']].map(([n,title,copy])=><article key={n}><span>{n}</span><div><h3>{title}</h3><p>{copy}</p></div><ArrowUpRight size={22}/></article>)}</div></section>
+      <section className="dm-private dm-section dm-reveal"><div className="dm-privacy-orbit" aria-hidden="true"><div /><div /><ShieldCheck size={42}/></div><div><span className="dm-eyebrow">YOUR WORK STAYS YOURS</span><h2>On your device.<br /><span>Off everyone else’s server.</span></h2><p>Your recordings are processed right in your browser.<br />No uploads. No account. A little peace of mind, built in.</p></div></section>
+      <section className="dm-section dm-faq dm-reveal"><div><span className="dm-eyebrow">GOOD QUESTIONS</span><h2>A few things<br />worth knowing.</h2></div><div>{questions.map(([q,a])=><details key={q}><summary>{q}<span>+</span></summary><p>{a}</p></details>)}</div></section>
+      <section className="dm-final dm-reveal" id="ready"><div className="dm-final-halo" aria-hidden="true"/><span className="dm-eyebrow">FREE TO USE. READY WHEN YOU ARE.</span><h2>Your next great demo<br /><span>starts with a click.</span></h2><button className="dm-button" onClick={onOpenStudio}>Let’s make something <ArrowUpRight size={19}/></button><p>No subscription. Just hit record.</p></section>
+      <Footer onNavigateLegal={navigateLegal} onBackToHome={() => { navigateLegal(null); document.querySelector('.landing-scroll-container')?.scrollTo({top: 0, behavior: 'smooth'}); }} />
+      </>}
     </main>
   );
 };
